@@ -7,7 +7,7 @@
 
 ## COSC 4P02 Team Project
 
-This is a course project for COSC 4P02 Software Engineering II taught by Professor Naser Ezzati-Jivan at Brock University. 
+This is a course project for COSC 4P02 Software Engineering II taught by Professor Naser Ezzati-Jivan at Brock University.
 
 View our project documents in the [documents](documents) folder.
 
@@ -20,36 +20,41 @@ View our project documents in the [documents](documents) folder.
 
 Alternatively, you can clone the repository and run it locally:
 
-1. Install [Node.js](https://nodejs.org/en) and npm if you don't already have these installed
-2. Clone the repository:
-
+1. Ensure [Node.js](https://nodejs.org/en) and npm are installed
+2. Ensure [Supabase is installed and running locally](https://supabase.com/docs/guides/self-hosting)
+3. Clone the repository:
 ```bash
 git clone https://github.com/SWE-2023/COSC-4P02-Project.git
 ```
-3. Change directory to the `timeline` directory within the repo
 
+4. Change directory to the `timeline` directory within the repo
 ```bash
 cd COSC-4P02-Project\timeline
 ```
 
-4. Install the project dependencies:
-
+5. Install the project dependencies:
 ```bash
 npm install
 ```
 
-5. Run the project in the local dev server:
+6. Configure environment variables by creating a `.env` file alongside `vite.config.js`:
+```ini
+VITE_SUPABASE_URL=http://localhost:8000/
+VITE_SUPABASE_ANON_KEY=the_key_that_you_setup_from_the_supabase_guide
+```
+
+7. Connect to the supabase web UI and create the necessary tables by manually applying the `0_init_tables.sql` migration, and optionally setup access permissions at http://localhost:3000/
+
+8. Run the project in the local dev server:
 
 ```bash
 npx vite
 ```
 
-6. Press 'O' on the terminal or CTRL+Click the local URL provided by Vite.
-
-This will open the locally-served web application in your browser.
+9. Press 'O' on the terminal or CTRL+Click the local URL provided by Vite to open the locally-served web application in your browser.
 
 ## Project Description 📝
-The goal of this project is to create an interactive timeline web application that will allow visitors to explore the history of Niagara-on-the-Lake. 
+The goal of this project is to create an interactive timeline web application that will allow visitors to explore the history of Niagara-on-the-Lake.
 
 ## Technology Stack
 
