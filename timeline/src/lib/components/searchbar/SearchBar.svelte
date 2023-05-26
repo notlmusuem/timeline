@@ -35,7 +35,7 @@
   }
 
   function handleShortcut(event) {
-    if (event.key == "/" && !event.target.closest("input")) {
+    if ((event.key == "/" || event.key == "?") && !event.target.closest("input")) {
       event.preventDefault();
       document.querySelector("html").scrollTo(0, 0);
       document.querySelector("input").focus();
