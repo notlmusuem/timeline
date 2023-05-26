@@ -19,6 +19,7 @@
   const handleLogin = async () => {
     loading = true;
     await login_pw(email, password);
+    navigation.goto("/");
     loading = false;
   };
 </script>
@@ -31,7 +32,7 @@
 <PageTransition>
   <div class="login-container">
     {#if user && user.email}
-      <h1>You are already logged in!</h1>
+      <h1>You are logged in!</h1>
       <p>Click the button below to log out</p>
       <div class="form">
         <div class="form-buttons">
