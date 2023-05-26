@@ -21,32 +21,37 @@ View our project documents in the [documents](documents) folder.
 Alternatively, you can clone the repository and run it locally:
 
 1. Ensure [Node.js](https://nodejs.org/en) and npm are installed
-2. Ensure [Supabase is installed and running locally](https://supabase.com/docs/guides/self-hosting)
-3. Clone the repository:
+2. Clone the repository:
 ```bash
-git clone https://github.com/SWE-2023/COSC-4P02-Project.git
+git clone https://github.com/notlmusuem/timeline.git
+cd timeline\timeline
 ```
 
-4. Change directory to the `timeline` directory within the repo
-```bash
-cd COSC-4P02-Project\timeline
-```
-
-5. Install the project dependencies:
+3. Install npm dependencies and development dependencies:
 ```bash
 npm install
 ```
 
-6. Configure environment variables by creating a `.env` file alongside `vite.config.js`:
+4. Configure environment variables by creating a `.env` file alongside `vite.config.js`:
 ```ini
 VITE_SUPABASE_URL=http://localhost:8000/
 VITE_SUPABASE_ANON_KEY=the_key_that_you_setup_from_the_supabase_guide
 ```
 
-7. Connect to the supabase web UI and create the necessary tables by manually applying the `0_init_tables.sql` migration, and optionally setup access permissions at http://localhost:3000/
+5. [Setup supabase selfhosting](https://supabase.com/docs/guides/getting-started/local-development):
+```bash
+npx supabase init
+npx supabase start
+```
 
-8. Run the project in the local dev server:
+6. Connect to the supabase web UI and manually apply migrations, or run the migration command:
+```bash
+npx supabase db reset
+```
 
+7. On the supabase studio web UI, create a new user account for yourself, and check auto confirm. This will be the account and password used to login to the website's staff interface.
+
+8. With supabase started, run the project:
 ```bash
 npx vite
 ```
