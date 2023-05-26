@@ -1,9 +1,11 @@
 <script>
   import PageTransition from "$lib/components/PageTransitionFly.svelte";
   import Button from "$lib/components/Button.svelte";
-  import { login } from "$lib/authStore";
+  import { login_pw } from "$lib/authStore";
   import { logout } from "$lib/authStore";
   import { userStore } from "$lib/authStore";
+  import * as navigation from "$app/navigation";
+
 
   let user;
   userStore.subscribe((value) => {
@@ -13,9 +15,10 @@
   let loading = false;
 
   let email = "";
+  let password = "";
   const handleLogin = async () => {
     loading = true;
-    await login(email);
+    await login_pw(email, password);
     loading = false;
   };
 </script>
@@ -40,15 +43,21 @@
       </div>
     {:else}
       <h1>Log In</h1>
-      <p>Enter your email to receive a log in link</p>
+      <p>Enter your email and password to login.</p>
 
       <div class="form">
         <label for="email">Email</label>
         <input
-          type="email"
-          id="email"
-          bind:value={email}
-          placeholder="username@email.com" />
+        type="email"
+        id="email"
+        bind:value={email}
+        placeholder="username@email.com" />
+        <label for="email">Password</label>
+        <input
+          type="password"
+          id="password"
+          bind:value={password}
+          placeholder="password" />
 
         <div class="form-buttons">
           <div><Button text="Back" href="/" /></div>
@@ -56,7 +65,7 @@
             <Button
               alt
               on:click={handleLogin}
-              text="Send Log In Link"
+              text="Log In"
               {loading} />
           </div>
         </div>

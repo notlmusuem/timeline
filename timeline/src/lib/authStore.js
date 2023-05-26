@@ -36,6 +36,22 @@ export const login = async (email) => {
   return;
 };
 
+export const login_pw = async (email, password) => {
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    toast.push("<b>Success</b><br>Logged in");
+    return await getSessionUser();
+  } catch (error) {
+    if (error.status === 403) {
+      toast.push("<b>Error</b><br>Incorrect username or password.");
+    } else {
+      toast.push(`<b>Error!</b><br>${error.message}`);
+    }
+    return null;
+  }
+};
+
 export const logout = async () => {
   try {
     const { error } = await supabase.auth.signOut();
