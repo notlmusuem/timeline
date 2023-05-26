@@ -94,35 +94,39 @@
       if (file.size > 4 * 1024 * 1024) {
         toast.push(`<b>Error:</b><br>File size should be less than 4MB`);
         return;
-      } else {
-        const { data, error } = await supabase.storage
-          .from("images")
-          .upload(file.name, file);
-        if (error) {
-          if (error.error === "Duplicate") {
-            const imageUrl = supabase.storage
-              .from("images")
-              .getPublicUrl(file.name);
-            if (editing) {
-              editList.media = imageUrl.data["publicUrl"];
-            } else if (adding) {
-              addList.media = imageUrl.data["publicUrl"];
-            }
-          } else {
-            toast.push(
-              `<b>Error ${error.satusCode}: ${error.error}</b><br>${error.message}`
-            );
-          }
-        } else {
+      }
+
+      const { data, error } = await supabase.storage
+        .from("images")
+        .upload(file.name, file);
+
+      if (error) {
+        if (error.error === "Duplicate") {
           const imageUrl = supabase.storage
             .from("images")
             .getPublicUrl(file.name);
-          if (editing) {
+          if ($mode === "edit") {
             editList.media = imageUrl.data["publicUrl"];
-          } else if (adding) {
+          } else if ($mode === "add") {
             addList.media = imageUrl.data["publicUrl"];
           }
+        } else {
+          toast.push(
+            `<b>Error ${error.status}: ${error.error}</b><br>${error.message}`
+          );
         }
+        return;
+      }
+
+      const imageUrl = supabase.storage
+        .from("images")
+        .getPublicUrl(file.name);
+      if ($mode === "edit") {
+        editList.media = imageUrl.data["publicUrl"];
+      } else if ($mode === "add") {
+        addList.media = imageUrl.data["publicUrl"];
+      } else {
+        toast.push(`<b>Error:</b><br>Not editing an item`);
       }
     }
     uploading = false;
