@@ -153,7 +153,10 @@
   async function fetchTimelineData() {
     const { data } = await supabase
       .from("timeline")
-      .select("id, title, image, image_credit, body, start_date")
+      .select(`
+        id, title, image, image_credit, body, start_date, start_date_precision,
+        end_date, end_date_precision
+      `)
       .order("start_date");
     if (data) {
       timeline = data;
