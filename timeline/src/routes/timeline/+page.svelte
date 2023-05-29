@@ -43,8 +43,11 @@
     title: selectedItem.title,
     media: selectedItem.image,
     image_credit: selectedItem.image_credit,
-    start_date: selectedItem.start_date,
     body: selectedItem.body,
+    start_date: selectedItem.start_date,
+    start_date_precision: selectedItem.start_date_precision,
+    end_date: selectedItem.end_date,
+    end_date_precision: selectedItem.end_date_precision,
   };
 
   $: if ($mode === "default") {
@@ -53,8 +56,11 @@
         title: selectedItem.title,
         media: selectedItem.image,
         image_credit: selectedItem.image_credit,
-        start_date: selectedItem.start_date,
         body: selectedItem.body,
+        start_date: selectedItem.start_date,
+        start_date_precision: selectedItem.start_date_precision,
+        end_date: selectedItem.end_date,
+        end_date_precision: selectedItem.end_date_precision,
       };
     }
   }
@@ -63,17 +69,14 @@
     title: "",
     media: "",
     image_credit: "",
-    start_date: "",
     body: "",
+    start_date: "",
+    start_date_precision: "",
+    end_date: "",
+    end_date_precision: "",
   };
 
-  let currentItem = {
-    title: selectedItem.title,
-    image: selectedItem.image,
-    image_credit: selectedItem.image_credit,
-    body: selectedItem.body,
-    start_date: selectedItem.start_date,
-  };
+  let currentItem = structuredClone(selectedItem);
 
   let timelineBar;
 
@@ -103,13 +106,7 @@
 
   async function update() {
     year.set(parseInt(selectedItem.start_date.slice(0, 4)));
-    currentItem = {
-      title: selectedItem.title,
-      image: selectedItem.image,
-      image_credit: selectedItem.image_credit,
-      body: selectedItem.body,
-      start_date: selectedItem.start_date,
-    };
+    currentItem = structuredClone(selectedItem);
 
     currentIndex = timeline.indexOf(selectedItem);
     currentItemIndexStore.set(currentIndex);
@@ -132,8 +129,11 @@
     title: "",
     media: "",
     image_credit: "",
-    start_date: "",
     body: "",
+    start_date: "",
+    start_date_precision: "",
+    end_date: "",
+    end_date_precision: "",
   };
 
   function handleAdd() {
@@ -363,7 +363,6 @@
     Click on the <span class="material-symbols-rounded i">help</span> button to view
     this message again
   </p>
-  
 </Modal>
 <SearchBar
   bind:selection={dropDownSelection}

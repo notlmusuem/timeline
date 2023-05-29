@@ -21,6 +21,9 @@
     image_credit: "",
     body: "",
     start_date: "",
+    start_date_precision: "",
+    end_date: "",
+    end_date_precision: "",
   };
 
   const full = writable(false);
@@ -30,19 +33,38 @@
 
   let formatted_date;
 
-  // makes date readable
-  function formatDate(date) {
-    if (date.slice(5) == "01-01") {
-      return date.slice(0, 4);
-    }
+  function formatDate(date, precision) {
     date = new Date(date + "T00:00:00");
-    if (date == "Invalid Date") {
-      return date;
+
+    if (date == "Invalid Date") { return date; }
+
+    switch (precision) {
+      case "day": return format(date, "MMMM d, yyyy");
+      case "month": return format(date, "MMMM, yyyy");
+      case "year": return format(date, "yyyy");
+      case "decade":
+        // zero out the last year digit with an intdiv
+        date.setYear(Math.floor(date.getFullYear() / 10) * 10);
+        return format(date, "yyyy") + "s";
+      default: throw new Exception(`unexpected date precision ${precision}`);
     }
-    return format(date, "MMMM d, yyyy");
   }
 
-  formatted_date = formatDate(item.start_date);
+
+  function formatDateRange(start_date, start_date_precision, end_date, end_date_precision) {
+    let start = formatDate(start_date, start_date_precision);
+    let end = null;
+    if (end_date != null) {
+      end = formatDate(end_date, end_date_precision);
+    }
+
+    return end == null ? `${start}` : `${start} – ${end}`;
+  }
+
+  formatted_date = formatDateRange(
+    item.start_date, item.start_date_precision,
+    item.end_date, item.end_date_precision
+  );
 
   function autofill(event) {
     const input = event.target.value.replace(/\D/g, "");
