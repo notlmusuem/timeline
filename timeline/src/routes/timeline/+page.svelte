@@ -131,9 +131,9 @@
     image_credit: "",
     body: "",
     start_date: "",
-    start_date_precision: "",
+    start_date_precision: "day",
     end_date: "",
-    end_date_precision: "",
+    end_date_precision: "day",
   };
 
   function handleAdd() {

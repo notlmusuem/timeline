@@ -21,9 +21,9 @@
     image_credit: "",
     body: "",
     start_date: "",
-    start_date_precision: "",
+    start_date_precision: "day",
     end_date: "",
-    end_date_precision: "",
+    end_date_precision: "day",
   };
 
   const full = writable(false);
@@ -31,6 +31,7 @@
   export let editList;
   export let addList;
 
+  let endDateInput;
   let formatted_date;
 
   function formatDate(date, precision) {
@@ -66,46 +67,10 @@
     item.end_date, item.end_date_precision
   );
 
-  function autofill(event) {
-    const input = event.target.value.replace(/\D/g, "");
-    const year = input.slice(0, 4);
-    const month = input.slice(4, 6);
-    const day = input.slice(6, 8);
-
-    let formattedDate = "";
-    if (year) {
-      formattedDate += year;
-      if (month) {
-        formattedDate += "-" + month;
-        if (day) {
-          formattedDate += "-" + day;
-        }
-      }
-    }
-
-    $mode === "edit"
-      ? (editList.start_date = formattedDate)
-      : (addList.start_date = formattedDate);
-  }
-
-  let inputElement;
   function setCursorPositionToEnd() {
-    if (inputElement) {
-      const inputValueLength = inputElement.value.length;
-      inputElement.setSelectionRange(inputValueLength, inputValueLength);
-    }
-  }
-
-  function handleKeydown(event) {
-    if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowUp" ||
-      event.key === "ArrowRight" ||
-      event.key === "Home" ||
-      event.key === "End"
-    ) {
-      event.preventDefault();
-      setCursorPositionToEnd();
+    if (this) {
+      const inputValueLength = this.value.length;
+      this.setSelectionRange(inputValueLength, inputValueLength);
     }
   }
 
@@ -197,8 +162,7 @@
               <div style="width:100%;text-align:center;">
                 <p
                   style="font-size:var(--font-size-small);align-content:center">
-                  <i
-                    >Paste image URL or drag and drop onto image section (4MB
+                  <i>Paste image URL or drag and drop onto image section (4MB
                     limit).</i>
                 </p>
               </div>
@@ -271,45 +235,88 @@
     <div class="text-component">
       {#if $mode !== "default"}
         <form>
-          <div class="input-cont">
-            <label for="title"
-              >Title <span style="color:var(--color-theme-1)">*</span></label>
-            {#if $mode === "edit"}
-              <input
-                type="text"
-                placeholder="Title"
-                bind:value={editList.title} />
-            {:else if $mode === "add"}
-              <input
-                type="text"
-                placeholder="Title"
-                bind:value={addList.title} />
-            {/if}
+          <div class='edit-cont'>
+            <div class="input-cont">
+              <label for="title"
+                >Title <span style="color:var(--color-theme-1)">*</span></label>
+              {#if $mode === "edit"}
+                <input
+                  type="text"
+                  placeholder="Title"
+                  bind:value={editList.title} />
+              {:else if $mode === "add"}
+                <input
+                  type="text"
+                  placeholder="Title"
+                  bind:value={addList.title} />
+              {/if}
+            </div>
           </div>
-          <div class="input-cont">
-            <label for="start_date"
-              >Date <span style="color:var(--color-theme-1)">*</span></label>
-            {#if $mode === "edit"}
-              <input
-                type="text"
-                placeholder="YYYY-MM-DD"
-                bind:value={editList.start_date}
-                on:input={autofill}
-                bind:this={inputElement}
-                on:click={setCursorPositionToEnd}
-                on:focus={setCursorPositionToEnd}
-                on:keydown={handleKeydown} />
-            {:else if $mode === "add"}
-              <input
-                type="text"
-                placeholder="YYYY-MM-DD"
-                bind:value={addList.start_date}
-                on:input={autofill}
-                bind:this={inputElement}
-                on:click={setCursorPositionToEnd}
-                on:focus={setCursorPositionToEnd}
-                on:keydown={handleKeydown} />
-            {/if}
+          <div class="edit-cont">
+            <div class="input-cont row-4">
+              <label for="start_date"
+                >Start Date <span style="color:var(--color-theme-1)">*</span></label>
+              {#if $mode === "edit"}
+                <input
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  bind:value={editList.start_date} />
+              {:else if $mode === "add"}
+                <input
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  bind:value={addList.start_date} />
+              {/if}
+            </div>
+            <div class="input-cont row-4">
+              <label for="end_date"
+                >End Date (<a href=""
+                on:click|preventDefault={endDateInput.value = ""}
+                on:keypress|preventDefault={endDateInput.value = ""}>clear</a>)</label>
+              {#if $mode === "edit"}
+                <input
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  bind:value={editList.end_date}
+                  bind:this={endDateInput}
+                  min={editList.start_date} />
+              {:else if $mode === "add"}
+                <input
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  bind:value={addList.end_date}
+                  bind:this={endDateInput}
+                  min={addList.start_date} />
+              {/if}
+            </div>
+            <div class="input-cont row-4">
+              <label for="date_precision"
+                >Date Precision <span style="color:var(--color-theme-1)">*</span></label>
+              {#if $mode === "edit"}
+                <select
+                  bind:value={editList.start_date_precision}
+                  on:change={(event) => {
+                    editList.end_date_precision = editList.start_date_precision = event.target.value;
+                  }}>
+                  <option value='day'>Exact Day</option>this.value;
+                  <option value='month'>Month & Year</option>
+                  <option value='year'>Year</option>
+                  <option value='decade'>Decade</option>
+                </select>
+              {:else if $mode === "add"}
+                <select
+                  bind:value={addList.start_date_precision}
+                  on:change={(event) => {
+                    addList.end_date_precision = addList.start_date_precision = event.target.value;
+                  }}>
+                  <option value='day'>Exact Day</option>
+                  <option value='month'>Month & Year</option>
+                  <option value='year'>Year</option>
+                  <option value='decade'>Decade</option>
+                </select>
+
+              {/if}
+            </div>
           </div>
           <div class="input-cont">
             <label for="body">Description</label>
@@ -495,14 +502,21 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin: 1rem;
     max-width: 60rem;
+  }
+
+  .image-cont .edit-cont {
+    margin: 1rem;
   }
 
   .input-cont {
     flex: 1 1 49%;
     display: flex;
     flex-flow: column wrap;
+  }
+
+  .input-cont.row-4 {
+    flex: 1 1 calc(25% - 1rem);
   }
 
   label {
@@ -518,6 +532,8 @@
   }
 
   input[type="text"],
+  input[type="date"],
+  select,
   textarea {
     text-overflow: ellipsis;
     flex: 1 1 auto;

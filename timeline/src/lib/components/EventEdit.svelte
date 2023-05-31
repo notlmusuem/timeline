@@ -66,8 +66,11 @@
               title: changes.title,
               image: changes.media,
               image_credit: changes.image_credit,
-              start_date: changes.start_date,
               body: changes.body,
+              start_date: changes.start_date,
+              start_date_precision: changes.start_date_precision,
+              end_date: changes.end_date,
+              end_date_precision: changes.end_date_precision,
             })
             .eq("id", currentEntry);
 
@@ -100,8 +103,11 @@
             title: newItem.title,
             image: newItem.media,
             image_credit: newItem.image_credit,
-            start_date: newItem.start_date,
             body: newItem.body,
+            start_date: newItem.start_date,
+            start_date_precision: newItem.start_date_precision,
+            end_date: newItem.end_date,
+            end_date_precision: newItem.end_date_precision,
           });
 
           if (error) {
