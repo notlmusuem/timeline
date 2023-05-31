@@ -26,7 +26,7 @@
 <style>
   dialog {
     max-width: 40em;
-    max-height:50rem;
+    max-height:90vh;
     background: var(--color-bg-2);
     color: var(--color-text);
     border-radius: 2rem;
@@ -50,7 +50,8 @@
   }
 
   .content {
-    max-height: 30rem;
+    max-height: 50vh;
+    min-height: 10rem;
     overflow-y: scroll;
   }
 

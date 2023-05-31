@@ -165,17 +165,17 @@
       decades.push(i);
     }
   }
-  
+
   function handleMove() {
     tweening = true;
   }
-  
+
   function handleDownArrow() {
     if (!$atEnd) {
       callPageDown();
     }
   }
-  
+
   function handleUpArrow() {
     if (!$atStart) {
       callPageUp();
