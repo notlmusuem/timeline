@@ -11,8 +11,8 @@
   export let newItem;
 
   let user;
-  userStore.subscribe((value) => {
-    user = value && value.email ? value : null;
+  userStore.subscribe(value => {
+    user = value?.email ? value : null;
   });
 
   const dispatch = createEventDispatcher();
