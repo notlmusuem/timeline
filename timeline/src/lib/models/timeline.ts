@@ -19,8 +19,8 @@ export interface Table {
 }
 
 
-export class Item implements Table {
-  // A null id indicates this Item is not yet present in the table
+export class Entry implements Table {
+  // A null id indicates this is not yet present in the table
   id: number|null = null;
   title: string;
   image: string|null = null;
@@ -37,7 +37,7 @@ export class Item implements Table {
   }
 
   static new_default() {
-    return new Item("", new Date());
+    return new Entry("", new Date());
   }
 
   private static from_row(row: {
@@ -45,7 +45,7 @@ export class Item implements Table {
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
-  }): Item {
+  }): Entry {
     return {
       id: row.id,
       title: row.title,
@@ -57,10 +57,10 @@ export class Item implements Table {
       end_date: row.end_date == null
         ? null : new Date(Date.parse(row.end_date)),
       end_date_precision: row.end_date_precision,
-    } as Item;
+    } as Entry;
   }
 
-  static async select_all(conx): Promise<Item[]> {
+  static async select_all(conx): Promise<Entry[]> {
     const { data, error } = await conx
       .from("timeline")
       .select(
@@ -69,7 +69,7 @@ export class Item implements Table {
       )
       .order("start_date");
     if (error) { throw error as PostgrestError; }
-    return data.map(Item.from_row);
+    return data.map(Entry.from_row);
   }
 
   async insert(conx: SupabaseClient<any, "public", any>) {
