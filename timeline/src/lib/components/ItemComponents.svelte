@@ -45,7 +45,7 @@
       case "year": return format(date, "yyyy");
       case "decade":
         // zero out the last year digit with an intdiv
-        date.setYear(Math.floor(date.getFullYear() / 10) * 10);
+        date.setYear(Math.floor(date.getUTCFullYear() / 10) * 10);
         return format(date, "yyyy") + "s";
       default: throw new Exception(`unexpected date precision ${precision}`);
     }
