@@ -1,6 +1,15 @@
 <script>
-  import { windowWidth } from "$lib/stores/window.js";
-  import { direction, mode } from "$lib/stores/store.js";
+  import { onMount } from "svelte";
+  import { tweened } from "svelte/motion";
+  import { quintOut } from "svelte/easing";
+  import { writable } from "svelte/store";
+  import supabase from "$lib/supabaseClient";
+
+  import { windowWidth } from "$lib/stores/window";
+  import { direction, mode } from "$lib/stores/store";
+  import { year, atStart, atEnd, showModal } from "$lib/stores/store";
+  import { currentItemIndexStore } from "$lib/stores/store";
+
   import ItemTransition from "$lib/components/ItemTransition.svelte";
   import TimelineBar from "$lib/components/TimelineBar.svelte";
   import SearchBar from "$lib/components/searchbar/SearchBar.svelte";
@@ -8,13 +17,7 @@
   import PageTransitionFade from "$lib/components/PageTransitionFade.svelte";
   import EventEdit from "$lib/components/EventEdit.svelte";
   import Modal from "$lib/components/Modal.svelte";
-  import supabase from "$lib/supabaseClient.js";
-  import { tweened } from "svelte/motion";
-  import { year, atStart, atEnd, showModal } from "$lib/stores/store.js";
-  import { currentItemIndexStore } from "$lib/stores/store.js";
-  import { onMount } from "svelte";
-  import { quintOut } from "svelte/easing";
-  import { writable } from "svelte/store";
+
 
   export let data;
   let { timeline } = data;

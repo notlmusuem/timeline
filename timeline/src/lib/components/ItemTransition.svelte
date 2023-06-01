@@ -1,9 +1,9 @@
 <script>
   import { fly, blur } from "svelte/transition";
-  import { reduceMotionStore } from "$lib/stores/store.js";
   import { quintOut } from "svelte/easing";
+
+  import { direction, reduceMotionStore } from "$lib/stores/store";
   import { derived } from "svelte/store";
-  import { direction } from "$lib/stores/store.js";
 
   let transition = fly;
   let offset = 200;

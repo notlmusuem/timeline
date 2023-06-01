@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { mobile } from "$lib/stores/window.js";
+  import { mobile } from "$lib/stores/window";
   import { fade, slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import Text2Speech from "$lib/components/TextToSpeech.svelte";

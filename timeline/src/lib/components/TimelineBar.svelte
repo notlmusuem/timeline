@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { mode } from "$lib/stores/store.js";
+  import { mode } from "$lib/stores/store";
   import { fly } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
   import { tweened } from "svelte/motion";
