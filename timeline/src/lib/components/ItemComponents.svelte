@@ -342,8 +342,9 @@
               body={item.body} />
           </div>
           <div class="image_cred">
-            <a href={item.image_credit} target="_blank" rel="noreferrer"
-              >Image source</a>
+            {#if item.image_credit}
+              <a href="{item.image_credit}" target="_blank" rel="noreferrer">Image source</a>
+            {/if}
           </div>
         </div>
       {/if}
