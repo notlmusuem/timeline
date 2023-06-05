@@ -26,7 +26,6 @@
 <style>
   dialog {
     max-width: 40em;
-    max-height:90vh;
     background: var(--color-bg-2);
     color: var(--color-text);
     border-radius: 2rem;
@@ -46,7 +45,7 @@
   }
 
   dialog > div {
-    padding: 1.5em;
+    padding: .5em 1em;
   }
 
   .content {
