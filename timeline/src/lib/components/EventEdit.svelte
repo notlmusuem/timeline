@@ -1,14 +1,17 @@
-<script>
-  // @ts-nocheck
-  import supabase from "$lib/supabaseClient";
-  import { slide, fly } from "svelte/transition";
-  import { userStore } from "$lib/authStore";
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import { slide, fly } from "svelte/transition";
   import { toast } from "@zerodevx/svelte-toast";
-  import { mode } from "$lib/stores/store";
-  export let currentEntry;
-  export let changes;
-  export let newItem;
+  import supabase from "$lib/supabaseClient";
+  import type { PostgrestError } from "@supabase/supabase-js";
+
+  import { userStore } from "$lib/authStore";
+  import { direction, mode } from "$lib/stores/store";
+
+  import { Entry } from "$lib/models/timeline";
+
+  export let entry: Entry;
+
 
   let user;
   userStore.subscribe(value => {
@@ -16,145 +19,73 @@
   });
 
   const dispatch = createEventDispatcher();
-  const resetEdit = () => dispatch("resetEdit");
-  const resetAdd = () => dispatch("resetAdd");
 
-  function handleEdit() {
-    mode.update((n) => (n === "default" ? "edit" : "default"));
-  }
-
-  function handleAdd() {
-    mode.update((n) => (n === "default" ? "add" : "default"));
-  }
-
-  const cancelEdit = () => {
-    handleEdit();
-    resetEdit();
-  };
-
-  const cancelAdd = () => {
-    handleAdd();
-    resetAdd();
-  };
+  function startEdit() { mode.update(n => "edit"); }
+  function startAdd() { mode.update(n => "add"); }
+  function stopChange() { mode.update(n => "default"); }
 
   function isValidDateFormat(dateString) {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(dateString)) {
-      return false;
-    }
-
-    const [year, month, day] = dateString.split("-");
-
-    if (Number(month) < 1 || Number(month) > 12) {
-      return false;
-    }
-
-    if (Number(day) < 1 || Number(day) > 31) {
-      return false;
-    }
-
-    return true;
+    // A date instance is invalid iff it's timestamp is nan
+    // note: the Date constructor also checks if the months/days are valid, and
+    // considers all the ugly edge cases (e.g. Feb 29th)
+    const date = new Date(Date.parse(dateString));
+    return !isNaN(date.getTime());
   }
 
-  const saveChanges = async () => {
-    if (changes.title.length != 0 && changes.start_date.length != 0) {
-      if (isValidDateFormat(changes.start_date)) {
-        try {
-          const { error } = await supabase
-            .from("timeline")
-            .update({
-              title: changes.title,
-              image: changes.media,
-              image_credit: changes.image_credit,
-              body: changes.body,
-              start_date: changes.start_date,
-              start_date_precision: changes.start_date_precision,
-              end_date: changes.end_date,
-              end_date_precision: changes.end_date_precision,
-            })
-            .eq("id", currentEntry);
-
-          if (error) {
-            throw error;
-          }
-
-          handleEdit();
-          resetEdit();
-          toast.push("<b>Success</b><br>Changes saved. Refreshing items...");
-          setTimeout(() => {
-            location.reload();
-          }, 0);
-        } catch (error) {
-          toast.push(`Error: ${error.message}`);
-        }
-      } else {
-        toast.push("Please enter a valid date.");
-      }
-    } else {
-      toast.push("<b>Error</b><br>Please fill out the date and title fields.");
+  // todo: saving changes does not handle setting end_date or end_date_precision to null if needed
+  async function saveChanges(insert) {
+    let inserting = !entry.in_table;  // insert the item if it is locally created
+    if (
+      !isValidDateFormat(entry.start_date)
+      || (entry.end_date != null && !isValidDateFormat(entry.end_date))
+    ) {
+      toast.push("Please enter a valid date.");
+      return;
     }
-  };
 
-  const saveNew = async () => {
-    if (newItem.title.length != 0 && newItem.start_date.length != 0) {
-      if (isValidDateFormat(newItem.start_date)) {
-        try {
-          const { error } = await supabase.from("timeline").insert({
-            title: newItem.title,
-            image: newItem.media,
-            image_credit: newItem.image_credit,
-            body: newItem.body,
-            start_date: newItem.start_date,
-            start_date_precision: newItem.start_date_precision,
-            end_date: newItem.end_date,
-            end_date_precision: newItem.end_date_precision,
-          });
-
-          if (error) {
-            throw error;
-          }
-
-          dispatch("saveNew");
-          handleAdd();
-          resetAdd();
-          toast.push("<b>Success</b><br>New entry added. Refreshing items...");
-          setTimeout(() => {
-            location.reload();
-          }, 0);
-        } catch (error) {
-          toast.push(`<b>Query Error</b><br>${error.message}`);
-        }
+    try {
+      if (inserting) {
+        await entry.insert(supabase);  // note: this updates item.id
+        dispatch("saveNew");
       } else {
-        toast.push("<b>Error</b><br>Please enter a valid date.");
+        await entry.update(supabase);
       }
-    } else {
-      toast.push("<b>Error</b><br>Please fill out the date and title fields.");
+
+      stopChange();
+
+      if (inserting) {
+        toast.push("<b>Success</b><br>New entry added. Refreshing items...");
+      } else {
+        toast.push("<b>Success</b><br>Changes saved. Refreshing items...");
+      }
+      // fixme: a page reload isn't necessary and hinders the editing experience
+      location.reload();
+    } catch (err) {
+      let error = err as PostgrestError;
+      toast.push(`<b>Database Error</b><br>${error.message}`);
     }
   };
 
   const deleteEntry = async () => {
-    try {
-      if (confirm("Are you sure you want to delete this entry?") == false) {
-        toast.push("<b>Cancelled</b><br>Item not deleted.");
-        return;
-      }
-      const { data, error } = await supabase
-        .from("timeline")
-        .delete()
-        .eq("id", currentEntry);
+    if (confirm(
+      "Are you sure you want to delete this entry?\nPress OK to permanently delete this entry."
+    ) == false) {
+      toast.push("<b>Cancelled</b><br>Item not deleted.");
+      return;
+    }
 
-      if (error) {
-        throw error;
-      }
+    try {
+      await entry.delete(supabase);
+
+      stopChange();
       dispatch("entryDeleted");
-      toast.push(
-        "<b>Success</b><br>Entry deleted successfully. Refreshing items..."
-      );
-      setTimeout(() => {
-        location.reload();
-      }, 0);
-    } catch (error) {
-      toast.push(`<b>Query Error</b><br>${error.message}`);
+
+      toast.push("<b>Success</b><br>Entry deleted successfully. Refreshing items...");
+      // fixme: a page reload isn't necessary and hinders the editing experience
+      location.reload();
+    } catch (err) {
+      let error = err as PostgrestError;
+      toast.push(`<b>Database Error</b><br>${error.message}`);
     }
   };
 </script>
@@ -164,36 +95,40 @@
     <div class="container" transition:fly={{ y: 100 }}>
       {#if $mode !== "default"}
         <div class="notice">
-          <h2>
-            {$mode === "edit" ? "Edit" : "Add"}ing item
-          </h2>
+          <h2>{$mode === "edit" ? "Editing item" : "Adding item"}</h2>
         </div>
       {/if}
       <div class="edit-items">
         {#if $mode === "edit"}
-          <button on:click={cancelEdit} title="Cancel changes"
+          <button on:click={stopChange} title="Cancel changes"
             ><span class="material-symbols-rounded i">close</span
             >Cancel</button>
           <div class="line" />
-          <button class="options" on:click={saveChanges} title="Save changes"
-            ><span class="material-symbols-rounded i">save</span>Save</button>
+          <button class="options" title="Save changes"
+            on:click={() => saveChanges(false)}
+            ><span class="material-symbols-rounded i">save</span
+            >Save</button>
           <div class="line" />
           <button class="options" on:click={deleteEntry} title="Delete entry"
             ><span class="material-symbols-rounded i">delete</span
             >Delete</button>
         {:else if $mode === "add"}
-          <button on:click={cancelAdd} title="Cancel changes"
+          <button on:click={stopChange} title="Cancel changes"
             ><span class="material-symbols-rounded i">close</span
             >Cancel</button>
           <div class="line" />
-          <button class="options" on:click={saveNew} title="Save changes"
-            ><span class="material-symbols-rounded i">save</span>Save</button>
+          <button class="options" title="Save changes"
+            on:click={() => saveChanges(true)}
+            ><span class="material-symbols-rounded i">save</span
+            >Save</button>
         {:else}
-          <button on:click={handleEdit} title="Edit items"
-            ><span class="material-symbols-rounded i">edit</span>Edit</button>
+          <button on:click={startEdit} title="Edit items"
+            ><span class="material-symbols-rounded i">edit</span
+            >Edit</button>
           <div class="line" />
-          <button on:click={handleAdd} title="Add New item"
-            ><span class="material-symbols-rounded i">add</span>Add</button>
+          <button on:click={startAdd} title="Add New item"
+            ><span class="material-symbols-rounded i">add</span
+            >Add</button>
         {/if}
       </div>
     </div>

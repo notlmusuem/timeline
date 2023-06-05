@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { tweened } from "svelte/motion";
   import { quintOut } from "svelte/easing";
@@ -18,17 +18,20 @@
   import EventEdit from "$lib/components/EventEdit.svelte";
   import Modal from "$lib/components/Modal.svelte";
 
+  import { Entry } from "$lib/models/timeline";
 
   export let data;
-  let { timeline } = data;
+  let timeline: Entry[] = data.timeline.map(o => Entry.from_obj(o));
+
 
   // map timeline titles and years to searchData
-  let searchData = [];
+  let searchData: { title: string; year: number; }[] = [];
   $: {
     searchData = timeline.map((item) => {
       return {
         title: item.title,
-        year: item.start_date.slice(0, 4),
+        // todo: support proper dates
+        year: item.start_date.getUTCFullYear(),
       };
     });
   }
@@ -41,47 +44,9 @@
   let dropDownSelection = "";
   let selectedItem = timeline[0];
 
+
   let currentIndex = 0;
-  let edit = {
-    title: selectedItem.title,
-    media: selectedItem.image,
-    image_credit: selectedItem.image_credit,
-    body: selectedItem.body,
-    start_date: selectedItem.start_date,
-    start_date_precision: selectedItem.start_date_precision,
-    end_date: selectedItem.end_date,
-    end_date_precision: selectedItem.end_date_precision,
-  };
-
-  $: if ($mode === "default") {
-    if (selectedItem) {
-      edit = {
-        title: selectedItem.title,
-        media: selectedItem.image,
-        image_credit: selectedItem.image_credit,
-        body: selectedItem.body,
-        start_date: selectedItem.start_date,
-        start_date_precision: selectedItem.start_date_precision,
-        end_date: selectedItem.end_date,
-        end_date_precision: selectedItem.end_date_precision,
-      };
-    }
-  }
-
-  let add = {
-    title: "",
-    media: "",
-    image_credit: "",
-    body: "",
-    start_date: "",
-    start_date_precision: "",
-    end_date: "",
-    end_date_precision: "",
-  };
-
-  let currentItem = structuredClone(selectedItem);
-
-  let timelineBar;
+  let editingItem = Entry.new_default();
 
   let touchStartX = 0;
   let touchEndX = 0;
@@ -108,15 +73,14 @@
   }
 
   async function update() {
-    year.set(parseInt(selectedItem.start_date.slice(0, 4)));
-    currentItem = structuredClone(selectedItem);
+    year.set(selectedItem.start_date.getUTCFullYear());
 
     currentIndex = timeline.indexOf(selectedItem);
     currentItemIndexStore.set(currentIndex);
   }
 
   function gotoItem() {
-    let item = timeline.find((item) => item.title == dropDownSelection);
+    let item = timeline.find(item => item.title == dropDownSelection);
     if (item) {
       selectedItem = item;
       if (timeline.indexOf(selectedItem) > currentIndex) {
@@ -128,16 +92,7 @@
     }
   }
 
-  $: add = {
-    title: "",
-    media: "",
-    image_credit: "",
-    body: "",
-    start_date: "",
-    start_date_precision: "day",
-    end_date: "",
-    end_date_precision: "day",
-  };
+  $: add = Entry.new_default();
 
   function handleAdd() {
     selectedItem = timeline[0];
@@ -154,17 +109,8 @@
   }
 
   async function fetchTimelineData() {
-    const { data } = await supabase
-      .from("timeline")
-      .select(`
-        id, title, image, image_credit, body, start_date, start_date_precision,
-        end_date, end_date_precision
-      `)
-      .order("start_date");
-    if (data) {
-      timeline = data;
-      update();
-    }
+    timeline = await Entry.select_all(supabase);
+    update();
   }
 
   function handleTouchStart(event) {
@@ -172,8 +118,7 @@
       event.touches[0].clientX < 128 ||
       event.touches[0].clientY < 128 ||
       $mode !== "default"
-    )
-      return;
+    ) { return; }
     touchStartX = event.touches[0].clientX;
   }
 
@@ -182,8 +127,7 @@
       event.touches[0].clientX < 128 ||
       event.touches[0].clientY < 128 ||
       $mode !== "default"
-    )
-      return;
+    ) { return; }
     touchEndX = event.touches[0].clientX;
     if (Math.abs(touchEndX - touchStartX) < 60) return;
     touchDeltaX = touchEndX - touchStartX;
@@ -214,9 +158,9 @@
     }
   }
 
-  const sleep = (milliseconds) => {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
-  };
+  async function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  }
 
   function resetSwipe() {
     touchDeltaX = 0;
@@ -224,7 +168,7 @@
     $itemTranslateX = 0;
   }
 
-  onMount(async () => {
+  onMount(() => {
     const firstVisit = localStorage.getItem("firstVisit");
 
     if (!firstVisit) {
@@ -367,24 +311,25 @@
     this message again
   </p>
 </Modal>
+
 <SearchBar
   bind:selection={dropDownSelection}
   data={searchData}
   on:selection={gotoItem}
   on:selection={update} />
+
 <TimelineBar
   timeData={timeline}
   bind:currentItem={selectedItem}
-  bind:this={timelineBar}
   on:change={update}
   on:pagedown={pageDown}
   on:pageup={pageUp} />
+
 <EventEdit
-  changes={edit}
-  newItem={add}
-  currentEntry={selectedItem.id}
+  entry={editingItem}
   on:saveNew={handleAdd}
   on:entryDeleted={handleDelete} />
+
 {#if timeline.length > 0}
   <PageTransitionFade>
     {#key `${selectedItem.id}-${$direction}`}
@@ -395,9 +340,8 @@
         on:touchstart|passive={handleTouchStart}>
         <ItemTransition>
           <ItemComponents
-            bind:editList={edit}
-            bind:addList={add}
-            item={selectedItem} />
+            bind:editingItem={editingItem}
+            entry={selectedItem} />
         </ItemTransition>
       </section>
     {/key}

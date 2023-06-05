@@ -1,5 +1,4 @@
 <script>
-  // @ts-nocheck
   import { mode } from "$lib/stores/store";
   import { fly } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
@@ -40,8 +39,8 @@
 
   $: disabled = $mode !== "default";
 
-  firstYear.set(getYear(timeData[0].start_date));
-  lastYear.set(getYear(timeData[timeData.length - 1].start_date));
+  firstYear.set(timeData[0].start_date.getUTCFullYear());
+  lastYear.set(timeData[timeData.length - 1].start_date.getUTCFullYear());
 
   const dispatch = createEventDispatcher();
 
@@ -156,7 +155,7 @@
     );
     lowest = Math.floor($firstYear / scale) * scale - 10;
     highest =
-      Math.ceil(getYear(timeData[timeData.length - 1].start_date) / scale) *
+      Math.ceil(timeData[timeData.length - 1].start_date.getUTCFullYear() / scale) *
         scale +
       10;
 
@@ -235,16 +234,16 @@
           on:keyup
           class="lineItem"
           on:click={handleMove}
-          on:click={() => year.set(getYear(td.start_date))}>
+          on:click={() => year.set(td.start_date.getUTCFullYear())}>
           <div
             class="dot"
-            style="transform:translateY({getSpacing(
-              getYear(td.start_date)
-            )}vh)">
+            style="transform:translateY({
+              getSpacing(td.start_date.getUTCFullYear())
+            }vh)">
             <Dot
               eventOne={() => setDetails(td)}
               eventTwo={() => change()}
-              year={getYear(td.start_date)} />
+              year={td.start_date.getUTCFullYear()} />
           </div>
         </div>
       {/each}

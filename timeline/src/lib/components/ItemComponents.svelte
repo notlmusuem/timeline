@@ -1,119 +1,129 @@
-<script>
-  // @ts-nocheck
-  import { mobile } from "$lib/stores/window";
+<script lang="ts">
   import { fade, slide } from "svelte/transition";
   import { writable } from "svelte/store";
-  import Text2Speech from "$lib/components/TextToSpeech.svelte";
+  import { format, utcToZonedTime } from "date-fns-tz";
   import Fullscreen from "svelte-fullscreen";
-  import { format } from "date-fns";
-  import supabase from "$lib/supabaseClient";
   import { loadingAction } from "svelte-legos";
   import { toast } from "@zerodevx/svelte-toast";
+  import supabase from "$lib/supabaseClient";
+
+  import { mobile } from "$lib/stores/window";
   import { mode } from "$lib/stores/store";
+
+  import Text2Speech from "$lib/components/TextToSpeech.svelte";
+
+  import { Entry } from "$lib/models/timeline";
+
 
   let loading = true;
   let uploading = false;
 
-  export let item = {
-    id: 0,
-    title: "",
-    image: "",
-    image_credit: "",
-    body: "",
-    start_date: "",
-    start_date_precision: "day",
-    end_date: "",
-    end_date_precision: "day",
-  };
+  export let entry: Entry;
+  export let editingItem: Entry = Entry.new_default();
 
   const full = writable(false);
 
-  export let editList;
-  export let addList;
-
+  let startDateInput;
   let endDateInput;
-  let formatted_date;
 
-  function formatDate(date, precision) {
-    date = new Date(date + "T00:00:00");
+  // dynamically reset editingItem when the edit/add buttons are pressed
+  mode.subscribe(v => {
+    if ($mode === "default") { return; }
 
-    if (date == "Invalid Date") { return date; }
+    if ($mode === "edit") {
+      // Since the changes to editingItem might be cancelled, we don't want to
+      // modify the entry itself. Instead, clone it and edit the clone.
+      editingItem = structuredCloneProto(entry);
+    } else if ($mode === "add") {
+      editingItem = Entry.new_default();
+    }
+  });
+
+
+  function structuredCloneProto<T>(obj: T): T {
+    const clone = structuredClone(obj);
+    // structuredClone presently does not copy over prototypes, so we need to
+    // copy them ourselves
+    Object.setPrototypeOf(clone, Object.getPrototypeOf(obj));
+    return clone;
+  }
+
+  function formatDateNumbers(date: Date|null): string {
+    if (date == null || isNaN(date.getTime())) { return ""; }
+
+    const localDate = utcToZonedTime(date, "UTC");
+    return format(localDate, "yyyy-MM-dd");
+  }
+
+  function formatDate(date: Date, precision: "day"|"month"|"year"|"decade"): string {
+    // if the date is invalid, there's no meaningful way to format it
+    if (isNaN(date.getTime())) { return date.toString(); }
+
+    const localDate = utcToZonedTime(date, "UTC");
 
     switch (precision) {
-      case "day": return format(date, "MMMM d, yyyy");
-      case "month": return format(date, "MMMM, yyyy");
-      case "year": return format(date, "yyyy");
+      case "day": return format(localDate, "MMMM d, yyyy");
+      case "month": return format(localDate, "MMMM, yyyy");
+      case "year": return date.getUTCFullYear().toString();
       case "decade":
         // zero out the last year digit with an intdiv
-        date.setYear(Math.floor(date.getUTCFullYear() / 10) * 10);
-        return format(date, "yyyy") + "s";
-      default: throw new Exception(`unexpected date precision ${precision}`);
+        let zeroed = structuredCloneProto(date);
+        zeroed.setUTCFullYear(Math.floor(date.getUTCFullYear() / 10) * 10);
+        return format(zeroed, "yyyy") + "s";
     }
   }
 
-
-  function formatDateRange(start_date, start_date_precision, end_date, end_date_precision) {
+  function formatDateRange(
+    start_date: Date, start_date_precision: "day"|"month"|"year"|"decade",
+    end_date: Date|null, end_date_precision: "day"|"month"|"year"|"decade"|null
+  ): string {
     let start = formatDate(start_date, start_date_precision);
-    let end = null;
-    if (end_date != null) {
-      end = formatDate(end_date, end_date_precision);
+    if (end_date != null && end_date_precision != null) {
+      let end = formatDate(end_date, end_date_precision);
+      return `${start} – ${end}`;
+    } else {
+      return start;
     }
-
-    return end == null ? `${start}` : `${start} – ${end}`;
   }
 
-  formatted_date = formatDateRange(
-    item.start_date, item.start_date_precision,
-    item.end_date, item.end_date_precision
+  let formatted_date = formatDateRange(
+    entry.start_date, entry.start_date_precision,
+    entry.end_date, entry.end_date_precision
   );
 
-  function setCursorPositionToEnd() {
-    if (this) {
-      const inputValueLength = this.value.length;
-      this.setSelectionRange(inputValueLength, inputValueLength);
-    }
-  }
 
-  async function upload(e) {
+  async function upload(event) {
     uploading = true;
-    const file = e.target.files[0];
+    const file = event.target.files[0];
     if (file) {
       if (file.size > 4 * 1024 * 1024) {
-        toast.push(`<b>Error:</b><br>File size should be less than 4MB`);
+        toast.push(`<b>Error:</b><br>File size must be less than 4MB`);
         return;
       }
 
       const { data, error } = await supabase.storage
         .from("images")
-        .upload(file.name, file);
+        .upload(`${Date.now()}_${file.name}`, file);
 
-      if (error) {
-        if (error.error === "Duplicate") {
-          const imageUrl = supabase.storage
-            .from("images")
-            .getPublicUrl(file.name);
-          if ($mode === "edit") {
-            editList.media = imageUrl.data["publicUrl"];
-          } else if ($mode === "add") {
-            addList.media = imageUrl.data["publicUrl"];
-          }
-        } else {
+      if (error != null) {
+        if (error.message === "Duplicate") {
           toast.push(
-            `<b>Error ${error.status}: ${error.error}</b><br>${error.message}`
+            `<b>Error</b><br>${error.message}. Please try again in a few seconds.`
           );
+        } else {
+          toast.push(`<b>Error</b><br>${error.message}`);
         }
         return;
       }
 
-      const imageUrl = supabase.storage
+      const { data: { publicUrl } } = supabase.storage
         .from("images")
         .getPublicUrl(file.name);
-      if ($mode === "edit") {
-        editList.media = imageUrl.data["publicUrl"];
-      } else if ($mode === "add") {
-        addList.media = imageUrl.data["publicUrl"];
+
+      if ($mode !== "default") {
+        editingItem.image = publicUrl;
       } else {
-        toast.push(`<b>Error:</b><br>Not editing an item`);
+        toast.push(`<b>Error</b><br>Not currently editing an item; image was not uploaded`);
       }
     }
     uploading = false;
@@ -122,7 +132,7 @@
 
 {#key $mode}
   <section class="item-components">
-    {#if item.image || $mode !== "default"}
+    {#if entry.image || $mode !== "default"}
       <div class="media-component">
         {#if $mode !== "default"}
           <p class={uploading ? "upload-notice red" : "upload-notice"}>
@@ -145,20 +155,8 @@
                 on:change={upload} />
               <img
                 class="image-edit"
-                src={$mode === "add"
-                  ? $mode === "add"
-                    ? addList.media
-                    : ""
-                  : $mode === "edit"
-                  ? editList.media
-                  : ""}
-                alt={$mode === "add"
-                  ? $mode === "add"
-                    ? addList.title
-                    : ""
-                  : $mode === "edit"
-                  ? editList.title
-                  : ""} />
+                src={editingItem.image}
+                alt={editingItem.title} />
               <div style="width:100%;text-align:center;">
                 <p
                   style="font-size:var(--font-size-small);align-content:center">
@@ -168,53 +166,42 @@
               </div>
 
               <div class="input-cont">
-                <label for="media">Image URL</label>
-                {#if $mode === "edit"}
-                  <input
-                    type="text"
-                    placeholder="https://example.com/image.jpg"
-                    bind:value={editList.media} />
-                {:else if $mode === "add"}
-                  <input
-                    type="text"
-                    placeholder="https://example.com/image.jpg"
-                    bind:value={addList.media} />
-                {/if}
+                <label for="image_url">Image URL</label>
+                <input
+                  type="text"
+                  name="image_url"
+                  placeholder="https://example.com/image.jpg"
+                  bind:value={editingItem.image} />
               </div>
               <div class="input-cont">
                 <label for="image_credit">Image source</label>
-                {#if $mode === "edit"}
-                  <input
-                    type="text"
-                    placeholder="https://example.com"
-                    bind:value={editList.image_credit} />
-                {:else if $mode === "add"}
-                  <input
-                    type="text"
-                    placeholder="https://example.com"
-                    bind:value={addList.image_credit} />
-                {/if}
+                <input
+                  type="text"
+                  name="image_credit"
+                  placeholder="https://example.com"
+                  bind:value={editingItem.image_credit} />
               </div>
             </div>
-          {:else if item.image}
-            {#if item.image.includes("youtube.com")}
+          {:else if $mode == "default" && entry.image != null}
+            {#if entry.image.includes("youtube.com")}
               <iframe
                 class="video"
                 title="youtube video"
-                src={item.image.replace("watch?v=", "embed/")}
+                src={entry.image.replace("watch?v=", "embed/")}
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen />
             {:else}
               <div class="image-placeholder" use:loadingAction={loading}>
+                <!-- svelte-ignore -->
                 <Fullscreen let:onToggle let:onExit>
                   <img
                     on:load={() => (loading = false)}
                     class="image"
-                    src={item.image}
-                    alt={item.title}
-                    on:keydown={(e) => {
-                      if (e.key === "Escape") {
+                    src={entry.image}
+                    alt={entry.title}
+                    on:keydown={event => {
+                      if (event.key === "Escape") {
                         onExit();
                         $full = false;
                       }
@@ -232,6 +219,7 @@
         </div>
       </div>
     {/if}
+
     <div class="text-component">
       {#if $mode !== "default"}
         <form>
@@ -239,111 +227,106 @@
             <div class="input-cont">
               <label for="title"
                 >Title <span style="color:var(--color-theme-1)">*</span></label>
-              {#if $mode === "edit"}
-                <input
-                  type="text"
-                  placeholder="Title"
-                  bind:value={editList.title} />
-              {:else if $mode === "add"}
-                <input
-                  type="text"
-                  placeholder="Title"
-                  bind:value={addList.title} />
-              {/if}
+              <input
+                name="title"
+                type="text"
+                placeholder="Title"
+                bind:value={editingItem.title} />
             </div>
           </div>
+
           <div class="edit-cont">
             <div class="input-cont row-4">
               <label for="start_date"
                 >Start Date <span style="color:var(--color-theme-1)">*</span></label>
-              {#if $mode === "edit"}
-                <input
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  bind:value={editList.start_date} />
-              {:else if $mode === "add"}
-                <input
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  bind:value={addList.start_date} />
-              {/if}
+              <input
+                name="start_date"
+                type="date"
+                placeholder="YYYY-MM-DD"
+                on:change={event => {
+                  // We can't actually use typescript casts in this context
+                  // because this isn't in a <script lang="ts"> block. Ew.
+                  // @ts-ignore
+                  const value = event.target?.value;
+
+                  editingItem.start_date = new Date(Date.parse(value));
+                }}
+                value={formatDateNumbers(editingItem.start_date)}
+                max={formatDateNumbers(editingItem.end_date)} />
             </div>
+
             <div class="input-cont row-4">
+              <!-- svelte-ignore a11y-invalid-attribute -->
               <label for="end_date"
                 >End Date (<a href=""
-                on:click|preventDefault={endDateInput.value = ""}
-                on:keypress|preventDefault={endDateInput.value = ""}>clear</a>)</label>
-              {#if $mode === "edit"}
-                <input
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  bind:value={editList.end_date}
-                  bind:this={endDateInput}
-                  min={editList.start_date} />
-              {:else if $mode === "add"}
-                <input
-                  type="date"
-                  placeholder="YYYY-MM-DD"
-                  bind:value={addList.end_date}
-                  bind:this={endDateInput}
-                  min={addList.start_date} />
-              {/if}
+                on:click|preventDefault={() => { endDateInput.value = null; }}
+                on:keypress|preventDefault={() => { endDateInput.value = null; }}>remove end date</a>)</label>
+              <input
+                name="end_date"
+                type="date"
+                placeholder="YYYY-MM-DD"
+                on:change={event => {
+                  // We can't actually use typescript casts in this context
+                  // because this isn't in a <script lang="ts"> block. Ew.
+                  // @ts-ignore
+                  const value = event.target?.value;
+
+                  editingItem.end_date = value == "" || value == null
+                    ? null : new Date(Date.parse(value));
+
+                  editingItem.end_date_precision = editingItem.end_date == null
+                    ? null : editingItem.start_date_precision;
+                }}
+                value={formatDateNumbers(editingItem.end_date)}
+                bind:this={endDateInput}
+                min={formatDateNumbers(editingItem.start_date)} />
             </div>
+
             <div class="input-cont row-4">
               <label for="date_precision"
                 >Date Precision <span style="color:var(--color-theme-1)">*</span></label>
-              {#if $mode === "edit"}
-                <select
-                  bind:value={editList.start_date_precision}
-                  on:change={(event) => {
-                    editList.end_date_precision = editList.start_date_precision = event.target.value;
-                  }}>
-                  <option value='day'>Exact Day</option>this.value;
-                  <option value='month'>Month & Year</option>
-                  <option value='year'>Year</option>
-                  <option value='decade'>Decade</option>
-                </select>
-              {:else if $mode === "add"}
-                <select
-                  bind:value={addList.start_date_precision}
-                  on:change={(event) => {
-                    addList.end_date_precision = addList.start_date_precision = event.target.value;
-                  }}>
-                  <option value='day'>Exact Day</option>
-                  <option value='month'>Month & Year</option>
-                  <option value='year'>Year</option>
-                  <option value='decade'>Decade</option>
-                </select>
-
-              {/if}
+              <select
+                name="date_precision"
+                bind:value={editingItem.start_date_precision}
+                on:change={event => {
+                  // We can't actually use typescript casts in this context
+                  // because this isn't in a <script lang="ts"> block. Ew.
+                  // @ts-ignore
+                  const value = event.target?.value;
+                  editingItem.end_date_precision =
+                    editingItem.end_date == null ? null : value;
+                }}>
+                <option value="day">Exact Day</option>
+                <option value="month">Month & Year</option>
+                <option value="year">Year</option>
+                <option value="decade">Decade</option>
+              </select>
             </div>
           </div>
+
           <div class="input-cont">
             <label for="body">Description</label>
-            {#if $mode === "edit"}
-              <textarea placeholder="Description" bind:value={editList.body} />
-            {:else if $mode === "add"}
-              <textarea placeholder="Description" bind:value={addList.body} />
-            {/if}
+            <textarea name="body" placeholder="Description" bind:value={editingItem.body} />
           </div>
         </form>
-      {:else}
-        <h1 class="title">{item.title}</h1>
+      {:else}  <!-- $mode === "default" -->
+        <h1 class="title">{entry.title}</h1>
         <p class="date"><i>{formatted_date}</i></p>
         <hr />
-        {#if item.body}
-          <p class="desc">{item.body}</p>
+        {#if entry.body}
+          <p class="desc">{entry.body}</p>
         {/if}
         <div class="cont-tts">
           <div class="tts">
             <Text2Speech
-              title={item.title}
+              title={entry.title}
               date={formatted_date}
-              body={item.body} />
+              body={entry.body} />
           </div>
           <div class="image_cred">
-            {#if item.image_credit}
-              <a href="{item.image_credit}" target="_blank" rel="noreferrer">Image source</a>
+            {#if entry.image_credit != null}
+              <a href="{entry.image_credit}" target="_blank" rel="noreferrer"
+                >Image source</a>
             {/if}
           </div>
         </div>
