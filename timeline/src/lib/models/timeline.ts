@@ -1,4 +1,5 @@
 import { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
+import { utcToZonedTime } from "date-fns-tz";
 
 
 export interface Table {
@@ -41,7 +42,7 @@ export class Entry implements Table {
   }
 
   static from_obj(obj: {
-    id: number, title: string, image: string|null, image_credit: string|null,
+    id: number|null, title: string, image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
@@ -53,17 +54,23 @@ export class Entry implements Table {
     self.image = obj.image;
     self.image_credit = obj.image_credit;
     self.body = obj.body;
-    self.start_date = new Date(Date.parse(obj.start_date));
+    self.start_date = utcToZonedTime(
+      new Date(Date.parse(obj.start_date)),
+      "UTC"
+    );
     self.start_date_precision = obj.start_date_precision;
     self.end_date = obj.end_date == null
-        ? null : new Date(Date.parse(obj.end_date));
+        ? null : utcToZonedTime(
+          new Date(Date.parse(obj.end_date)),
+          "UTC"
+        );
     self.end_date_precision = obj.end_date_precision;
 
     return self;
   }
 
   public to_obj(): {
-    id: number, title: string, image: string|null, image_credit: string|null,
+    id: number|null, title: string, image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
@@ -72,7 +79,7 @@ export class Entry implements Table {
     return { ...this };
   }
 
-  static async select_all(conx): Promise<Entry[]> {
+  static async select_all(conx: SupabaseClient): Promise<Entry[]> {
     const { data, error } = await conx
       .from("timeline")
       .select(
@@ -84,16 +91,16 @@ export class Entry implements Table {
     return data.map(Entry.from_obj);
   }
 
-  async insert(conx: SupabaseClient<any, "public", any>) {
+  async insert(conx: SupabaseClient): Promise<this> {
     const { data, error } = await conx.from("timeline").insert(
       {
         title: this.title,
         image: this.image,
         image_credit: this.image_credit,
         body: this.body,
-        start_date: this.start_date,
+        start_date: this.start_date.toUTCString(),
         start_date_precision: this.start_date_precision,
-        end_date: this.end_date,
+        end_date: this.end_date?.toUTCString() ?? null,
         end_date_precision: this.end_date_precision,
       }).select("id");
     if (error) { throw error as PostgrestError; }
@@ -101,22 +108,22 @@ export class Entry implements Table {
     return this;
   }
 
-  async update(conx: SupabaseClient<any, "public", any>) {
+  async update(conx: SupabaseClient) {
     const { error } = await conx.from("timeline").update({
       title: this.title,
       image: this.image,
       image_credit: this.image_credit,
       body: this.body,
-      start_date: this.start_date,
+      start_date: this.start_date.toUTCString(),
       start_date_precision: this.start_date_precision,
-      end_date: this.end_date,
+      end_date: this.end_date?.toUTCString() ?? null,
       end_date_precision: this.end_date_precision,
     }).eq("id", this.id);
     if (error) { throw error as PostgrestError; }
     return this;
   }
 
-  async delete(conx: SupabaseClient<any, "public", any>) {
+  async delete(conx: SupabaseClient) {
     const { error } = await conx
       .from("timeline")
       .delete()

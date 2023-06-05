@@ -59,11 +59,9 @@
     // if the date is invalid, there's no meaningful way to format it
     if (isNaN(date.getTime())) { return date.toString(); }
 
-    const localDate = utcToZonedTime(date, "UTC");
-
     switch (precision) {
-      case "day": return format(localDate, "MMMM d, yyyy");
-      case "month": return format(localDate, "MMMM, yyyy");
+      case "day": return format(date, "MMMM d, yyyy");
+      case "month": return format(date, "MMMM, yyyy");
       case "year": return date.getUTCFullYear().toString();
       case "decade":
         // zero out the last year digit with an intdiv
@@ -250,7 +248,10 @@
                   // @ts-ignore
                   const value = event.target?.value;
 
-                  editingItem.start_date = new Date(Date.parse(value));
+                  editingItem.start_date = utcToZonedTime(
+                    new Date(Date.parse(value)),
+                    "UTC"
+                  );
                 }}
                 value={formatDateNumbers(editingItem.start_date)}
                 max={formatDateNumbers(editingItem.end_date)} />
@@ -273,7 +274,10 @@
                   const value = event.target?.value;
 
                   editingItem.end_date = value == "" || value == null
-                    ? null : new Date(Date.parse(value));
+                    ? null : utcToZonedTime(
+                      new Date(Date.parse(value)),
+                      "UTC"
+                    );
 
                   editingItem.end_date_precision = editingItem.end_date == null
                     ? null : editingItem.start_date_precision;

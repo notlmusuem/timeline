@@ -24,11 +24,10 @@
   function startAdd() { mode.update(n => "add"); }
   function stopChange() { mode.update(n => "default"); }
 
-  function isValidDateFormat(dateString) {
+  function isValidDateFormat(date) {
     // A date instance is invalid iff it's timestamp is nan
     // note: the Date constructor also checks if the months/days are valid, and
     // considers all the ugly edge cases (e.g. Feb 29th)
-    const date = new Date(Date.parse(dateString));
     return !isNaN(date.getTime());
   }
 
