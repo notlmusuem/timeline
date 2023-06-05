@@ -1,4 +1,4 @@
-import { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
 
 
 export interface Table {
@@ -40,24 +40,36 @@ export class Entry implements Table {
     return new Entry("", new Date());
   }
 
-  private static from_row(row: {
+  static from_obj(obj: {
     id: number, title: string, image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
   }): Entry {
-    return {
-      id: row.id,
-      title: row.title,
-      image: row.image,
-      image_credit: row.image_credit,
-      body: row.body,
-      start_date: new Date(Date.parse(row.start_date)),
-      start_date_precision: row.start_date_precision,
-      end_date: row.end_date == null
-        ? null : new Date(Date.parse(row.end_date)),
-      end_date_precision: row.end_date_precision,
-    } as Entry;
+    const self = new Entry(obj.title, new Date());
+
+    self.id = obj.id;
+    self.title = obj.title;
+    self.image = obj.image;
+    self.image_credit = obj.image_credit;
+    self.body = obj.body;
+    self.start_date = new Date(Date.parse(obj.start_date));
+    self.start_date_precision = obj.start_date_precision;
+    self.end_date = obj.end_date == null
+        ? null : new Date(Date.parse(obj.end_date));
+    self.end_date_precision = obj.end_date_precision;
+
+    return self;
+  }
+
+  public to_obj(): {
+    id: number, title: string, image: string|null, image_credit: string|null,
+    body: string|null, start_date: string,
+    start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
+    end_date_precision: "day"|"month"|"year"|"decade"|null
+  } {
+    // @ts-ignore typescript is dumb
+    return { ...this };
   }
 
   static async select_all(conx): Promise<Entry[]> {
@@ -69,7 +81,7 @@ export class Entry implements Table {
       )
       .order("start_date");
     if (error) { throw error as PostgrestError; }
-    return data.map(Entry.from_row);
+    return data.map(Entry.from_obj);
   }
 
   async insert(conx: SupabaseClient<any, "public", any>) {
@@ -113,7 +125,5 @@ export class Entry implements Table {
   }
 
   // Determines if item is present in the remote table, or if not, it is local.
-  in_table = {
-    get: (): boolean => this.id != null
-  };
+  public get in_table(): boolean { return this.id != null; }
 }
