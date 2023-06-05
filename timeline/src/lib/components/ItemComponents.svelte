@@ -101,9 +101,10 @@
         return;
       }
 
+      const filename = `${Date.now()}_${file.name}`;
       const { data, error } = await supabase.storage
         .from("images")
-        .upload(`${Date.now()}_${file.name}`, file);
+        .upload(filename, file);
 
       if (error != null) {
         if (error.message === "Duplicate") {
@@ -118,7 +119,7 @@
 
       const { data: { publicUrl } } = supabase.storage
         .from("images")
-        .getPublicUrl(file.name);
+        .getPublicUrl(filename);
 
       if ($mode !== "default") {
         editingItem.image = publicUrl;
