@@ -1,16 +1,10 @@
 import adapter from "@sveltejs/adapter-auto";
-import sveltePreprocess from "svelte-preprocess";
+import { vitePreprocess } from '@sveltejs/kit/vite';
 
 /** @type {import('@sveltejs/kit').Config} */
-const config = {
+export default {
   kit: {
-    adapter: adapter({
-      pages: "build",
-      assets: "build",
-      fallback: null,
-    }),
+    adapter: adapter(),
   },
-  preprocess: sveltePreprocess({}),
+  preprocess: vitePreprocess(),
 };
-
-export default config;
