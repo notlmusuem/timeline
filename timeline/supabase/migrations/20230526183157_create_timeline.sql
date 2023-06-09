@@ -10,3 +10,22 @@ public.timeline (
   constraint timeline_pkey primary key (id),
   constraint timeline_id_key unique (id)
 ) tablespace pg_default;
+
+create policy "Enable read access for all users" on public.timeline
+as permissive for select to public
+using (true);
+
+create policy "Enable insert access for authenticated users only" on public.timeline
+as permissive for insert to authenticated
+with check (true);
+
+create policy "Enable update access for authenticated users only" on public.timeline
+as permissive for update to authenticated
+using (true)
+with check (true);
+
+create policy "Enable delete access for authenticated users only" on public.timeline
+as permissive for delete to authenticated
+using (true);
+
+alter table public.timeline enable row level security;
