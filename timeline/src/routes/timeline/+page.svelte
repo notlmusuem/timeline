@@ -72,6 +72,24 @@
     update();
   }
 
+  // checks for multiple events in a year when dot on timeline is clicked
+  async function multipleEventsCheck() {
+    year.set(selectedItem.start_date.getUTCFullYear());
+
+    currentIndex = timeline.indexOf(selectedItem);
+    currentItemIndexStore.set(currentIndex);
+    const indexDate = timeline[currentIndex].start_date.getUTCFullYear();
+    for(var i=0; timeline.length; i++)
+    {
+      if(timeline[i].start_date.getUTCFullYear() == indexDate)
+      {
+        currentIndex = i;
+        currentItemIndexStore.set(currentIndex);
+        break;
+      }
+    }
+  }
+
   async function update() {
     year.set(selectedItem.start_date.getUTCFullYear());
 
@@ -321,7 +339,7 @@
 <TimelineBar
   timeData={timeline}
   bind:currentItem={selectedItem}
-  on:change={update}
+  on:change={multipleEventsCheck}
   on:pagedown={pageDown}
   on:pageup={pageUp} />
 
