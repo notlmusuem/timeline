@@ -534,6 +534,23 @@
     }
   }
 
+   @media screen and (max-height: 1000px) {
+    .timeline-container {
+      height: 60vh;
+    }
+    .line {
+      height: 60vh;
+    }
+  }
+
+  @media screen and (max-height: 450px) {
+    .btns {
+      flex-flow: row wrap;
+      width: 106px;
+      gap: 0vh;
+    }
+  }
+
   .disabled {
     pointer-events: none;
   }
