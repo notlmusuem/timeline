@@ -30,7 +30,7 @@
   let tweening;
   let zoom = 1;
   let zoomOffset = 0;
-  let timelineHeight = 80;
+  let timelineHeight = 70;
   let lowest;
   let highest;
   let decadeGap;
@@ -49,7 +49,7 @@
   const callPageUp = () => dispatch("pageup");
 
   function change() {
-    const index = timeData.findIndex((item) => item.id == currentItem.id);
+    var index = timeData.findIndex((entry) => entry.id == currentItem.id);
     $direction = index > $currentItemIndexStore ? "down" : "up";
     dispatch("change");
   }
@@ -70,7 +70,7 @@
     return spacing;
   };
 
-  $: $mobile ? (timelineHeight = 65) : (timelineHeight = 80);
+  $: $mobile ? (timelineHeight = 65) : (timelineHeight = 70);
 
   function getYear(date) {
     const y = date.substring(0, 4);
@@ -533,16 +533,7 @@
     }
   }
 
-   @media screen and (max-height: 1000px) {
-    .timeline-container {
-      height: 60vh;
-    }
-    .line {
-      height: 60vh;
-    }
-  }
-
-  @media screen and (max-height: 450px) {
+  @media screen and (max-height: 520px) {
     .btns {
       flex-flow: row wrap;
       width: 106px;
