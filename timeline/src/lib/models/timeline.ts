@@ -23,6 +23,7 @@ export interface Table {
 export class Entry implements Table {
   // A null id indicates this is not yet present in the table
   id: number|null = null;
+  timeline: Timeline;
   title: string;
   image: string|null = null;
   image_credit: string|null = null;
@@ -32,22 +33,27 @@ export class Entry implements Table {
   end_date: Date|null = null;
   end_date_precision: "day"|"month"|"year"|"decade"|null = null;
 
-  constructor(title: string, start_date: Date) {
+  constructor(timeline: Timeline, title: string, start_date: Date) {
+    this.timeline = timeline;
     this.title = title;
     this.start_date = start_date;
   }
 
   static new_default() {
-    return new Entry("", new Date());
+    return new Entry(DEFAULT_TIMELINE, "", new Date());
   }
 
+  // static from_obj(timelines_ref: Timeline[], obj: {
   static from_obj(obj: {
-    id: number|null, title: string, image: string|null, image_credit: string|null,
+    id: number|null, timeline: number, title: string,
+    image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
   }): Entry {
-    const self = new Entry(obj.title, new Date());
+    // todo: look up id in timelines_ref
+    // note: temp fix; see eof
+    const self = new Entry(DEFAULT_TIMELINE, obj.title, new Date());
 
     self.id = obj.id;
     self.title = obj.title;
@@ -60,40 +66,48 @@ export class Entry implements Table {
     );
     self.start_date_precision = obj.start_date_precision;
     self.end_date = obj.end_date == null
-        ? null : utcToZonedTime(
-          new Date(Date.parse(obj.end_date)),
-          "UTC"
-        );
+      ? null : utcToZonedTime(
+        new Date(Date.parse(obj.end_date)),
+        "UTC"
+      );
     self.end_date_precision = obj.end_date_precision;
 
     return self;
   }
 
   public to_obj(): {
-    id: number|null, title: string, image: string|null, image_credit: string|null,
+    id: number|null, timeline: number, title: string,
+    image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
   } {
     // @ts-ignore typescript is dumb
-    return { ...this };
+    return { ...this, timeline: this.timeline.id };
   }
 
+  // static async select_all(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
   static async select_all(conx: SupabaseClient): Promise<Entry[]> {
+    const timeline = DEFAULT_TIMELINE;  // note: temp fix; see eof
     const { data, error } = await conx
       .from("timeline")
       .select(
-        `id, title, image, image_credit, body, start_date, start_date_precision,
+        `id, title, image, image_credit, body,
+        start_date, start_date_precision,
         end_date, end_date_precision`
       )
+      .eq("timeline", timeline.id)
       .order("start_date");
     if (error) { throw error as PostgrestError; }
-    return data.map(Entry.from_obj);
+    return data.map(obj => Entry.from_obj({
+      ...obj, timeline: timeline.id as number
+    }));
   }
 
   async insert(conx: SupabaseClient): Promise<this> {
     const { data, error } = await conx.from("timeline").insert(
       {
+        timeline: this.timeline.id,
         title: this.title,
         image: this.image,
         image_credit: this.image_credit,
@@ -110,6 +124,7 @@ export class Entry implements Table {
 
   async update(conx: SupabaseClient) {
     const { error } = await conx.from("timeline").update({
+      timeline: this.timeline.id,
       title: this.title,
       image: this.image,
       image_credit: this.image_credit,
@@ -134,3 +149,77 @@ export class Entry implements Table {
   // Determines if item is present in the remote table, or if not, it is local.
   public get in_table(): boolean { return this.id != null; }
 }
+
+
+export class Timeline implements Table {
+  // A null id indicates this Item is not yet present in the table
+  id: number|null = null;
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  static from_obj(obj: { id: number|null, name: string }): Timeline {
+    const self = new Timeline(obj.name);
+    self.id = obj.id;
+    return self;
+  }
+
+  public to_obj(): { id: number|null, name: string } {
+    return { id: this.id, name: this.name };
+  }
+
+  static async select(conx: SupabaseClient, id: number): Promise<Timeline|null> {
+    const { data, error } = await conx
+      .from("timelines")
+      .select("id, name")
+      .eq("id", id)
+      .order("id");
+    if (error) { throw error as PostgrestError; }
+    return data.length == 1 ? Timeline.from_obj(data[0]) : null;
+  }
+
+  static async select_all(conx: SupabaseClient): Promise<Timeline[]> {
+    const { data, error } = await conx
+      .from("timelines")
+      .select("id, name")
+      .order("id");
+    if (error) { throw error as PostgrestError; }
+    return data.map(Timeline.from_obj);
+  }
+
+  async insert(conx: SupabaseClient): Promise<this> {
+    const { data, error } = await conx.from("timelines").insert(
+      {
+        name: this.name,
+      }).select("id");
+    if (error) { throw error as PostgrestError; }
+    this.id = data[0].id;
+    return this;
+  }
+
+  async update(conx: SupabaseClient) {
+    const { error } = await conx.from("timelines").update({
+      name: this.name,
+    }).eq("id", this.id);
+    if (error) { throw error as PostgrestError; }
+    return this;
+  }
+
+  async delete(conx: SupabaseClient) {
+    const { error } = await conx
+      .from("timelines")
+      .delete()
+      .eq("id", this.id);
+    if (error) { throw error as PostgrestError; }
+  }
+
+  // Determines if item is present in the remote table, or if not, it is local.
+  public get in_table(): boolean { return this.id != null; }
+}
+
+
+// note: temporary fix until function signature changes are final and refactored elsewhere
+import supabase from "$lib/supabaseClient";
+const DEFAULT_TIMELINE: Timeline = (await Timeline.select_all(supabase))[0];
