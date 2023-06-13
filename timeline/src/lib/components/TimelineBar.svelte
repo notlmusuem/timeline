@@ -50,7 +50,7 @@
   const callPageUp = () => dispatch("pageup");
 
   function change() {
-    var index = timeData.findIndex((entry) => entry.id == currentItem.id);
+    const index = timeData.findIndex((entry) => entry.id == currentItem.id);
     $direction = index > $currentItemIndexStore ? "down" : "up";
     dispatch("change");
   }
