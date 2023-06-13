@@ -31,7 +31,7 @@
       return {
         title: item.title,
         // todo: support proper dates
-        year: item.start_date.getUTCFullYear(),
+        year: item.start_date.getFullYear(),
       };
     });
   }
@@ -73,7 +73,7 @@
   }
 
   async function update() {
-    year.set(selectedItem.start_date.getUTCFullYear());
+    year.set(selectedItem.start_date.getFullYear());
 
     currentIndex = timeline.indexOf(selectedItem);
     currentItemIndexStore.set(currentIndex);
