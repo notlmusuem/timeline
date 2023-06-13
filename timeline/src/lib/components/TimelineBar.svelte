@@ -39,8 +39,9 @@
 
   $: disabled = $mode !== "default";
 
-  firstYear.set(timeData[0].start_date.getUTCFullYear());
-  lastYear.set(timeData[timeData.length - 1].start_date.getUTCFullYear());
+  // since start_date is already compensated for UTC, this actually gets the UTC year
+  firstYear.set(timeData[0].start_date.getFullYear());
+  lastYear.set(timeData[timeData.length - 1].start_date.getFullYear());
 
   const dispatch = createEventDispatcher();
 
@@ -155,7 +156,7 @@
     );
     lowest = Math.floor($firstYear / scale) * scale - 10;
     highest =
-      Math.ceil(timeData[timeData.length - 1].start_date.getUTCFullYear() / scale) *
+      Math.ceil(timeData[timeData.length - 1].start_date.getFullYear() / scale) *
         scale +
       10;
 
@@ -234,16 +235,16 @@
           on:keyup
           class="lineItem"
           on:click={handleMove}
-          on:click={() => year.set(td.start_date.getUTCFullYear())}>
+          on:click={() => year.set(td.start_date.getFullYear())}>
           <div
             class="dot"
             style="transform:translateY({
-              getSpacing(td.start_date.getUTCFullYear())
+              getSpacing(td.start_date.getFullYear())
             }vh)">
             <Dot
               eventOne={() => setDetails(td)}
               eventTwo={() => change()}
-              year={td.start_date.getUTCFullYear()} />
+              year={td.start_date.getFullYear()} />
           </div>
         </div>
       {/each}
