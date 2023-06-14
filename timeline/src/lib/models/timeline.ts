@@ -221,5 +221,4 @@ export class Timeline implements Table {
 
 
 // note: temporary fix until function signature changes are final and refactored elsewhere
-import supabase from "$lib/supabaseClient";
-const DEFAULT_TIMELINE: Timeline = (await Timeline.select_all(supabase))[0];
+const DEFAULT_TIMELINE: Timeline = Timeline.from_obj({ id: 1, name: "NOTL" });
