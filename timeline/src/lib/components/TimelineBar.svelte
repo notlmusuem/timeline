@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { mode } from "$lib/stores/store";
   import { fly } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
@@ -14,8 +14,7 @@
     firstYear,
     lastYear,
     atStart,
-    atEnd,
-    showModal,
+    atEnd
   } from "$lib/stores/store";
   import { onMount } from "svelte";
   import { mobile, windowHeight } from "$lib/stores/window";
@@ -23,6 +22,9 @@
 
   export let timeData;
   export let currentItem;
+
+  export let modalQuickStart: boolean;
+  export let modalEditorGuide: boolean;
 
   let disabled;
   let dragging = false;
@@ -203,18 +205,33 @@
   <div class="arrow-button" title="Previous item">
     <Arrow on:moveup={handleUpArrow} disabled={$atStart} />
   </div>
+
   <div class="arrow-button" title="Next item">
     <Arrow on:movedown={handleDownArrow} down disabled={$atEnd} />
   </div>
+
   <div class="help">
     <button
       class="help-btn"
       title="Show Quick Start guide"
-      on:click={() => showModal.set(true)}>
+      on:click={() => modalQuickStart = true}>
       <span class="material-symbols-rounded i">help</span>
     </button>
   </div>
 </div>
+
+<div
+  class={"arrow-btns" + (!arrowVisible && $userStore?.email ? " edit" : " hidden")}>
+  <div class="help">
+    <button
+      class="help-btn"
+      title="Show Quick Start guide"
+      on:click={() => modalEditorGuide = true}>
+      <span class="material-symbols-rounded i">unknown_document</span>
+    </button>
+  </div>
+</div>
+
 <div
   style="--height:{timelineHeight}vh"
   transition:fly={{ x: -100, easing: quintOut, duration: 500 }}

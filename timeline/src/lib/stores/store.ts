@@ -56,8 +56,5 @@ function expoOut(t: number): number {
 // transition direction
 export const direction: Writable<string> = writable("down");
 
-// modal store
-export const showModal: Writable<boolean> = writable(false);
-
 // item editing mode store
 export const mode: Writable<string> = writable("default");

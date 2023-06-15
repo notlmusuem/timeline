@@ -1,17 +1,17 @@
-<script>
+<script lang="ts">
   // based on https://svelte.dev/examples/modal from Svelte docs
   import Button from "$lib/components/Button.svelte";
-  import { showModal } from "$lib/stores/store";
 
-  let dialog;
+  export let visible: boolean;
+  let dialog: HTMLDialogElement;
 
-  $: if (dialog && $showModal) dialog.showModal();
+  $: if (dialog && visible) dialog.showModal();
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
   bind:this={dialog}
-  on:close={() => (showModal.set(false))}
+  on:close={() => visible = false}
   on:click|self={() => dialog.close()}>
   <div on:click|stopPropagation>
     <slot name="header" />
