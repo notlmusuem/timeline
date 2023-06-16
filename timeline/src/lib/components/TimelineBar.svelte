@@ -36,7 +36,7 @@
   let lowest;
   let highest;
   let decadeGap;
-  let decades = [];
+  let decades: number[] = [];
   let arrowVisible = true;
 
   $: disabled = $mode !== "default";
