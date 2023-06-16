@@ -190,19 +190,20 @@
   let firstVisit: boolean = false;
   $: if (firstVisit) {
     modalQuickStart = true;
+    firstVisit = false;
     localStorage.setItem("firstVisit", "false");
   }
 
   let firstTimeEditor: boolean = false;
   $: if (firstTimeEditor && $mode != "default") {
     modalEditorGuide = true;
+    firstTimeEditor = false;
     localStorage.setItem("firstTimeEditor", "false");
   }
 
   onMount(() => {
     firstVisit = localStorage.getItem("firstVisit") == null;
     firstTimeEditor = localStorage.getItem("firstTimeEditor") == null;
-    console.log("firstVisit:", firstVisit)
 
     const timelineChannel = supabase
       .channel("custom-all-channel")
