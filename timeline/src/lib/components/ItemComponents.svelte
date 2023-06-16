@@ -192,7 +192,6 @@
                     }
                   }} />
               </div>
-              </div>
             </div>
           {:else if $mode == "default" && entry.image != null}
             {#if entry.image.includes("youtube.com")}
