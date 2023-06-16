@@ -31,14 +31,26 @@
     return !isNaN(date.getTime());
   }
 
-  // todo: saving changes does not handle setting end_date or end_date_precision to null if needed
   async function saveChanges(insert) {
     let inserting = !entry.in_table;  // insert the item if it is locally created
-    if (
-      !isValidDateFormat(entry.start_date)
-      || (entry.end_date != null && !isValidDateFormat(entry.end_date))
-    ) {
-      toast.push("Please enter a valid date.");
+
+    if ((entry.title ?? "").trim() == "") {
+      toast.push("<b>Error</b><br>Entry title is required.");
+      return;
+    }
+
+    if (entry.start_date == null) {
+      toast.push("<b>Error</b><br>Start date is required.");
+      return;
+    }
+
+    if (entry.start_date == null || !isValidDateFormat(entry.start_date)) {
+      toast.push("<b>Error</b><br>Start date is an invalid date.");
+      return;
+    }
+
+    if (entry.end_date != null && !isValidDateFormat(entry.end_date)) {
+      toast.push("<b>Error</b><br>End date is an invalid date.");
       return;
     }
 
