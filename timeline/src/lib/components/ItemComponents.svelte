@@ -6,6 +6,7 @@
   import { loadingAction } from "svelte-legos";
   import { toast } from "@zerodevx/svelte-toast";
   import supabase from "$lib/supabaseClient";
+  import { structuredCloneProto } from "$lib/utils";
 
   import { mobile } from "$lib/stores/window";
   import { mode } from "$lib/stores/store";
@@ -39,14 +40,6 @@
     }
   });
 
-
-  function structuredCloneProto<T>(obj: T): T {
-    const clone = structuredClone(obj);
-    // structuredClone presently does not copy over prototypes, so we need to
-    // copy them ourselves
-    Object.setPrototypeOf(clone, Object.getPrototypeOf(obj));
-    return clone;
-  }
 
   function formatDateNumbers(date: Date|null): string {
     if (date == null || isNaN(date.getTime())) { return ""; }
