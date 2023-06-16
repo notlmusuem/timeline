@@ -170,7 +170,13 @@
                   type="text"
                   name="image_url"
                   placeholder="https://example.com/image.jpg"
-                  bind:value={editingItem.image} />
+                  bind:value={editingItem.image}
+                  on:change={event => {
+                    editingItem.image = editingItem.image?.trim() ?? null;
+                    if (editingItem.image == "") {
+                      editingItem.image = null;
+                    }
+                  }} />
               </div>
               <div class="input-cont">
                 <label for="image_credit">Image source</label>
@@ -178,7 +184,14 @@
                   type="text"
                   name="image_credit"
                   placeholder="https://example.com"
-                  bind:value={editingItem.image_credit} />
+                  bind:value={editingItem.image_credit}
+                  on:change={event => {
+                    editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
+                    if (editingItem.image_credit == "") {
+                      editingItem.image_credit = null;
+                    }
+                  }} />
+              </div>
               </div>
             </div>
           {:else if $mode == "default" && entry.image != null}
@@ -230,7 +243,10 @@
                 name="title"
                 type="text"
                 placeholder="Title"
-                bind:value={editingItem.title} />
+                bind:value={editingItem.title}
+                on:change={event => {
+                  editingItem.title = editingItem.title?.trim() ?? null;
+                }} />
             </div>
           </div>
 
@@ -268,9 +284,7 @@
                 type="date"
                 placeholder="YYYY-MM-DD"
                 on:change={event => {
-                  // We can't actually use typescript casts in this context
-                  // because this isn't in a <script lang="ts"> block. Ew.
-                  // @ts-ignore
+                  // @ts-ignore Not in a <script lang="ts"> block.
                   const value = event.target?.value;
 
                   editingItem.end_date = value == "" || value == null
@@ -294,9 +308,7 @@
                 name="date_precision"
                 bind:value={editingItem.start_date_precision}
                 on:change={event => {
-                  // We can't actually use typescript casts in this context
-                  // because this isn't in a <script lang="ts"> block. Ew.
-                  // @ts-ignore
+                  // @ts-ignore Not in a <script lang="ts"> block.
                   const value = event.target?.value;
                   editingItem.end_date_precision =
                     editingItem.end_date == null ? null : value;
@@ -311,7 +323,16 @@
 
           <div class="input-cont">
             <label for="body">Description</label>
-            <textarea name="body" placeholder="Description" bind:value={editingItem.body} />
+            <textarea
+              name="body"
+              placeholder="Description"
+              bind:value={editingItem.body}
+              on:change={event => {
+                editingItem.body = editingItem.body?.trim() ?? null;
+                if (editingItem.body == "") {
+                  editingItem.body = null;
+                }
+              }}/>
           </div>
         </form>
       {:else}  <!-- $mode === "default" -->
