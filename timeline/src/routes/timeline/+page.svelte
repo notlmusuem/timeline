@@ -19,6 +19,7 @@
   import Modal from "$lib/components/Modal.svelte";
 
   import { Entry } from "$lib/models/timeline";
+  import { sleep } from "$lib/utils";
 
   export let data;
   let timeline: Entry[] = data.timeline.map(o => Entry.from_obj(o));
@@ -175,10 +176,6 @@
         resetSwipe();
       });
     }
-  }
-
-  async function sleep(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 
   function resetSwipe() {

@@ -22,3 +22,7 @@ export function structuredCloneProto<T>(obj: T): T {
   Object.setPrototypeOf(clone, Object.getPrototypeOf(obj));
   return clone;
 }
+
+export async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
