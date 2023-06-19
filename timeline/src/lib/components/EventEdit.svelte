@@ -80,10 +80,7 @@
   const deleteEntry = async () => {
     if (confirm(
       "Are you sure you want to delete this entry?\nPress OK to permanently delete this entry."
-    ) == false) {
-      toast.push("<b>Cancelled</b><br>Item not deleted.");
-      return;
-    }
+    ) == false) { return; }
 
     try {
       await entry.delete(supabase);
