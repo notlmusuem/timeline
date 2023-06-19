@@ -114,17 +114,49 @@
 
   $: add = Entry.new_default();
 
-  function handleAdd() {
-    selectedItem = timeline[0];
+  function handleCreate({ detail: new_entry }) {
+    timeline.push(new_entry);
+    timeline.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
+
+    currentIndex = timeline.findIndex(entry => entry.id == new_entry.id);
+    selectedItem = timeline[currentIndex];
+    currentItemIndexStore.set(currentIndex);
     update();
-    $mode = "add";
+    mode.set("add");
+    mode.set("default");
   }
 
-  function handleDelete() {
+  function handleUpdate({ detail: new_entry }) {
+    console.log("updated entry", new_entry)
+    let idx = timeline.findIndex(entry => entry.id == new_entry.id);
+    if (idx != -1) {
+      timeline[idx] = new_entry;
+    }
+
+    timeline.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
+    idx = timeline.findIndex(entry => entry.id == new_entry.id);
+
+    currentIndex = idx;
+    selectedItem = timeline[currentIndex];
+    currentItemIndexStore.set(currentIndex);
+    update();
+    mode.set("add");
+    mode.set("default");
+  }
+
+  function handleDelete({ detail: rm_entry }) {
+    let idx = timeline.findIndex(entry => entry.id == rm_entry.id);
+    if (idx != -1) {
+      timeline.splice(idx, 1);
+    }
+
+    selectedItem = timeline[currentIndex--];
+    currentItemIndexStore.set(currentIndex);
+
     if (timeline.length >= 1) {
-      selectedItem = timeline[0];
       update();
-      $mode = "default";
+      mode.set("add");
+      mode.set("default");
     }
   }
 
@@ -463,7 +495,8 @@
 
 <EventEdit
   entry={editingItem}
-  on:saveNew={handleAdd}
+  on:entryCreate={handleCreate}
+  on:entryUpdate={handleUpdate}
   on:entryDeleted={handleDelete} />
 
 {#if timeline.length > 0}

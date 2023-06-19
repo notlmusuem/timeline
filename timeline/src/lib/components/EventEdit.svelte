@@ -57,9 +57,10 @@
     try {
       if (inserting) {
         await entry.insert(supabase);  // note: this updates item.id
-        dispatch("saveNew");
+        dispatch("entryCreate", entry);
       } else {
         await entry.update(supabase);
+        dispatch("entryUpdate", entry);
       }
 
       stopChange();
@@ -69,7 +70,7 @@
       } else {
         toast.push("<b>Success</b><br>Changes saved. Refreshing items...");
       }
-      // fixme: a page reload isn't necessary and hinders the editing experience
+      // fixme: a page reload isn't necessary and hinders the editing experience; see #26
       location.reload();
     } catch (err) {
       let error = err as PostgrestError;
@@ -84,12 +85,12 @@
 
     try {
       await entry.delete(supabase);
-
-      stopChange();
       dispatch("entryDeleted");
 
+      stopChange();
+
       toast.push("<b>Success</b><br>Entry deleted successfully. Refreshing items...");
-      // fixme: a page reload isn't necessary and hinders the editing experience
+      // fixme: a page reload isn't necessary and hinders the editing experience; see #26
       location.reload();
     } catch (err) {
       let error = err as PostgrestError;
