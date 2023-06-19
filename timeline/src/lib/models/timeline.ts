@@ -1,5 +1,6 @@
 import { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
-import { utcToZonedTime } from "date-fns-tz";
+import { UTCDate } from "@date-fns/utc";
+import * as datefn from "date-fns-tz";
 
 
 export interface Table {
@@ -28,19 +29,19 @@ export class Entry implements Table {
   image: string|null = null;
   image_credit: string|null = null;
   body: string|null = null;
-  start_date: Date;
+  start_date: UTCDate;
   start_date_precision: "day"|"month"|"year"|"decade" = "day";
-  end_date: Date|null = null;
+  end_date: UTCDate|null = null;
   end_date_precision: "day"|"month"|"year"|"decade"|null = null;
 
-  constructor(timeline: Timeline, title: string, start_date: Date) {
+  constructor(timeline: Timeline, title: string, start_date: UTCDate) {
     this.timeline = timeline;
     this.title = title;
     this.start_date = start_date;
   }
 
   static new_default() {
-    return new Entry(DEFAULT_TIMELINE, "", new Date());
+    return new Entry(DEFAULT_TIMELINE, "", new UTCDate());
   }
 
   // static from_obj(timelines_ref: Timeline[], obj: {
@@ -53,23 +54,17 @@ export class Entry implements Table {
   }): Entry {
     // todo: look up id in timelines_ref
     // note: temp fix; see eof
-    const self = new Entry(DEFAULT_TIMELINE, obj.title, new Date());
+    const self = new Entry(DEFAULT_TIMELINE, obj.title, new UTCDate());
 
     self.id = obj.id;
     self.title = obj.title;
     self.image = obj.image;
     self.image_credit = obj.image_credit;
     self.body = obj.body;
-    self.start_date = utcToZonedTime(
-      new Date(Date.parse(obj.start_date)),
-      "UTC"
-    );
+    self.start_date = new UTCDate(UTCDate.parse(obj.start_date));
     self.start_date_precision = obj.start_date_precision;
     self.end_date = obj.end_date == null
-      ? null : utcToZonedTime(
-        new Date(Date.parse(obj.end_date)),
-        "UTC"
-      );
+      ? null : new UTCDate(UTCDate.parse(obj.end_date));
     self.end_date_precision = obj.end_date_precision;
 
     return self;
@@ -83,7 +78,14 @@ export class Entry implements Table {
     end_date_precision: "day"|"month"|"year"|"decade"|null
   } {
     // @ts-ignore typescript is dumb
-    return { ...this, timeline: this.timeline.id };
+    return {
+      ...this,
+      // note: when implementing localization, use options { locale: enCA }
+      start_date: datefn.formatInTimeZone(this.start_date, "UTC", "yyyy-MM-dd"),
+      end_date: this.end_date == null
+        ? null : datefn.formatInTimeZone(this.end_date, "UTC", "yyyy-MM-dd"),
+      timeline: this.timeline.id
+    };
   }
 
   // static async select_all(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
@@ -112,9 +114,10 @@ export class Entry implements Table {
         image: this.image,
         image_credit: this.image_credit,
         body: this.body,
-        start_date: this.start_date.toUTCString(),
+        start_date: datefn.formatInTimeZone(this.start_date, "UTC", "yyyy-MM-dd"),
         start_date_precision: this.start_date_precision,
-        end_date: this.end_date?.toUTCString() ?? null,
+        end_date: this.end_date == null
+          ? null : datefn.formatInTimeZone(this.end_date, "UTC", "yyyy-MM-dd"),
         end_date_precision: this.end_date_precision,
       }).select("id");
     if (error) { throw error as PostgrestError; }
@@ -129,9 +132,10 @@ export class Entry implements Table {
       image: this.image,
       image_credit: this.image_credit,
       body: this.body,
-      start_date: this.start_date.toUTCString(),
+      start_date: datefn.formatInTimeZone(this.start_date, "UTC", "yyyy-MM-dd"),
       start_date_precision: this.start_date_precision,
-      end_date: this.end_date?.toUTCString() ?? null,
+      end_date: this.end_date == null
+        ? null : datefn.formatInTimeZone(this.end_date, "UTC", "yyyy-MM-dd"),
       end_date_precision: this.end_date_precision,
     }).eq("id", this.id);
     if (error) { throw error as PostgrestError; }

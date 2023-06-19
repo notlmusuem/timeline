@@ -1,7 +1,8 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
   import { writable } from "svelte/store";
-  import { format, utcToZonedTime } from "date-fns-tz";
+  import { UTCDate } from "@date-fns/utc";
+  import * as datefn from "date-fns-tz";
   import Fullscreen from "svelte-fullscreen";
   import { loadingAction } from "svelte-legos";
   import { toast } from "@zerodevx/svelte-toast";
@@ -41,32 +42,31 @@
   });
 
 
-  function formatDateNumbers(date: Date|null): string {
+  function formatDateNumbers(date: UTCDate|null): string {
     if (date == null || isNaN(date.getTime())) { return ""; }
 
-    const localDate = utcToZonedTime(date, "UTC");
-    return format(localDate, "yyyy-MM-dd");
+    return datefn.formatInTimeZone(date, "UTC", "yyyy-MM-dd");
   }
 
-  function formatDate(date: Date, precision: "day"|"month"|"year"|"decade"): string {
+  function formatDate(date: UTCDate, precision: "day"|"month"|"year"|"decade"): string {
     // if the date is invalid, there's no meaningful way to format it
     if (isNaN(date.getTime())) { return date.toString(); }
 
     switch (precision) {
-      case "day": return format(date, "MMMM d, yyyy");
-      case "month": return format(date, "MMMM, yyyy");
-      case "year": return date.getUTCFullYear().toString();
+      case "day": return datefn.formatInTimeZone(date, "UTC", "MMMM d, yyyy");
+      case "month": return datefn.formatInTimeZone(date, "UTC", "MMMM, yyyy");
+      case "year": return datefn.formatInTimeZone(date, "UTC", "yyyy");
       case "decade":
         // zero out the last year digit with an intdiv
         let zeroed = structuredCloneProto(date);
-        zeroed.setUTCFullYear(Math.floor(date.getUTCFullYear() / 10) * 10);
-        return format(zeroed, "yyyy") + "s";
+        zeroed.setFullYear(Math.floor(date.getFullYear() / 10) * 10);
+        return datefn.formatInTimeZone(zeroed, "UTC", "yyyy") + "s";
     }
   }
 
   function formatDateRange(
-    start_date: Date, start_date_precision: "day"|"month"|"year"|"decade",
-    end_date: Date|null, end_date_precision: "day"|"month"|"year"|"decade"|null
+    start_date: UTCDate, start_date_precision: "day"|"month"|"year"|"decade",
+    end_date: UTCDate|null, end_date_precision: "day"|"month"|"year"|"decade"|null
   ): string {
     let start = formatDate(start_date, start_date_precision);
     if (end_date != null && end_date_precision != null) {
@@ -256,10 +256,7 @@
                   // @ts-ignore
                   const value = event.target?.value;
 
-                  editingItem.start_date = utcToZonedTime(
-                    new Date(Date.parse(value)),
-                    "UTC"
-                  );
+                  editingItem.start_date = new UTCDate(UTCDate.parse(value));
                 }}
                 value={formatDateNumbers(editingItem.start_date)}
                 max={formatDateNumbers(editingItem.end_date)} />
@@ -280,10 +277,7 @@
                   const value = event.target?.value;
 
                   editingItem.end_date = value == "" || value == null
-                    ? null : utcToZonedTime(
-                      new Date(Date.parse(value)),
-                      "UTC"
-                    );
+                    ? null : new UTCDate(UTCDate.parse(value));
 
                   editingItem.end_date_precision = editingItem.end_date == null
                     ? null : editingItem.start_date_precision;

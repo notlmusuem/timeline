@@ -1,30 +1,29 @@
 <script lang="ts">
-  import { mode } from "$lib/stores/store";
   import { fly } from "svelte/transition";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { tweened } from "svelte/motion";
-  import Cursor from "$lib/components/Cursor.svelte";
-  import { userStore } from "$lib/authStore";
-  import Dot from "$lib/components/Dot.svelte";
   import { cubicOut, quintOut } from "svelte/easing";
-  import { direction } from "$lib/stores/store";
-  import { currentItemIndexStore } from "$lib/stores/store";
-  import {
-    year,
-    firstYear,
-    lastYear,
-    atStart,
-    atEnd
-  } from "$lib/stores/store";
-  import { onMount } from "svelte";
-  import { mobile, windowHeight } from "$lib/stores/window";
-  import Arrow from "./Arrow.svelte";
 
-  export let timeData;
+  import Cursor from "$lib/components/Cursor.svelte";
+  import Dot from "$lib/components/Dot.svelte";
+  import Arrow from "$lib/components/Arrow.svelte";
+
+  import { userStore } from "$lib/authStore";
+  import {
+    currentItemIndexStore, direction, mode,
+    year, firstYear, lastYear, atStart, atEnd
+  } from "$lib/stores/store";
+  import { mobile, windowHeight } from "$lib/stores/window";
+
+  import { Entry } from "$lib/models/timeline";
+
+
+  export let timeData: Entry[];
   export let currentItem;
 
   export let modalQuickStart: boolean;
   export let modalEditorGuide: boolean;
+
 
   let disabled;
   let dragging = false;
@@ -41,9 +40,8 @@
 
   $: disabled = $mode !== "default";
 
-  // since start_date is already compensated for UTC, this actually gets the UTC year
-  firstYear.set(timeData[0].start_date.getFullYear());
-  lastYear.set(timeData[timeData.length - 1].start_date.getFullYear());
+  firstYear.set(timeData[0].start_date.getUTCFullYear());
+  lastYear.set(timeData[timeData.length - 1].start_date.getUTCFullYear());
 
   const dispatch = createEventDispatcher();
 
@@ -74,11 +72,6 @@
   };
 
   $: $mobile ? (timelineHeight = 65) : (timelineHeight = 70);
-
-  function getYear(date) {
-    const y = date.substring(0, 4);
-    return parseInt(y);
-  }
 
   let zoomTweened = tweened(zoom, {
     duration: 300,
@@ -158,7 +151,7 @@
     );
     lowest = Math.floor($firstYear / scale) * scale - 10;
     highest =
-      Math.ceil(timeData[timeData.length - 1].start_date.getFullYear() / scale) *
+      Math.ceil(timeData[timeData.length - 1].start_date.getUTCFullYear() / scale) *
         scale +
       10;
 
@@ -252,16 +245,16 @@
           on:keyup
           class="lineItem"
           on:click={handleMove}
-          on:click={() => year.set(td.start_date.getFullYear())}>
+          on:click={() => year.set(td.start_date.getUTCFullYear())}>
           <div
             class="dot"
             style="transform:translateY({
-              getSpacing(td.start_date.getFullYear())
+              getSpacing(td.start_date.getUTCFullYear())
             }vh)">
             <Dot
               eventOne={() => setDetails(td)}
               eventTwo={() => change()}
-              year={td.start_date.getFullYear()} />
+              year={td.start_date.getUTCFullYear()} />
           </div>
         </div>
       {/each}
