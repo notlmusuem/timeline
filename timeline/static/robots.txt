@@ -1,3 +1,71 @@
-# https://www.robotstxt.org/robotstxt.html
+# Get bots to slow down their crawling
 User-agent: *
-Disallow:
+Crawl-delay: 5
+
+# Mix of https://www.videolan.org/robots.txt, https://sr.ht/robots.txt, and
+# https://www.goyllo.com/block-seo-bots-in-robots-txt/ with kinder language
+
+# Too aggressive, marketing/SEO
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: SemrushBot-SA
+Disallow: /
+
+# Marketing/SEO
+User-agent: AhrefsBot
+Disallow: /
+
+# Marketing/SEO
+User-agent: dotbot
+Disallow: /
+
+# Marketing/SEO
+User-agent: rogerbot
+Disallow: /
+
+# Marketing/SEO
+User-agent: Alexibot
+Disallow: /
+
+# Marketing/SEO
+User-agent: SurveyBot
+Disallow: /
+
+# Marketing/SEO
+User-agent: BLEXBot
+Disallow: /
+
+# Huwei something or another, badly behaved
+User-agent: AspiegelBot
+Disallow: /
+
+# Marketing/SEO
+User-agent: ZoominfoBot
+Disallow: /
+
+# Marketing/SEO
+User-agent: MJ12bot
+Disallow: /
+
+# Marketing/SEO
+User-agent: DataForSeoBot
+Disallow: /
+
+# IP
+# http://www.turnitin.com/robot/crawlerinfo.html
+User-Agent: TurnitinBot
+Disallow: /
+
+User-agent: Turnitin
+Disallow: /
+
+# IP
+# http://www.nameprotect.com/botinfo.html
+User-Agent: NPBot
+Disallow: /
+
+# IP
+# http://www.slysearch.com/
+User-Agent: SlySearch
+Disallow: /
