@@ -34,6 +34,7 @@ export class Entry implements Table {
   timeline: Timeline;
   title: string;
   image: string|null = null;
+  image_caption: string|null = null;
   image_credit: string|null = null;
   body: string|null = null;
   start_date: UTCDate;
@@ -53,7 +54,7 @@ export class Entry implements Table {
 
   static from_obj(obj: {
     id: number|null, timeline: number, title: string,
-    image: string|null, image_credit: string|null,
+    image: string|null, image_caption: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
@@ -70,6 +71,7 @@ export class Entry implements Table {
     self.timeline = timeline;
     self.title = obj.title;
     self.image = obj.image;
+    self.image_caption = obj.image_caption;
     self.image_credit = obj.image_credit;
     self.body = obj.body;
     self.start_date = new UTCDate(UTCDate.parse(obj.start_date));
@@ -83,7 +85,7 @@ export class Entry implements Table {
 
   public to_obj(): {
     id: number|null, timeline: number, title: string,
-    image: string|null, image_credit: string|null,
+    image: string|null, image_caption: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
@@ -104,7 +106,8 @@ export class Entry implements Table {
     const { data, error } = await conx
       .from("timeline")
       .select(
-        `id, title, image, image_credit, body,
+        `id, title, body,
+        image, image_caption, image_credit,
         start_date, start_date_precision,
         end_date, end_date_precision`
       )
@@ -121,7 +124,8 @@ export class Entry implements Table {
     const { data, error } = await conx
       .from("timeline")
       .select(
-        `id, title, image, image_credit, body,
+        `id, title, body,
+        image, image_caption, image_credit,
         start_date, start_date_precision,
         end_date, end_date_precision`
       )
@@ -140,6 +144,7 @@ export class Entry implements Table {
         timeline: this.timeline.id,
         title: this.title,
         image: this.image,
+        image_caption: this.image_caption,
         image_credit: this.image_credit,
         body: this.body,
         start_date: datefn.formatInTimeZone(this.start_date, "UTC", "yyyy-MM-dd"),
@@ -158,6 +163,7 @@ export class Entry implements Table {
       timeline: this.timeline.id,
       title: this.title,
       image: this.image,
+      image_caption: this.image_caption,
       image_credit: this.image_credit,
       body: this.body,
       start_date: datefn.formatInTimeZone(this.start_date, "UTC", "yyyy-MM-dd"),
