@@ -25,8 +25,10 @@
         utterance.pitch = 1;
       });
 
-      for (let i = 0; i < utterances.length; i++) {
-        const utterance = utterances[i];
+      const newUtterances = notNullArray(utterances);
+
+      for (let i = 0; i < newUtterances.length; i++) {
+        const utterance = newUtterances[i];
         utterance.onend = () => {
           if (currentUtterance === utterance) {
             currentUtterance = null;
@@ -35,9 +37,21 @@
         };
         speechSynthesis.speak(utterance);
       }
-      currentUtterance = utterances[2];
+      currentUtterance = newUtterances[newUtterances.length - 1];
       speaking = true;
     }
+  }
+
+  function notNullArray(utterances)
+  {
+    const newUtterances = [];
+    for (let i = 0; i < utterances.length; i++) {
+      const utterance = utterances[i];
+      if (utterance.text != "null") {
+        newUtterances.push(utterance);
+      }
+    }
+    return newUtterances;
   }
 
   function stop() {
