@@ -1,8 +1,12 @@
+/// <reference types="@sveltejs/kit" />
+/// <reference lib="webworker" />
 import { build, files, version } from "$service-worker";
 
 const CACHE = `cache-${version}`;
 
 const ASSETS = [...build, ...files];
+
+window.onerror = e => console.error(e);
 
 self.addEventListener("install", (event) => {
   async function addFilesToCache() {
@@ -19,6 +23,7 @@ self.addEventListener("activate", (event) => {
       if (key !== CACHE) await caches.delete(key);
     }
   }
+
   event.waitUntil(deleteOldCaches());
 });
 
