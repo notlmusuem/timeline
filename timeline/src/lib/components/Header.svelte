@@ -61,14 +61,13 @@
 <header>
   <nav class={shadow ? "shadow" : ""}>
     <div class="left">
-      <a href="/"
-        ><img
-          src={$themeStore === "light-theme" || $themeStore === "reading-theme"
-            ? "assets/notl-museum.svg"
-            : "assets/notl-museum-dark.svg"}
-          alt="logo"
-          class="logo"
-          id="notl_logo" /></a>
+      <a href="/">{#if $themeStore === "light-theme" || $themeStore === "reading-theme"}
+        <img class="logo" src="$lib/assets/notl-museum.svg"
+          alt="Niagara-on-the-Lake" />
+      {:else}
+        <img class="logo" src="$lib/assets/notl-museum-dark.svg"
+          alt="Niagara-on-the-Lake" />
+      {/if}</a>
       <div title="Toggle menu visibility" class="menubutton">
         <ExpandButton bind:open={isMenuOpen} />
       </div>

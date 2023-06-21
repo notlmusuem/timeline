@@ -26,13 +26,13 @@
   <section class="welcome">
     {#if $mobile}
       <div>
-        <img
-          class="logo"
-          src={$themeStore === "light-theme" ||
-          $themeStore === "reading-theme"
-            ? "assets/notl-museum.svg"
-            : "assets/notl-museum-dark.svg"}
-          alt="Niagara-on-the-Lake" />
+        {#if $themeStore === "light-theme" || $themeStore === "reading-theme"}
+          <img class="logo" src="$lib/assets/notl-museum.svg"
+            alt="Niagara-on-the-Lake" />
+        {:else}
+          <img class="logo" src="$lib/assets/notl-museum-dark.svg"
+            alt="Niagara-on-the-Lake" />
+        {/if}
       </div>
     {/if}
     <h1 class="title">

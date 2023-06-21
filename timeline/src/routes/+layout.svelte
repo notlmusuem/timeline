@@ -45,7 +45,7 @@
         ? "background grey ontimeline"
         : "background grey"}
       alt="Niagara-on-the-Lake Main Street"
-      src="assets/landing-page-bg-4.webp" />
+      src="$lib/assets/landing-page-bg-4.webp" />
   </div>
 
   <div class="bg" />
@@ -62,7 +62,7 @@
     --toastPadding: 0.5rem;
     --toastBarHeight: 0;
   }
-  
+
   .background {
     user-select: none;
     opacity: var(--bg-opacity);

@@ -81,7 +81,7 @@
           century. Today, NOTL is known for its beautiful flowers and trees and
           is home to the summer Shaw Festival and its iconic wineries.
         </p>
-        <img class="radius" src="assets/clock-tower.webp" alt="Clock Tower" />
+        <img class="radius" src="$lib/assets/clock-tower.webp" alt="Clock Tower" />
       </div>
     </div>
     <div>
@@ -89,7 +89,7 @@
       <div class="row v-align">
         <img
           class="radius"
-          src="assets/museum.jpg"
+          src="$lib/assets/museum.jpg"
           alt="Niagara-on-the-Lake Museum Logo" />
         <p>
           The NOTL Museum is operated and owned by the Niagara Historical
@@ -119,7 +119,7 @@
         <img
           width="100"
           class="radius"
-          src="assets/brock.png"
+          src="$lib/assets/brock.png"
           alt="Brock University Logo" />
       </div>
       <gap />

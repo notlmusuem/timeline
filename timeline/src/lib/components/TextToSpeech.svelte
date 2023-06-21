@@ -86,7 +86,7 @@
     <button title="Stop reading" class="text2Speech" on:click={stop}>
       <span class="material-symbols-rounded">stop</span>
     </button>
-    <img class="playing" src="/assets/icons8-audio-wave.gif" alt="Audio wave" in:slide={{axis:'x'}}/>
+    <img class="playing" src="$lib/assets/icons8-audio-wave.gif" alt="Audio wave" in:slide={{axis:'x'}}/>
   {:else}
     <button title="Read aloud" class="text2Speech" on:click={text2Speech}>
       <span class="material-symbols-rounded">volume_up</span>
