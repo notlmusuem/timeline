@@ -111,7 +111,7 @@
   --bg-opacity: 0.1;
   --arrow-opacity: 0.5;
   --arrow-border: 1px solid transparent;
-  --bg-grayscale: grayscale(1);
+  --bg-grayscale: grayscale(0.25);
   --color-theme-1: #d32f2f;
   --color-theme-2: #244d86;
   --color-theme-1-light: #fd2235;
@@ -148,7 +148,7 @@
   --bg-opacity: 0;
   --arrow-opacity: 1;
   --arrow-border: var(--border);
-  --bg-grayscale: grayscale(1);
+  --bg-grayscale: grayscale(0.25);
   --color-theme-1: #d11827;
   --color-theme-2: #397fe0;
   --color-theme-1-light: #fd2235;
