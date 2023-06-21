@@ -1,4 +1,4 @@
-<div align="center"><a href="https://museumtimeline.vercel.app"><img width="96px" src="https://user-images.githubusercontent.com/18179415/222605007-66a06286-3f5a-4903-a837-d4c1e8c5147f.png"/></div>
+<div align="center"><img width="96px" src="https://user-images.githubusercontent.com/18179415/222605007-66a06286-3f5a-4903-a837-d4c1e8c5147f.png"/></div>
 <br>
 
 <div align=center><img src="https://img.shields.io/github/contributors/SWE-2023/COSC-4P02-Project?style=flat-square"/><img src="https://img.shields.io/github/issues/SWE-2023/COSC-4P02-Project?style=flat-square"/></div>
@@ -7,9 +7,10 @@
 
 ## COSC 4P02 Team Project
 
-This is a course project for COSC 4P02 Software Engineering II taught by Professor Naser Ezzati-Jivan at Brock University.
+This is a web application to present historical events on a visual timeline for the Niagara-on-the-Lake museum.
 
-View our project documents in the [documents](documents) folder.
+View original project documents in the documents branch.
+
 
 ## Accessing the Project
 
@@ -51,26 +52,40 @@ npx supabase db reset
 
 7. On the supabase studio web UI, create a new user account for yourself, and check auto confirm. This will be the account and password used to login to the website's staff interface.
 
-8. With supabase started, run the project:
+8. With supabase started, run the project. Note that this command is also responsible for generating sveltekit types on the fly.
 ```bash
-npx vite
+npm run dev
 ```
 
-9. Press 'O' on the terminal or CTRL+Click the local URL provided by Vite to open the locally-served web application in your browser.
+9. Press 'O' on the terminal or CTRL+Click the local URL provided by Vite to open the locally-served application in your browser.
+
+
+## Testing
+1. Check that sveltekit reports no errors.
+```bash
+npm run check
+# npm run check:watch is also available for live checking
+```
+
+2. Test the build. This will catch some infrequent vite and bundler errors not caught by the dev server.
+```bash
+npm run build
+```
+
 
 ## Project Description 📝
 The goal of this project is to create an interactive timeline web application that will allow visitors to explore the history of Niagara-on-the-Lake.
 
 ## Technology Stack
 
-<img src="https://skillicons.dev/icons?i=svelte,supabase,vercel"/>
+<img src="https://skillicons.dev/icons?i=svelte,supabase,vite"/>
 
-Our project uses the following technologies:
+The project uses the following technologies:
 
 - [SvelteKit](https://kit.svelte.dev): Web application framework built on top of Svelte
 - [Svelte](https://svelte.dev): Reactive front-end framework
 - [Supabase](https://supabase.com): Backend service with Postgres database and authentication
-- [Vercel](https://vercel.com/): Hosting and deployment service
+- [Vite](https://vitejs.dev/): Hosting and deployment service
 
 ## Team Members 👥
 
@@ -84,10 +99,6 @@ Our project uses the following technologies:
 | [Abhijeet Prajapati](https://github.com/TheDasher1)| 5987722 |
 | [Justin Stickel](https://github.com/Stickelation) - *Scrum Master*| 6718704 |
 | [Haaris Yahya](https://github.com/haarisyahya)| 7054984 |
-
-## Contact
-
-If you have any questions, please reach out to the [product owner](mailto:dev@alecames.com).
 
 ## License
 
