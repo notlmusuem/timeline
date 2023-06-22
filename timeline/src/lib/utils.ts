@@ -23,6 +23,19 @@ export function structuredCloneProto<T>(obj: T): T {
   return clone;
 }
 
+/**
+ * Sleeps for the provided time.
+ */
 export async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Tries to parses an integer from a string or returns null otherwise.
+ */
+export function parseIntNull(
+  str: string, radix: number|undefined = undefined
+): number|null {
+  const num = Number.parseInt(str, radix);
+  return isNaN(num) ? null : num;
 }
