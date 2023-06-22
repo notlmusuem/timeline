@@ -11,7 +11,7 @@
   import { userStore } from "$lib/authStore";
   import {
     currentItemIndexStore, direction, mode,
-    year, firstYear, lastYear, atStart, atEnd
+    year, firstYear, lastYear
   } from "$lib/stores/store";
   import { mobile, windowHeight } from "$lib/stores/window";
 
@@ -23,6 +23,9 @@
 
   export let modalQuickStart: boolean;
   export let modalEditorGuide: boolean;
+
+  export let startSelected: boolean;
+  export let endSelected: boolean;
 
 
   let disabled;
@@ -165,18 +168,6 @@
     tweening = true;
   }
 
-  function handleDownArrow() {
-    if (!$atEnd) {
-      callPageDown();
-    }
-  }
-
-  function handleUpArrow() {
-    if (!$atStart) {
-      callPageUp();
-    }
-  }
-
   onMount(() => {
     handleResize();
     year.set($firstYear);
@@ -196,11 +187,15 @@
       : "arrow-btns"
     : "arrow-btns hidden"}>
   <div class="arrow-button" title="Previous item">
-    <Arrow on:moveup={handleUpArrow} disabled={$atStart} />
+    <Arrow
+      on:moveup={() => {if (!startSelected) { callPageUp(); }}}
+      disabled={startSelected} />
   </div>
 
   <div class="arrow-button" title="Next item">
-    <Arrow on:movedown={handleDownArrow} down disabled={$atEnd} />
+    <Arrow down
+      on:movedown={() => {if (!endSelected) { callPageDown(); }}}
+      disabled={endSelected} />
   </div>
 
   <div class="help">
