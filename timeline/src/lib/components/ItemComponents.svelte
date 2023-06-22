@@ -252,7 +252,7 @@
                 placeholder="YYYY-MM-DD"
                 on:change={event => {
                   // We can't actually use typescript casts in this context
-                  // because this isn't in a <script lang="ts"> block. Ew.
+                  // because this isn't in a script lang="ts" block. Ew.
                   // @ts-ignore
                   const value = event.target?.value;
 
@@ -273,7 +273,7 @@
                 type="date"
                 placeholder="YYYY-MM-DD"
                 on:change={event => {
-                  // @ts-ignore Not in a <script lang="ts"> block.
+                  // @ts-ignore Not in a script lang="ts" block.
                   const value = event.target?.value;
 
                   editingItem.end_date = value == "" || value == null
@@ -294,7 +294,7 @@
                 name="date_precision"
                 bind:value={editingItem.start_date_precision}
                 on:change={event => {
-                  // @ts-ignore Not in a <script lang="ts"> block.
+                  // @ts-ignore Not in a script lang="ts" block.
                   const value = event.target?.value;
                   editingItem.end_date_precision =
                     editingItem.end_date == null ? null : value;
