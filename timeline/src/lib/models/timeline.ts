@@ -7,22 +7,28 @@ export interface Table {
   // typescript does not support static interface members well enough right now
   // select_all(conx: SupabaseClient): Promise<[this]>;
 
-  // Inserts this object as a new row into the remote database.
-  // Promise rejection type: PostgrestError
+  /**
+   * Inserts this object as a new row into the remote database.
+   * Promise rejection type: PostgrestError
+   */
   insert(conx: SupabaseClient): Promise<this>;
 
-  // Updates the row references by this object into the remote database.
-  // Promise rejection type: PostgrestError
+  /**
+   * Updates the row references by this object into the remote database.
+   * Promise rejection type: PostgrestError
+   */
   update(conx: SupabaseClient): Promise<this>;
 
-  // Deletes the row references by this object into the remote database.
-  // Promise rejection type: PostgrestError
+  /**
+   * Deletes the row references by this object into the remote database.
+   * Promise rejection type: PostgrestError
+   */
   delete(conx: SupabaseClient): Promise<void>;
 }
 
 
 export class Entry implements Table {
-  // A null id indicates this is not yet present in the table
+  /** A null id indicates this is not yet present in the table. */
   id: number|null = null;
   timeline: Timeline;
   title: string;
@@ -150,13 +156,15 @@ export class Entry implements Table {
     if (error) { throw error as PostgrestError; }
   }
 
-  // Determines if item is present in the remote table, or if not, it is local.
+  /**
+   * Determines if item is present in the remote table, or if not, it is local.
+   */
   public get in_table(): boolean { return this.id != null; }
 }
 
 
 export class Timeline implements Table {
-  // A null id indicates this Item is not yet present in the table
+  /** A null id indicates this Item is not yet present in the table */
   id: number|null = null;
   name: string;
 
@@ -219,7 +227,9 @@ export class Timeline implements Table {
     if (error) { throw error as PostgrestError; }
   }
 
-  // Determines if item is present in the remote table, or if not, it is local.
+  /**
+   * Determines if item is present in the remote table, or if not, it is local.
+   */
   public get in_table(): boolean { return this.id != null; }
 }
 
