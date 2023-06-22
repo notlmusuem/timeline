@@ -1,44 +1,44 @@
-<script>
-  // @ts-nocheck
+<script lang="ts">
   import { fly, fade } from "svelte/transition";
-  import { createEventDispatcher } from "svelte";
   import DropDownItem from "$lib/components/searchbar/DropDownItem.svelte";
   import { mode } from "$lib/stores/store";
 
-  export let selection;
-  export let data;
+  import { Entry } from "$lib/models/timeline";
 
-  let disabled;
-  let filtered = [];
-  let search = "";
-  let clicked = false;
+  export let selection: Entry|null = null;
+  export let data: Entry[];
+
+  let disabled: boolean;
+  let clicked: boolean = false;
+  let search: string = "";
+  let filtered: Entry[] = [];
 
   $: disabled = $mode !== "default";
 
-  const dispatch = createEventDispatcher();
-  const notify = () => dispatch("selection");
+  function performSearch() {
+    const keywords = search.toLowerCase().trim().split(" ");
 
-  const findTitles = () => {
-    const keywords = search.toLowerCase().split(" ");
     filtered = data
-      .filter((item) => {
-        return keywords.every((keyword) =>
-          (item.title.toLowerCase() + " " + item.year).includes(keyword)
+      .filter(entry => {
+        return keywords.every(keyword =>
+          // todo: maybe format the entire date here? or at least the end date?
+          `${entry.title.toLowerCase().trim()} ${entry.start_date.getUTCFullYear()}`
+            .includes(keyword)
         );
       })
       .slice(0, 10); // max 10
   };
 
   function handleClickOutside(event) {
-    if (event.target.closest(".search-container")) return;
+    if (event.target.closest(".search-container")) { return; }
     clicked = true;
   }
 
   function handleShortcut(event) {
     if ((event.key == "/" || event.key == "?") && !event.target.closest("input")) {
       event.preventDefault();
-      document.querySelector("html").scrollTo(0, 0);
-      document.querySelector("input").focus();
+      document.querySelector("html")?.scrollTo(0, 0);
+      document.querySelector("input")?.focus();
     }
   }
 </script>
@@ -47,7 +47,7 @@
 
 <div
   class="search-container"
-  style={disabled ? `top:-4rem !important;` : ``}
+  style={disabled ? `top: -4rem !important;` : ``}
   transition:fly={{y:-25}}>
   <div class="bar">
     <input
@@ -60,7 +60,7 @@
       bind:value={search}
       on:click={() => (clicked = false)}
       on:input={() => {
-        findTitles();
+        performSearch();
         clicked = false;
       }} />
     {#if search}
@@ -71,32 +71,39 @@
         close
       </span>
     {:else}
-      <span class="material-symbols-rounded i"> search </span>
+      <span class="material-symbols-rounded i">search</span>
     {/if}
   </div>
+
   {#if search && !clicked && filtered.length > 0}
     <div class="results">
-      {#each filtered as data}
+      {#each filtered as item}
         <DropDownItem
-          bind:selectedTitle={selection}
-          item={data}
-          on:selection={notify}
-          on:selection={() => (clicked = true)} />
+          on:selection={() => {
+            clicked = true;
+            selection = item;
+
+            search = "";  // void the search input
+          }}>
+          <b>{item.start_date.getFullYear()}</b> • {item.title}
+        </DropDownItem>
       {/each}
     </div>
   {:else if search == ""}
-    <div class="results" style="pointer-events:none;">
-      <DropDownItem
-        color="grey"
-        bind:selectedTitle={selection}
-        item="Type something..." />
+    <div class="results" style="pointer-events: none;">
+      <DropDownItem color="grey" on:selection={() => {
+        selection = null;
+      }}>
+        Type something...
+      </DropDownItem>
     </div>
   {:else}
-    <div class="results" style="pointer-events:none;">
-      <DropDownItem
-        color="grey"
-        bind:selectedTitle={selection}
-        item="No results..." />
+    <div class="results" style="pointer-events: none;">
+      <DropDownItem color="grey" on:selection={() => {
+        selection = null;
+      }}>
+        No results...
+      </DropDownItem>
     </div>
   {/if}
 </div>

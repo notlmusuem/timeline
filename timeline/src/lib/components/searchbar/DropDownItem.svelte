@@ -1,25 +1,20 @@
-<script>
-  import { slide } from "svelte/transition";
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import { slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
-  export let selectedTitle;
-  export let item;
-  export let color = "var(--color-text)";
-  const dispatch = createEventDispatcher();
 
-  function handleClick() {
-    selectedTitle = item.title;
-    dispatch("selection");
-  }
+  export let color = "var(--color-text)";
+
+  const dispatch = createEventDispatcher();
 </script>
 
-<button class="item" on:click={handleClick} transition:slide={{ duration: 250, easing: quintOut }}>
-  {#if item.title}
-    <p style="color:{color}" class="text"><b>{item.year}</b> • {item.title}</p>
-  {:else}
-    <p style="color:grey" class="text">{item}</p>
-  {/if}
+
+<button class="item"
+  on:click={() => { dispatch("selection"); }}
+  transition:slide={{ duration: 250, easing: quintOut }}>
+  <p style="color: {color}" class="text"><slot/></p>
 </button>
+
 
 <style>
   .item {
