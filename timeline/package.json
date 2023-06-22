@@ -41,6 +41,7 @@
     "date-fns-tz": "^2.0.0",
     "esbuild": "^0.17.11",
     "svelte-fullscreen": "^2.0.0",
-    "svelte-legos": "^0.0.6"
+    "svelte-legos": "^0.0.6",
+    "svelte-previous": "^2.1.3"
   }
 }
