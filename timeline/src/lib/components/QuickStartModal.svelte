@@ -108,3 +108,18 @@
     this message again
   </p>
 </Modal>
+
+
+<style>
+  li { margin-bottom: 0.25rem; }
+  .i { color: var(--color-theme-1); }
+  .r { vertical-align: -15%; }
+  .rotate-90 { transform: rotate(90deg); }
+
+  hr {
+    border: none;
+    width: 80%;
+    border-top: 1px solid var(--color-text);
+    opacity: 0.33;
+  }
+</style>
