@@ -50,19 +50,23 @@ export class Entry implements Table {
     return new Entry(DEFAULT_TIMELINE, "", new UTCDate());
   }
 
-  // static from_obj(timelines_ref: Timeline[], obj: {
   static from_obj(obj: {
     id: number|null, timeline: number, title: string,
     image: string|null, image_credit: string|null,
     body: string|null, start_date: string,
     start_date_precision: "day"|"month"|"year"|"decade", end_date: string|null,
     end_date_precision: "day"|"month"|"year"|"decade"|null
-  }): Entry {
-    // todo: look up id in timelines_ref
-    // note: temp fix; see eof
-    const self = new Entry(DEFAULT_TIMELINE, obj.title, new UTCDate());
+  }, timelines_ref: Timeline[]): Entry {
+    const timeline = timelines_ref.find(tl => tl.id == obj.timeline)
+    if (timeline === undefined) {
+      throw new Error(`Timeline ${obj.timeline} not found for entry ${obj.id}!`);
+    }
+
+    const self = new Entry(timeline, obj.title, new UTCDate());
 
     self.id = obj.id;
+
+    self.timeline = timeline;
     self.title = obj.title;
     self.image = obj.image;
     self.image_credit = obj.image_credit;
@@ -94,7 +98,6 @@ export class Entry implements Table {
     };
   }
 
-  // static async select_all(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
   static async select_all(conx: SupabaseClient): Promise<Entry[]> {
     const timeline = DEFAULT_TIMELINE;  // note: temp fix; see eof
     const { data, error } = await conx
@@ -107,9 +110,27 @@ export class Entry implements Table {
       .eq("timeline", timeline.id)
       .order("start_date");
     if (error) { throw error as PostgrestError; }
+
     return data.map(obj => Entry.from_obj({
       ...obj, timeline: timeline.id as number
-    }));
+    }, [timeline]));
+  }
+
+  static async select_all_from(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
+    const { data, error } = await conx
+      .from("timeline")
+      .select(
+        `id, title, image, image_credit, body,
+        start_date, start_date_precision,
+        end_date, end_date_precision`
+      )
+      .eq("timeline", timeline.id)
+      .order("start_date");
+    if (error) { throw error as PostgrestError; }
+
+    return data.map(obj => Entry.from_obj({
+      ...obj, timeline: timeline.id as number
+    }, [timeline]));
   }
 
   async insert(conx: SupabaseClient): Promise<this> {
