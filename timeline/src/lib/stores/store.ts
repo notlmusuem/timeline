@@ -27,14 +27,6 @@ themeStore.subscribe((value) => {
   if (localStorageN != null) { localStorageN.theme = value; }
 });
 
-// current timeline index
-export const currentItemIndexStore = writable(
-  parseInt(localStorageN?.currentItemIndex ?? "0")
-);
-currentItemIndexStore.subscribe((value) => {
-  if (localStorageN != null) { localStorageN.currentItemIndex = value; }
-});
-
 
 // temp stores; these would be factored away soon
 export const firstYear: Writable<number> = writable(0);

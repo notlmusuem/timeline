@@ -10,7 +10,7 @@
 
   import { userStore } from "$lib/authStore";
   import {
-    currentItemIndexStore, direction, mode,
+    direction, mode,
     year, firstYear, lastYear
   } from "$lib/stores/store";
   import { mobile, windowHeight } from "$lib/stores/window";
@@ -19,7 +19,7 @@
 
 
   export let timeData: Entry[];
-  export let currentItem;
+  export let currentEntry;
 
   export let modalQuickStart: boolean;
   export let modalEditorGuide: boolean;
@@ -53,12 +53,10 @@
   const callPageUp = () => dispatch("pageup");
 
   function change() {
-    const index = timeData.findIndex((entry) => entry.id == currentItem.id);
-    $direction = index > $currentItemIndexStore ? "down" : "up";
     dispatch("change");
   }
 
-  const setDetails = (item) => (currentItem = item);
+  const setDetails = (item) => (currentEntry = item);
 
   $: zoomOffsetTweened = tweened(zoomOffset, {
     duration: 300,
@@ -178,6 +176,7 @@
   $: disabled ? (arrowVisible = false) : (arrowVisible = true);
 </script>
 
+
 <svelte:window on:resize={handleResize} on:mouseup={handleDragEnd} />
 
 <div
@@ -275,6 +274,7 @@
     ><span class="material-symbols-rounded i">refresh</span>
   </button>
 </div>
+
 
 <style>
   :root {

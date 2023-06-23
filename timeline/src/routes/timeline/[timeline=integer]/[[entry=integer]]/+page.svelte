@@ -265,7 +265,7 @@
     timeData={entries}
     bind:modalQuickStart={modal_quick_start}
     bind:modalEditorGuide={modal_editor_guide}
-    bind:currentItem={selected_entry}
+    bind:currentEntry={$selected_entry}
     bind:startSelected={startSelected}
     bind:endSelected={endSelected}
     on:change={multipleEventsCheck}
