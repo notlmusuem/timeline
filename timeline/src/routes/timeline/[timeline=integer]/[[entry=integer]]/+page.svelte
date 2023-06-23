@@ -41,25 +41,62 @@
   }
 
 
-  let selected_entry: Writable<Entry|null>;
-  let prev_entry: Readable<Entry|null>;
+  let [selected_entry, prev_entry]: [Writable<Entry|null>, Readable<Entry|null>]
+  = writablePrev(null);
   let editing_entry = Entry.new_default();
 
-  {
-    if (entry_id == null) {
-      entry_id = entries.length > 0 ? entries[0]?.id : null;
+  // if we ever select a null entries try to switch to any other one if possible
+  $: if ($selected_entry == null && entries.length > 0) {
+    // if the previous entry is still in the timeline, then switch to it instead
+    if ($prev_entry != null && entries.indexOf($prev_entry) != -1) {
+      $selected_entry = $prev_entry;
+    } else {
+      // otherwise just fallback to the first
+      $selected_entry = entries[0];
     }
-
-    let entry: Entry|null = entries.find(e => e.id == entry_id) ?? null;
-    if (entry_id == null) {
-      entry = null;
-    } else if (entry == null) {
-      throw new Error(`Entry ${entry_id} is not in timeline!`)
-    }
-
-    [selected_entry, prev_entry] =
-      writablePrev(entry, { initPrevious: [entry] });
   }
+
+  // if
+  $: {
+    const entry_param = parseIntNull($page.params.entry);
+    if (entry_param == null) {
+      $selected_entry = null;
+    } else {
+      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+    }
+  }
+
+  // trigger the year tween
+  $: if ($selected_entry != null) {
+    $year = $selected_entry.start_date.getUTCFullYear();
+  }
+
+  onMount(() => {
+    selected_entry.subscribe(entry => {
+      // don't bother changing the url if it is already correct; otherwise it'll
+      // break the back button!
+      if (
+        parseIntNull($page.params.timeline) == timeline.id
+        && parseIntNull($page.params.page) == $selected_entry?.id
+      ) { return; }
+
+      goto(`/timeline/${timeline.id}/${entry?.id ?? ""}`, {
+        replaceState: false,
+        keepFocus: true,
+        invalidateAll: false
+      });
+    });
+  });
+
+  {
+    const entry_param = parseIntNull($page.params.entry);
+    if (entry_param == null) {
+      $selected_entry = null;
+    } else {
+      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+    }
+  }
+
 
   selected_entry.subscribe(entry => {
     if ($prev_entry == null || entry == null) {
@@ -98,7 +135,7 @@
     if (selected_entry == null) { return; }
     const idx = entries.indexOf($selected_entry as Entry);
     if (idx == -1) {
-      throw new Error(`Entry ${entry_id} is not in timeline for page_prev!`)
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_prev!`)
     }
 
     $selected_entry = entries[Math.max(0, idx - 1)];
@@ -108,7 +145,7 @@
     if (selected_entry == null) { return; }
     const idx = entries.indexOf($selected_entry as Entry);
     if (idx == -1) {
-      throw new Error(`Entry ${entry_id} is not in timeline for page_next!`)
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
     }
 
     $selected_entry = entries[Math.min(entries.length - 1, idx + 1)];
