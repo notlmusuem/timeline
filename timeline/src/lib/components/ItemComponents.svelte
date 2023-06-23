@@ -7,7 +7,7 @@
   import { loadingAction } from "svelte-legos";
   import { toast } from "@zerodevx/svelte-toast";
   import supabase from "$lib/supabaseClient";
-  import { structuredCloneProto } from "$lib/utils";
+  import { format_date_numbers, format_date_range, structuredCloneProto } from "$lib/utils";
 
   import { mobile } from "$lib/stores/window";
   import { mode } from "$lib/stores/store";
@@ -41,43 +41,7 @@
     }
   });
 
-
-  function formatDateNumbers(date: UTCDate|null): string {
-    if (date == null || isNaN(date.getTime())) { return ""; }
-
-    return datefn.formatInTimeZone(date, "UTC", "yyyy-MM-dd");
-  }
-
-  function formatDate(date: UTCDate, precision: "day"|"month"|"year"|"decade"): string {
-    // if the date is invalid, there's no meaningful way to format it
-    if (isNaN(date.getTime())) { return date.toString(); }
-
-    switch (precision) {
-      case "day": return datefn.formatInTimeZone(date, "UTC", "MMMM d, yyyy");
-      case "month": return datefn.formatInTimeZone(date, "UTC", "MMMM, yyyy");
-      case "year": return datefn.formatInTimeZone(date, "UTC", "yyyy");
-      case "decade":
-        // zero out the last year digit with an intdiv
-        let zeroed = structuredCloneProto(date);
-        zeroed.setFullYear(Math.floor(date.getFullYear() / 10) * 10);
-        return datefn.formatInTimeZone(zeroed, "UTC", "yyyy") + "s";
-    }
-  }
-
-  function formatDateRange(
-    start_date: UTCDate, start_date_precision: "day"|"month"|"year"|"decade",
-    end_date: UTCDate|null, end_date_precision: "day"|"month"|"year"|"decade"|null
-  ): string {
-    let start = formatDate(start_date, start_date_precision);
-    if (end_date != null && end_date_precision != null) {
-      let end = formatDate(end_date, end_date_precision);
-      return `${start} – ${end}`;
-    } else {
-      return start;
-    }
-  }
-
-  let formatted_date = formatDateRange(
+  let formatted_date = format_date_range(
     entry.start_date, entry.start_date_precision,
     entry.end_date, entry.end_date_precision
   );
@@ -258,8 +222,12 @@
 
                   editingItem.start_date = new UTCDate(UTCDate.parse(value));
                 }}
-                value={formatDateNumbers(editingItem.start_date)}
-                max={formatDateNumbers(editingItem.end_date)} />
+                value={format_date_numbers(editingItem.start_date, "day")}
+                max={
+                  editingItem.end_date == null
+                    ? undefined
+                    : format_date_numbers(editingItem.end_date, "day")
+                } />
             </div>
 
             <div class="input-cont row-4">
@@ -282,9 +250,13 @@
                   editingItem.end_date_precision = editingItem.end_date == null
                     ? null : editingItem.start_date_precision;
                 }}
-                value={formatDateNumbers(editingItem.end_date)}
+                value={
+                  editingItem.end_date == null
+                    ? undefined
+                    : format_date_numbers(editingItem.end_date, "day")
+                }
                 bind:this={endDateInput}
-                min={formatDateNumbers(editingItem.start_date)} />
+                min={format_date_numbers(editingItem.start_date, "day")} />
             </div>
 
             <div class="input-cont row-4">
