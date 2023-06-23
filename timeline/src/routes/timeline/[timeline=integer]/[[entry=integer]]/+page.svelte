@@ -218,7 +218,11 @@
 
 
 <svelte:head>
-  <title>Timeline | Niagara-on-the-Lake Timeline</title>
+  {#if $selected_entry != null}
+    <title>{$selected_entry.title} | {timeline.name} Timeline | NOTL Musuem</title>
+  {:else}
+    <title>{timeline.name} Timeline | NOTL Musuem</title>
+  {/if}
   <meta name="description" content="Timeline page" />
 </svelte:head>
 
