@@ -2,12 +2,11 @@
   import { fade, slide } from "svelte/transition";
   import { writable } from "svelte/store";
   import { UTCDate } from "@date-fns/utc";
-  import * as datefn from "date-fns-tz";
   import Fullscreen from "svelte-fullscreen";
   import { loadingAction } from "svelte-legos";
   import { toast } from "@zerodevx/svelte-toast";
   import supabase from "$lib/supabaseClient";
-  import { format_date_numbers, format_date_range, structuredCloneProto } from "$lib/utils";
+  import { format_date_numbers, structuredCloneProto } from "$lib/utils";
 
   import { mobile } from "$lib/stores/window";
   import { mode } from "$lib/stores/store";
@@ -40,11 +39,6 @@
       editingItem = Entry.new_default();
     }
   });
-
-  let formatted_date = format_date_range(
-    entry.start_date, entry.start_date_precision,
-    entry.end_date, entry.end_date_precision
-  );
 
 
   async function upload(event) {
@@ -295,7 +289,7 @@
         </form>
       {:else}  <!-- $mode === "default" -->
         <h1 class="title">{entry.title}</h1>
-        <p class="date"><i>{formatted_date}</i></p>
+        <p class="date"><i>{entry.format_date()}</i></p>
         <hr />
         {#if entry.body}
           <p class="desc">{entry.body}</p>
@@ -304,7 +298,7 @@
           <div class="tts">
             <Text2Speech
               title={entry.title}
-              date={formatted_date}
+              date={entry.format_date()}
               body={entry.body} />
           </div>
           <div class="image_cred">
