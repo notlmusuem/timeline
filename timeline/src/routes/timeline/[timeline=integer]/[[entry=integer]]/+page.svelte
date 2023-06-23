@@ -46,25 +46,17 @@
   let editing_entry = Entry.new_default();
 
   // if we ever select a null entries try to switch to any other one if possible
-  $: if ($selected_entry == null && entries.length > 0) {
-    // if the previous entry is still in the timeline, then switch to it instead
-    if ($prev_entry != null && entries.indexOf($prev_entry) != -1) {
-      $selected_entry = $prev_entry;
-    } else {
-      // otherwise just fallback to the first
-      $selected_entry = entries[0];
+  selected_entry.subscribe(() => {
+    if ($selected_entry == null && entries.length > 0) {
+      // if the previous entry is still in the timeline, then switch to it instead
+      if ($prev_entry != null && entries.indexOf($prev_entry) != -1) {
+        $selected_entry = $prev_entry;
+      } else {
+        // otherwise just fallback to the first
+        $selected_entry = entries[0];
+      }
     }
-  }
-
-  // if
-  $: {
-    const entry_param = parseIntNull($page.params.entry);
-    if (entry_param == null) {
-      $selected_entry = null;
-    } else {
-      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
-    }
-  }
+  });
 
   // trigger the year tween
   $: if ($selected_entry != null) {
@@ -72,36 +64,33 @@
   }
 
   onMount(() => {
-    selected_entry.subscribe(entry => {
+    selected_entry.subscribe(async entry => {
       // don't bother changing the url if it is already correct; otherwise it'll
       // break the back button!
       if (
         parseIntNull($page.params.timeline) == timeline.id
-        && parseIntNull($page.params.page) == $selected_entry?.id
+        && parseIntNull($page.params.entry) == $selected_entry?.id
       ) { return; }
 
-      goto(`/timeline/${timeline.id}/${entry?.id ?? ""}`, {
+      await goto(`/timeline/${timeline.id}/${entry?.id ?? ""}`, {
         replaceState: false,
         keepFocus: true,
         invalidateAll: false
       });
+
+      // the browser history is sensitive to the document title, so we should
+      // set it first before goto so it displays properly in history
+      if ($selected_entry != null) {
+        document.title = `${$selected_entry.title} | ${timeline.name} Timeline | NOTL Musuem`;
+      } else {
+        document.title = `${timeline.name} Timeline | NOTL Musuem`;
+      }
     });
   });
 
-  {
-    const entry_param = parseIntNull($page.params.entry);
-    if (entry_param == null) {
-      $selected_entry = null;
-    } else {
-      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
-    }
-  }
-
-
+  // update the fade direction when the entry gets changed
   selected_entry.subscribe(entry => {
-    if ($prev_entry == null || entry == null) {
-      return;
-    }
+    if ($prev_entry == null || entry == null) { return; }
 
     const last_idx = entries.indexOf($prev_entry as Entry);
     if (last_idx == -1) {
@@ -122,6 +111,32 @@
       $direction = "down";
     }
   });
+
+  // if the page url changed, then update the selected entry accordingly
+  page.subscribe(() => {
+    const entry_param = parseIntNull($page.params.entry);
+
+    // if the url parameter is the same as the currently selected entry then we
+    // don't need to do anything
+    if (entry_param == $selected_entry) { return null; }
+
+    if (entry_param == null) {
+      $selected_entry = null;
+    } else {
+      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+    }
+  });
+
+  // ...and do that once the first time on page load to initialize everything
+  {
+    const entry_param = parseIntNull($page.params.entry);
+    if (entry_param == null) {
+      $selected_entry = null;
+    } else {
+      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+    }
+  }
+
 
   let startSelected: boolean;
   let endSelected: boolean;
@@ -217,6 +232,8 @@
 </script>
 
 
+<!-- note: svelte:head is not reactive; it's only rendered on the server! -->
+<!-- this metadata is updated dynamically above in an onMount handler -->
 <svelte:head>
   {#if $selected_entry != null}
     <title>{$selected_entry.title} | {timeline.name} Timeline | NOTL Musuem</title>
