@@ -296,10 +296,8 @@
         {/if}
         <div class="cont-tts">
           <div class="tts">
-            <Text2Speech
-              title={entry.title}
-              date={entry.format_date()}
-              body={entry.body} />
+            <!-- todo: put the image caption in here -->
+            <Text2Speech texts={[entry.title, entry.format_date(), entry?.body]}/>
           </div>
           <div class="image_cred">
             {#if entry.image_credit != null}

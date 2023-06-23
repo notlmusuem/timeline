@@ -1,22 +1,18 @@
-<script>
+<script lang="ts">
   import { slide } from 'svelte/transition';
   import { onDestroy, onMount } from "svelte";
 
-  export let body;
-  export let title;
-  export let date;
+  export let texts: (string|null)[];
 
   let speaking = false;
-  let currentUtterance;
-  let voice;
+  let currentUtterance: SpeechSynthesisUtterance|null;
+  let voice: SpeechSynthesisVoice;
 
   function text2Speech() {
     if (!speaking) {
-      const utterances = [
-        new SpeechSynthesisUtterance(title),
-        new SpeechSynthesisUtterance(date),
-        new SpeechSynthesisUtterance(body),
-      ];
+      let utterances: SpeechSynthesisUtterance[] = texts
+        .filter(text => text != null)
+        .map(text => new SpeechSynthesisUtterance(text as string));
 
       utterances.forEach((utterance) => {
         utterance.voice = voice;
@@ -25,10 +21,9 @@
         utterance.pitch = 1;
       });
 
-      const newUtterances = notNullArray(utterances);
+      utterances = notNullArray(utterances);
 
-      for (let i = 0; i < newUtterances.length; i++) {
-        const utterance = newUtterances[i];
+      for (const utterance of utterances) {
         utterance.onend = () => {
           if (currentUtterance === utterance) {
             currentUtterance = null;
@@ -37,14 +32,15 @@
         };
         speechSynthesis.speak(utterance);
       }
-      currentUtterance = newUtterances[newUtterances.length - 1];
+      currentUtterance = utterances[utterances.length - 1];
       speaking = true;
     }
   }
 
-  function notNullArray(utterances)
-  {
-    const newUtterances = [];
+  function notNullArray(
+    utterances: SpeechSynthesisUtterance[]
+  ): SpeechSynthesisUtterance[] {
+    const newUtterances: SpeechSynthesisUtterance[] = [];
     for (let i = 0; i < utterances.length; i++) {
       const utterance = utterances[i];
       if (utterance.text != "null") {
