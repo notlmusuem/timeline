@@ -21,9 +21,10 @@
     filtered = data
       .filter(entry => {
         return keywords.every(keyword =>
-          // todo: maybe format the entire date here? or at least the end date?
-          `${entry.title.toLowerCase().trim()} ${entry.start_date.getUTCFullYear()}`
-            .includes(keyword)
+          (
+            `${entry.title.toLowerCase().trim()} ${entry.start_date.getUTCFullYear()}`
+            + `-${entry.end_date?.getUTCFullYear() ?? ""}`
+          ).includes(keyword)
         );
       })
       .slice(0, 10); // max 10
@@ -85,7 +86,7 @@
 
             search = "";  // void the search input
           }}>
-          <b>{item.start_date.getFullYear()}</b> • {item.title}
+          <b>{item.format_date_numbers()}</b> • {item.title}
         </DropDownItem>
       {/each}
     </div>
