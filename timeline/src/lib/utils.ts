@@ -91,10 +91,10 @@ export function format_date_numbers(
 
 export function format_date_range_numbers(
   start_date: UTCDate, start_precision: "day"|"month"|"year"|"decade",
-  end_date: UTCDate|null, end_precision: "day"|"month"|"year"|"decade"
+  end_date: UTCDate|null, end_precision: "day"|"month"|"year"|"decade"|null
 ): string {
   const start = format_date_numbers(start_date, start_precision);
-  if (end_date != null) {
+  if (end_date != null && end_precision != null) {
     return `${start} – ${format_date_numbers(end_date, end_precision)}`;
   }
   return start;

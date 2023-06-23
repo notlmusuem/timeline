@@ -1,6 +1,7 @@
 import { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
 import { UTCDate } from "@date-fns/utc";
 import * as datefn from "date-fns-tz";
+import { format_date_range, format_date_range_numbers } from "$lib/utils";
 
 
 export interface Table {
@@ -181,6 +182,31 @@ export class Entry implements Table {
    * Determines if item is present in the remote table, or if not, it is local.
    */
   public get in_table(): boolean { return this.id != null; }
+
+
+  public format_date() {
+    if (isNaN(this.start_date.getTime())) {
+      throw new Error(`start_date of entry ${this.id} is invalid`);
+    }
+
+    if (this.end_date != null && isNaN(this.end_date.getTime())) {
+      throw new Error(`end_date of entry ${this.id} is invalid`);
+    }
+
+    return format_date_range(this.start_date, this.start_date_precision, this.end_date, this.end_date_precision);
+  }
+
+  public format_date_numbers() {
+    if (isNaN(this.start_date.getTime())) {
+      throw new Error(`start_date of entry ${this.id} is invalid`);
+    }
+
+    if (this.end_date != null && isNaN(this.end_date.getTime())) {
+      throw new Error(`end_date of entry ${this.id} is invalid`);
+    }
+
+    return format_date_range_numbers(this.start_date, this.start_date_precision, this.end_date, this.end_date_precision);
+  }
 }
 
 
