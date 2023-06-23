@@ -49,7 +49,7 @@
   </div>
 
   <div class="bg" />
-  {#if $page.url.pathname !== "/timeline"}
+  {#if !$page.url.pathname.startsWith("/timeline") }
     <Footer />
   {/if}
 </div>
