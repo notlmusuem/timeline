@@ -186,7 +186,6 @@
   let modal_quick_start = false;
   let modal_editor_guide = false;
 
-
   let first_visit = false;
   $: if (first_visit && $mode == "default") {
     modal_quick_start = true;
@@ -205,15 +204,15 @@
     first_visit = localStorage.getItem("firstVisit") == null;
     first_time_editor = localStorage.getItem("firstTimeEditor") == null;
 
-    selected_entry.subscribe(entry => {
-      if (entry == null) { return; }
-      $year = entry.start_date.getUTCFullYear();
-      goto(`/timeline/${timeline.id}/${entry.id}`, {
-        replaceState: false,
-        keepFocus: true,
-        invalidateAll: false
-      })
-    });
+    // const timelineChannel = supabase
+    //   .channel("custom-all-channel")
+    //   .on(
+    //     "postgres_changes",
+    //     { event: "*", schema: "public", table: "timeline" },
+    //     () => {
+    //       entries = await Entry.select_all(supabase);
+    //     }
+    //   ).subscribe();
   });
 </script>
 
