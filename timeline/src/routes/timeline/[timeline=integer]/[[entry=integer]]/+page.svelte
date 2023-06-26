@@ -33,7 +33,6 @@
   let entry_id: number|null = $page.params.entry == null
     ? null : parseIntNull($page.params.entry) as number;
 
-  // todo: hook params.entry and params.timeline for the browser back/forward buttons!
   // todo: make timeline_id and entry_id more cohesive wrt to timeline and entry
 
   let timeline: Timeline;
@@ -70,6 +69,9 @@
 
   onMount(() => {
     selected_entry.subscribe(async entry => {
+      // don't hook navigation to other routes
+      if (!$page.route.id?.startsWith("/timeline/")) { return; }
+
       // don't bother changing the url if it is already correct; otherwise it'll
       // break the back button!
       if (
@@ -119,6 +121,9 @@
 
   // if the page url changed, then update the selected entry accordingly
   page.subscribe(() => {
+    // don't hook navigation to other routes
+    if (!$page.route.id?.startsWith("/timeline/")) { return; }
+
     const entry_param = parseIntNull($page.params.entry);
 
     // if the url parameter is the same as the currently selected entry then we
