@@ -84,7 +84,7 @@
               }}>Home</a>
           </li>
           <li
-            aria-current={$page.url.pathname === "/timeline"
+            aria-current={$page.url.pathname.startsWith("/timeline")
               ? "page"
               : undefined}>
             <a
