@@ -2,9 +2,14 @@
   import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { goto } from '$app/navigation';
+  import { tweened } from "svelte/motion";
+  import { quintOut } from "svelte/easing";
   import { writable, type Readable, type Writable } from "svelte/store";
   import { withPrevious as writablePrev } from 'svelte-previous';
+
   import { direction, mode, year } from "$lib/stores/store";
+  import { windowWidth } from "$lib/stores/window";
+
 
   import EditorModal from "$lib/components/EditorModal.svelte";
   import EventEdit from "$lib/components/EventEdit.svelte";
@@ -15,7 +20,7 @@
   import SearchBar from "$lib/components/searchbar/SearchBar.svelte";
   import TimelineBar from "$lib/components/TimelineBar.svelte";
 
-  import { parseIntNull } from "$lib/utils";
+  import { parseIntNull, sleep } from "$lib/utils";
   import { Entry, Timeline } from "$lib/models/timeline.js";
   import { userStore } from "$lib/authStore";
 
@@ -192,11 +197,68 @@
   // todo: handleUpdate
   // todo: handleDelete
   // todo: fetchTimelineData
-  // todo: handleTouchStart
-  // todo: handleTouchMove
-  // todo: handleTouchEnd
-  // todo: resetSwipe
   // todo: timelineChannel
+
+
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let touchDeltaX = 0;
+  const opacity = tweened(1, {
+    duration: 100,
+    easing: quintOut,
+  });
+
+  const itemTranslateX = tweened(0, {
+    duration: 300,
+    easing: quintOut,
+  });
+
+  function handleTouchStart(event) {
+    if (
+      event.touches[0].clientX < 128 || event.touches[0].clientY < 128
+      || $mode !== "default"
+    ) { return; }
+
+    touchStartX = event.touches[0].clientX;
+  }
+
+  function handleTouchMove(event) {
+    if (
+      event.touches[0].clientX < 128 || event.touches[0].clientY < 128
+      || $mode !== "default"
+    ) { return; }
+
+    touchEndX = event.touches[0].clientX;
+    if (Math.abs(touchEndX - touchStartX) < 60) { return };
+    touchDeltaX = touchEndX - touchStartX;
+    itemTranslateX.set(touchDeltaX);
+    $opacity = 1 - Math.abs(touchDeltaX) / 750;
+  }
+
+  async function handleTouchEnd() {
+    if (Math.abs(touchDeltaX) > 60) {
+      if (touchDeltaX > 100 && !startSelected) {
+        $direction = "none";
+        await page_prev();
+        $opacity = 0;
+        $itemTranslateX = -250;
+      } else if (touchDeltaX < -100 && !endSelected) {
+        $direction = "none";
+        await page_next();
+        $opacity = 0;
+        $itemTranslateX = 250;
+      }
+
+      sleep(250).then(() => {
+        // after the tween has definitely finished, reset everything
+        touchDeltaX = 0;
+        $opacity = 1;
+        $itemTranslateX = 0;
+      });
+    }
+  }
+
 
   let modal_quick_start = false;
   let modal_editor_guide = false;
@@ -243,9 +305,9 @@
   <meta name="description" content="Timeline page" />
 </svelte:head>
 
-<!-- <svelte:window
+<svelte:window
   on:touchend={handleTouchEnd}
-  on:touchmove|passive={handleTouchMove} /> -->
+  on:touchmove|passive={handleTouchMove} />
 
 <QuickStartModal bind:visible={modal_quick_start} />
 
@@ -278,11 +340,11 @@
     {#key `${$selected_entry?.id}-${$direction}`}
       <section
         class="layout"
-        style:transform-origin="bottom center" >
-        <!-- style:transform="translateX({$itemTranslateX}px) rotate({$itemTranslateX /
-          ($windowWidth / 5)}deg);"
-        style:opacity={opacity}
-        on:touchstart|passive={handleTouchStart}> -->
+        style:transform-origin="bottom center"
+        style:transform="translateX({$itemTranslateX}px)
+          rotate({$itemTranslateX / ($windowWidth / 5)}deg)"
+        style:opacity={$opacity}
+        on:touchstart|passive={handleTouchStart}>
 
         <ItemTransition>
           <ItemComponents
