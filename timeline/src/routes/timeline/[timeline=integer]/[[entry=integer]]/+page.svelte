@@ -107,7 +107,7 @@
       throw new Error(`Current entry ${entry?.id} was not in timeline!`);
     }
 
-    // $direction is the fade out direction; not the fade in direction!
+    // $direction is the side of the screen the next entry fades in from!
     // only change the direction if it's incorrect; we use horizontal directions
     // for arrow keys and swipes, and those should remain as is!
     if (idx > last_idx && $direction != "left") {
@@ -193,12 +193,66 @@
     $selected_entry = search_selection;
   }
 
-  // todo: handleCreate
-  // todo: handleUpdate
-  // todo: handleDelete
-  // todo: fetchTimelineData
-  // todo: timelineChannel
 
+  function handleCreate({ detail: new_entry }) {
+    // entries.push(new_entry);
+    // entries.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
+
+    // currentIndex = entries.findIndex(entry => entry.id == new_entry.id);
+    // selectedItem = entries[currentIndex];
+    // currentItemIndexStore.set(currentIndex);
+    // update();
+    // mode.set("add");
+    // mode.set("default");
+  }
+
+  function handleUpdate({ detail: new_entry }) {
+    // console.log("updated entry", new_entry)
+    // let idx = entries.findIndex(entry => entry.id == new_entry.id);
+    // if (idx != -1) {
+    //   entries[idx] = new_entry;
+    // }
+
+    // entries.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
+    // idx = entries.findIndex(entry => entry.id == new_entry.id);
+
+    // currentIndex = idx;
+    // selectedItem = entries[currentIndex];
+    // currentItemIndexStore.set(currentIndex);
+    // update();
+    // mode.set("add");
+    // mode.set("default");
+  }
+
+  function handleDelete({ detail: rm_entry }) {
+    // let idx = entries.findIndex(entry => entry.id == rm_entry.id);
+    // if (idx != -1) {
+    //   entries.splice(idx, 1);
+    // }
+
+    // selectedItem = entries[currentIndex--];
+    // currentItemIndexStore.set(currentIndex);
+
+    // if (entries.length >= 1) {
+    //   update();
+    //   mode.set("add");
+    //   mode.set("default");
+    // }
+  }
+
+  // todo: live reload the entries array **and the timelines array** when changes
+  // are made to either table. consider calling handleCreate/Update/Delete instead
+  // onMount(() => {
+  //   const timelineChannel = supabase
+  //     .channel("custom-all-channel")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "timeline" },
+  //       () => {
+  //         entries = await Entry.select_all(supabase);
+  //       }
+  //     ).subscribe();
+  // });
 
 
   let touchStartX = 0;
@@ -280,16 +334,6 @@
   onMount(() => {
     first_visit = localStorage.getItem("firstVisit") == null;
     first_time_editor = localStorage.getItem("firstTimeEditor") == null;
-
-    // const timelineChannel = supabase
-    //   .channel("custom-all-channel")
-    //   .on(
-    //     "postgres_changes",
-    //     { event: "*", schema: "public", table: "timeline" },
-    //     () => {
-    //       entries = await Entry.select_all(supabase);
-    //     }
-    //   ).subscribe();
   });
 </script>
 
@@ -303,6 +347,7 @@
     <title>{timeline.name} Timeline | NOTL Musuem</title>
   {/if}
   <meta name="description" content="Timeline page" />
+  <!-- todo: add metadata about the item here for search engines and media services -->
 </svelte:head>
 
 <svelte:window
@@ -317,10 +362,10 @@
 
 
 <EventEdit
-  entry={editing_entry} />
-  <!-- on:entryCreate={handleCreate}
+  entry={editing_entry}
+  on:entryCreate={handleCreate}
   on:entryUpdate={handleUpdate}
-  on:entryDeleted={handleDelete} /> -->
+  on:entryDeleted={handleDelete} />
 
 {#if entries.length > 0 && $selected_entry != null}
   <TimelineBar
