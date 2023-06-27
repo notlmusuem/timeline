@@ -1,41 +1,32 @@
-<script>
-  import ExpandButton from "$lib/components/ExpandButton.svelte";
-  import { themeStore } from "$lib/stores/store";
+<script lang="ts">
+  import { onMount } from "svelte";
+  import { quintOut } from "svelte/easing";
   import { slide } from "svelte/transition";
   import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { userStore, logout } from "$lib/authStore";
-  import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
-  import { scrollY, mobile } from "$lib/stores/window";
-  import AccessibilityMenu from "$lib/components/AccessibilityMenu.svelte";
-  import { quintOut } from "svelte/easing";
 
-  let user;
-  userStore.subscribe((value) => {
-    user = value;
-  });
+  import { type User } from "@supabase/supabase-js";
+
+  import { themeStore } from "$lib/stores/store";
+  import { scrollY, mobile } from "$lib/stores/window";
+  import { userStore, logout } from "$lib/authStore";
+
+  import ExpandButton from "$lib/components/ExpandButton.svelte";
+  import AccessibilityMenu from "$lib/components/AccessibilityMenu.svelte";
+  import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
+
+
+  let user: User | null;
+  $: { user = $userStore; }
 
   let isAccessibilityOpen = false;
   let isMenuOpen = false;
+
   let shadow = 0;
+  $: { shadow = $scrollY > 25 ? 1 : 0; }
 
   $: {
-    shadow = $scrollY > 25 ? 1 : 0;
-  }
-
-  $: {
-    if ($mobile) {
-      isMenuOpen = false;
-    } else {
-      isMenuOpen = true;
-    }
-  }
-
-  function handleHeader() {
-    if (!$page.url.pathname.startsWith("/timeline")) {
-    } else {
-      shadow = 0;
-    }
+    // menu closed on mobile and open on desktop by default
+    isMenuOpen = !$mobile;
   }
 
   function handleClickOutside(event) {
@@ -52,7 +43,6 @@
 
   onMount(() => {
     setFontSize();
-    handleHeader();
   });
 </script>
 
