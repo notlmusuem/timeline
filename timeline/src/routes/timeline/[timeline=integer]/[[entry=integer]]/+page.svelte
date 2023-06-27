@@ -19,6 +19,7 @@
   import QuickStartModal from "$lib/components/QuickStartModal.svelte";
   import SearchBar from "$lib/components/searchbar/SearchBar.svelte";
   import TimelineBar from "$lib/components/TimelineBar.svelte";
+  import PageMeta from "$lib/components/PageMeta.svelte";
 
   import { parseIntNull, sleep } from "$lib/utils";
   import { Entry, Timeline } from "$lib/models/timeline.js";
@@ -43,6 +44,12 @@
     }
     timeline = found;
   }
+
+
+  let pageMeta: {
+    titles: string[], site_name: string,
+    description: string|null, image: string|null
+  };
 
 
   let [selected_entry, prev_entry]: [Writable<Entry|null>, Readable<Entry|null>]
@@ -86,12 +93,11 @@
       });
 
       // the browser history is sensitive to the document title, so we should
-      // set it first before goto so it displays properly in history
-      if ($selected_entry != null) {
-        document.title = `${$selected_entry.title} | ${timeline.name} Timeline | NOTL Musuem`;
-      } else {
-        document.title = `${timeline.name} Timeline | NOTL Musuem`;
-      }
+      // set it *after* goto so it displays properly in browser history
+      pageMeta.titles = ($selected_entry != null ? [$selected_entry.title] : [])
+        .concat(`${timeline.name} Timeline`);
+      pageMeta.description = $selected_entry?.body ?? null;
+      pageMeta.image = $selected_entry?.image ?? null;
     });
   });
 
@@ -145,6 +151,14 @@
     } else {
       $selected_entry = entries.find(e => e.id == entry_param) ?? null;
     }
+
+    pageMeta = {
+      titles: ($selected_entry != null ? [$selected_entry.title] : [])
+        .concat(`${timeline.name} Timeline`),
+      site_name: "NOTL Musuem",
+      description: $selected_entry?.body ?? null,
+      image: $selected_entry?.image ?? null,
+    };
   }
 
 
@@ -343,16 +357,9 @@
 </script>
 
 
-<!-- note: svelte:head is not reactive; it's only rendered on the server! -->
-<!-- this metadata is updated dynamically above in an onMount handler -->
 <svelte:head>
-  {#if $selected_entry != null}
-    <title>{$selected_entry.title} | {timeline.name} Timeline | NOTL Musuem</title>
-  {:else}
-    <title>{timeline.name} Timeline | NOTL Musuem</title>
-  {/if}
-  <meta name="description" content="Timeline page" />
-  <!-- todo: add metadata about the item here for search engines and media services -->
+  <!-- page metadata needs to be carefully updated in sync with navigation -->
+  <PageMeta {...pageMeta} />
 </svelte:head>
 
 <svelte:window
