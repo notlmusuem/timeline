@@ -9,7 +9,7 @@
 
   import { direction, mode, year } from "$lib/stores/store";
   import { windowWidth } from "$lib/stores/window";
-
+  import { userStore } from "$lib/authStore";
 
   import EditorModal from "$lib/components/EditorModal.svelte";
   import EventEdit from "$lib/components/EventEdit.svelte";
@@ -23,7 +23,6 @@
 
   import { parseIntNull, sleep } from "$lib/utils";
   import { Entry, Timeline } from "$lib/models/timeline.js";
-  import { userStore } from "$lib/authStore";
 
 
   export let data;
