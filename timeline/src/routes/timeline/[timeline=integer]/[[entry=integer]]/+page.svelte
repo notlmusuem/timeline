@@ -363,7 +363,7 @@
 </svelte:head>
 
 <svelte:window
-  on:touchend={handleTouchEnd}
+  on:touchend|passive={handleTouchEnd}
   on:touchmove|passive={handleTouchMove} />
 
 <QuickStartModal bind:visible={modal_quick_start} />
