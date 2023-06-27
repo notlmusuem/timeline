@@ -235,9 +235,9 @@
     <span class="line" />
     <div class="line-components">
       {#each timeData as td, i}
-        <div
-          on:keyup
+        <a
           class="lineItem"
+          href='{`/timeline/${td.timeline.id}/${td.id}`}'
           on:click={handleMove}
           on:click={() => year.set(td.start_date.getUTCFullYear())}>
           <div
@@ -250,7 +250,7 @@
               eventTwo={() => change()}
               year={td.start_date.getUTCFullYear()} />
           </div>
-        </div>
+        </a>
       {/each}
       <Cursor pos={getSpacing($year)} {tweening} />
     </div>
