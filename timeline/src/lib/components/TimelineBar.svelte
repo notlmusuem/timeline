@@ -230,7 +230,7 @@
   on:mouseup={handleDragEnd}
   on:touchstart|passive={handleDragStart}
   on:touchmove|preventDefault={handleDragMove}
-  on:touchend={handleDragEnd}>
+  on:touchend|passive={handleDragEnd}>
   <div>
     <span class="line" />
     <div class="line-components">
