@@ -7,6 +7,7 @@
   import { type User } from "@supabase/supabase-js";
 
   import { themeStore } from "$lib/stores/store";
+  import { timelines } from "$lib/stores/data";
   import { scrollY, mobile } from "$lib/stores/window";
   import { userStore, logout } from "$lib/authStore";
 
@@ -73,37 +74,16 @@
                 if ($mobile) isMenuOpen = false;
               }}>Home</a>
           </li>
-          <li
-            aria-current={$page.url.pathname.startsWith("/timeline")
-              ? "page"
-              : undefined}>
-            <a
-              title="Explore the timeline"
-              href="/timeline"
-              on:click={() => {
-                if ($mobile) isMenuOpen = false;
-              }}>Explore</a>
-          </li>
-          <li
-            aria-current={$page.url.pathname === "/contact"
-              ? "page"
-              : undefined}>
-            <a
-              title="Contact us"
-              href="/contact"
-              on:click={() => {
-                if ($mobile) isMenuOpen = false;
-              }}>Contact</a>
-          </li>
-          <li
-            aria-current={$page.url.pathname === "/about" ? "page" : undefined}>
-            <a
-              title="About the project"
-              href="/about"
-              on:click={() => {
-                if ($mobile) isMenuOpen = false;
-              }}>About</a>
-          </li>
+          {#each $timelines as timeline}
+            <li aria-current={
+              $page.url.pathname.startsWith(`/timeline/${timeline.id}`)
+              ? "page" : undefined
+            }>
+              <a title={timeline.name} href={`/timeline/${timeline.id}`}
+                on:click={() => { if ($mobile) { isMenuOpen = false; }}}
+                >{timeline.name}</a>
+            </li>
+          {/each}
           {#if user && user.email}
             <li
               aria-current={$page.url.pathname.startsWith("/login")
