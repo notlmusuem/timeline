@@ -29,10 +29,6 @@ themeStore.subscribe((value) => {
 });
 
 
-// temp stores; these would be factored away soon
-export const firstYear: Writable<number> = writable(0);
-export const lastYear: Writable<number> = writable(0);
-
 // year tweened
 export const year: Tweened<number> = tweened(0, {
   duration: 750,

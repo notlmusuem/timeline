@@ -9,10 +9,7 @@
   import Arrow from "$lib/components/Arrow.svelte";
 
   import { userStore } from "$lib/authStore";
-  import {
-    direction, mode,
-    year, firstYear, lastYear
-  } from "$lib/stores/store";
+  import { direction, mode, year } from "$lib/stores/store";
   import { mobile, windowHeight } from "$lib/stores/window";
 
   import { Entry } from "$lib/models/timeline";
@@ -27,24 +24,29 @@
   export let startSelected: boolean;
   export let endSelected: boolean;
 
+  let disabled: boolean;
+  $: disabled = $mode !== "default";
 
-  let disabled;
   let dragging = false;
+  let arrowVisible = true;
+
   let startY;
   let tweening;
   let zoom = 1;
   let zoomOffset = 0;
   let timelineHeight = 70;
-  let lowest;
-  let highest;
-  let decadeGap;
+
+  let lowest: number;
+  let highest: number;
+  let decadeGap: number;
   let decades: number[] = [];
-  let arrowVisible = true;
 
-  $: disabled = $mode !== "default";
+  let firstYear: number = timeData[0].start_date.getUTCFullYear();
+  $: firstYear = timeData[0].start_date.getUTCFullYear();
 
-  firstYear.set(timeData[0].start_date.getUTCFullYear());
-  lastYear.set(timeData[timeData.length - 1].start_date.getUTCFullYear());
+  let lastYear: number = timeData[timeData.length - 1].start_date.getUTCFullYear();
+  $: lastYear = timeData[timeData.length - 1].start_date.getUTCFullYear();
+
 
   const dispatch = createEventDispatcher();
 
@@ -150,7 +152,7 @@
         Math.round((750 - $windowHeight) / 50) * 10
       )
     );
-    lowest = Math.floor($firstYear / scale) * scale - 10;
+    lowest = Math.floor(firstYear / scale) * scale - 10;
     highest =
       Math.ceil(timeData[timeData.length - 1].start_date.getUTCFullYear() / scale) *
         scale +
@@ -168,7 +170,7 @@
 
   onMount(() => {
     handleResize();
-    year.set($firstYear);
+    year.set(firstYear);
   });
 
   handleResize();
