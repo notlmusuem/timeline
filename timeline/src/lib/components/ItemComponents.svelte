@@ -143,6 +143,20 @@
                     }
                   }} />
               </div>
+              <div class="input-cont">
+                <label for="image_caption">Image caption</label>
+                <input
+                  type="text"
+                  name="image_caption"
+                  placeholder="Picture of a ..."
+                  bind:value={editingItem.image_caption}
+                  on:change={event => {
+                    editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
+                    if (editingItem.image_caption == "") {
+                      editingItem.image_caption = null;
+                    }
+                  }} />
+              </div>
             </div>
           {:else if $mode == "default" && entry.image != null}
             {#if entry.image.includes("youtube.com")}
@@ -161,7 +175,7 @@
                     on:load={() => (loading = false)}
                     class="image"
                     src={entry.image}
-                    alt={entry.title}
+                    alt={entry.image_caption ?? entry.title}
                     on:keydown={event => {
                       if (event.key === "Escape") {
                         onExit();
@@ -175,6 +189,11 @@
                       }
                     }} />
                 </Fullscreen>
+                <!-- {#if entry.image_caption != null}
+                  <div class="image_caption">
+                    <span>{entry.image_caption}</span>
+                  </div>
+                {/if} -->
               </div>
             {/if}
           {/if}
@@ -333,6 +352,20 @@
     margin: 0.5rem 0;
   }
 
+  .image_caption {
+    max-width: fit;
+    width: 100%;
+    padding: 1em;
+    min-width: 40ch;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+  }
+
+  .image_caption > span {
+    vertical-align: middle;
+  }
+
   .cont-tts {
     display: flex;
     flex-direction: row;
@@ -404,6 +437,7 @@
     border: var(--border);
     border-radius: 1.5rem;
     max-width: 100%;
+    background: var(--color-text-card);
   }
 
   .image-placeholder {
