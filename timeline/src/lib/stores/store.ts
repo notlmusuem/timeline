@@ -1,5 +1,6 @@
-import { Tweened, tweened } from "svelte/motion";
-import { Writable, writable } from "svelte/store";
+import { type Tweened, tweened } from "svelte/motion";
+import { type Writable, writable } from "svelte/store";
+
 
 // local storage stores
 const localStorageN = typeof localStorage !== "undefined"
