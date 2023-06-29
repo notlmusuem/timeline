@@ -1,10 +1,20 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { browser } from '$app/environment';
 
   export let titles: string[];
   export let site_name: string;
   export let description: string|null = null;
   export let image: string|null = null;
+
+  // While the title is changed properly if the <title> tag was rendered on the
+  // server, this does not hold true in the case where the client has rendered
+  // the whole page (eg. after client-side navigation) because there are
+  // several <title> tags and svelte gets confused. In this case we need to
+  // manually update the title.
+  $: if (browser) {
+    document.title = `${titles.join(" | ")} | ${site_name}`;
+  }
 </script>
 
 
