@@ -1,8 +1,47 @@
-<script>
+<script lang="ts">
   import { slide } from "svelte/transition";
   import PageTransition from "$lib/components/PageTransitionFly.svelte";
 
-  let members = [
+  import { strip_end, strip_start } from "$lib/utils";
+
+  // This json file was automatically generated with the package
+  // https://www.npmjs.com/package/license-report and the command line:
+  // npx license-report --output=json
+  import projects_m from "./projects.json";
+  const projects = projects_m as {
+    department: string;
+    relatedTo: string;
+    name: string;
+    licensePeriod: string;
+    material: string;
+    licenseType: string;
+    licenseLink: string;  // new prop
+    link: string;
+    remoteVersion: string;
+    installedVersion: string;
+    definedVersion: string;
+    author: string;
+  }[];
+
+  for (const project of projects) {
+    project.licenseLink = "";
+
+    // this license is not documented on npm for whatever reason, see https://github.com/ankurrsinghal/svelte-legos/blob/master/LICENSE.md
+    if (project.name == "svelte-legos") {
+      project.licenseType = "MIT";
+    }
+
+    if (project.name == "scss") {
+      project.licenseType = "Modified MIT";
+      project.licenseLink = "https://www.npmjs.com/package/scss#modified-mit-license";
+    }
+
+    project.licenseLink = project.licenseLink != "" ? project.licenseLink
+      : `https://opensource.org/license/${project.licenseType}`;
+  }
+
+
+  const members = [
     {
       name: "Alec Ames",
       pic: "https://media.licdn.com/dms/image/D5603AQGBaGdxymdLTA/profile-displayphoto-shrink_800_800/0/1679545357267?e=1687392000&v=beta&t=tdCHXPorM-cBHk8URmvTgFk83c2wrhPRO0cd0wFu-OA",
@@ -106,39 +145,48 @@
     </div>
     <div>
       <h1>About the Timeline</h1>
-      <div class="row v-align">
+      <div>
         <p>
-          The Niagara-on-the-Lake Timeline is a project created a team of
-          student developers from Brock University created for the
+          The Niagara-on-the-Lake Timeline is a project created by a team of
+          student developers from Brock University for the
           Niagara-on-the-Lake Museum. The project is an interactive timeline
-          that documents the history of NOTL from 1726 to the present day. The
-          timeline is developed as a term-long project for COSC 4P02 &mdash; the
-          Software Engineering course taught by Prof. Naser Ezzati-Jivan at
-          Brock University.
+          that documents the history of Niagara-on-the-Lake and other historical
+          events from 1726 to the present day.
+          The timeline is developed as a project spanning over multiple terms
+          and multiple teams of developers, and was supervised by Professor Naser
+          Ezzati-Jivan.
         </p>
-        <img
-          width="100"
-          class="radius"
-          src="$lib/assets/brock.png"
-          alt="Brock University Logo" />
+        <!-- we will need to actually update the app first -->
+        <!-- <p>
+          Want to download the app? Click the button below!
+          <a
+            href="https://play.google.com/store/apps/details?id=app.notltimeline.twa&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+            ><img
+              width="250"
+              alt="Get it on Google Play"
+              src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" /></a>
+        </p> -->
+        <p>This project would not be possible without the extensive open source libraries used, as outlined below:</p>
+        <ul>
+          {#each projects as project}
+            <li>
+              <b><a
+                href={strip_end(strip_start(project.link, "git+"), ".git")}
+                >{project.name}</a></b>
+              — licensed under
+              <a href={project.licenseLink}
+                >{project.licenseType}</a>
+            </li>
+          {/each}
+        </ul>
+        <p>This project itself is licensed under <a href='https://github.com/SWE-2023/COSC-4P02-Project/LICENSE'>MIT.</a> An <a href="https://github.com/SWE-2023/COSC-4P02-Project">older version of the source is freely available.</a> A current version will follow in the near future.</p>
       </div>
-      <gap />
-      <p>
-        Want to download the app? Click the button below!
-        <a
-          href="https://play.google.com/store/apps/details?id=app.notltimeline.twa&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
-          ><img
-            width="250"
-            alt="Get it on Google Play"
-            src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" /></a>
-      </p>
     </div>
     <div>
       <h1>Our Team</h1>
       <div class="row v-align">
-        <p style="text-align:center">
-          Meet the software development team behind the Niagara-on-the-Lake
-          Timeline.
+        <p style="text-align: center">
+          Meet the software development team behind the timeline.
         </p>
         <!-- Team container  -->
         <div class="container">
@@ -154,13 +202,13 @@
                 <span class="role">{member.role}</span>
               </div>
               <ul class="social">
-                <li>
+                {#if typeof member.linkedin === "string"}<li>
                   <a href={member.linkedin}
                     ><span class="fab fa-linkedin" /></a>
-                </li>
-                <li>
+                </li>{/if}
+                {#if typeof member.github === "string"}<li>
                   <a href={member.github}><span class="fab fa-github" /></a>
-                </li>
+                </li>{/if}
               </ul>
             </div>
           {/each}
@@ -181,8 +229,8 @@
   }
 
   .member-card {
-    flex: 1 20%;
-    min-width: 16rem;
+    flex: 1 8rem;
+    min-width: 8rem;
     background: var(--color-bg-1);
     padding: 1rem;
     text-align: center;
@@ -191,13 +239,14 @@
     position: relative;
     border-radius: 1.5rem;
     border: var(--border);
+    justify-items: space-evenly;
   }
 
   .member-card .avatar {
     display: inline-block;
     align-self: center;
-    width: 10rem;
-    height: 10rem;
+    width: 50%;
+    aspect-ratio: 1;
     margin-bottom: 0px;
     z-index: 1;
     position: relative;
@@ -219,7 +268,7 @@
   }
 
   .member-card:hover .avatar::before {
-    height: 10rem;
+    height: 8rem;
   }
 
   .member-card .avatar img {
@@ -236,7 +285,7 @@
   }
 
   .member-card .team-content {
-    margin-bottom: 4rem;
+    /* margin-bottom: 4rem; */
   }
 
   .member-card .title {
@@ -288,7 +337,7 @@
     align-items: center;
   }
 
-  section p {
+  section .row p {
     flex: 1 1 50%;
     text-align: justify;
     display: flex;
@@ -296,7 +345,12 @@
     flex-flow: column;
     margin-left: auto;
     margin-right: auto;
-    max-width: 40rem;
+    max-width: 60ch;
+  }
+
+  section p {
+    text-align: justify;
+    max-width: 60ch;
   }
 
   .row > img {
