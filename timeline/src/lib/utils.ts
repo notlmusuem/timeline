@@ -12,6 +12,21 @@ export function validatePhone(phone: string): boolean {
   return re.test(phone);
 }
 
+
+export function strip(str: string, strip: string): string {
+  return strip_end(strip_start(str, strip), strip);
+}
+
+export function strip_start(str: string, strip: string): string {
+  return str.startsWith(strip) ? str.substring(strip.length) : str;
+}
+
+export function strip_end(str: string, strip: string): string {
+  return str.endsWith(strip)
+    ? str.substring(0, str.length - strip.length) : str;
+}
+
+
 /**
  * Performs a structuredClone on an object, but also copies over the prototype
  * by reference. This is important when cloning class instances.
