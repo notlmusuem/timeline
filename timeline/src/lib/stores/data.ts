@@ -1,7 +1,11 @@
-import { type Writable, writable } from "svelte/store";
+import { runtime_writable } from "$lib/ext/store";
 
-import { Timeline } from "$lib/models/timeline";
 import supabase from "$lib/supabaseClient";
+import { Timeline } from "$lib/models/timeline";
 
 
-export const timelines: Writable<Timeline[]> = writable(await Timeline.select_all(supabase));
+export const timelines = runtime_writable<Timeline[]>([], set => {
+  (async () => {
+    set(await Timeline.select_all(supabase));
+  })();
+});
