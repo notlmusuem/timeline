@@ -348,8 +348,6 @@
   p {
     font-family: var(--font-sans);
     font-size: var(--font-size-base);
-    padding: 1em 0 1em 0;
-    margin: 0.5rem 0;
   }
 
   .image_caption {
@@ -413,7 +411,7 @@
   }
 
   .title {
-    padding-top: 1rem;
+    margin: 1.5rem 0;
     text-align: center;
   }
 
@@ -426,7 +424,6 @@
 
   .desc {
     text-align: justify;
-    padding-top: 1rem;
   }
 
   .image-cont {

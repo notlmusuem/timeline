@@ -294,14 +294,16 @@
     display: flex;
     align-items: center;
     flex-flow: column;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     max-width: 40rem;
   }
 
   .row > img {
     flex: 1 1 50%;
     display: flex;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
     max-width: 30rem;
   }

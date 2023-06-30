@@ -217,12 +217,11 @@ h1 {
   font-size: var(--font-size-xxlarge);
   font-weight: 700;
   margin: 1rem 0;
-  padding-top: 3rem;
+  margin-top: 3rem;
 }
 
 .page p {
-  padding: 1em 0 1em 0;
-  margin: 0.5rem 0;
+  margin: calc(1em + 0.25rem) 0;
 }
 
 .page h1 {
@@ -234,6 +233,10 @@ h1 {
 }
 
 .page p {
+  font-size: var(--font-size-base);
+}
+
+.page details, .page summary, .page ul, .page li {
   font-size: var(--font-size-base);
 }
 
