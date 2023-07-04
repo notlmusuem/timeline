@@ -310,13 +310,16 @@
         <h1 class="title">{entry.title}</h1>
         <p class="date"><i>{entry.format_date()}</i></p>
         <hr />
-        {#if entry.body}
-          <p class="desc">{entry.body}</p>
-        {/if}
+        {#if entry.body}<p class="desc">{entry.body}</p>{/if}
         <div class="cont-tts">
           <div class="tts">
-            <!-- todo: put the image caption in here -->
-            <Text2Speech texts={[entry.title, entry.format_date(), entry?.body]}/>
+            <Text2Speech texts={[
+              entry.title,
+              entry.format_date(),
+              entry?.body,
+              entry.image_caption == null ? null
+                : `The above image is an ${entry.image_caption}`
+            ]}/>
           </div>
           <div class="image_cred">
             {#if entry.image_credit != null}
