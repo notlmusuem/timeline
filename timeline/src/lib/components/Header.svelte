@@ -89,26 +89,24 @@
     </div>
 
     <div class="right">
-      <span
+      <button
         title="Accessibility options"
         class="material-symbols-rounded icon-btn accessibility"
-        style="scale: 1.2;"
         on:click={() => (isAccessibilityOpen = !isAccessibilityOpen)}
         on:keydown={(e) => {
           if (e.key === "Enter") {
             isAccessibilityOpen = !isAccessibilityOpen;
           }
-        }}>settings</span>
+        }}>settings</button>
       <AccessibilityMenu bind:open={isAccessibilityOpen} />
 
       {#if user && user.email}
-        <span
+        <button
           title="Logout"
           class="material-symbols-rounded icon-btn"
-          style="scale: 1.2;"
           on:click|preventDefault={() => { logout(); }}
           on:keypress|preventDefault={() => { logout(); }}
-          >logout</span>
+          >logout</button>
       {:else}
         <a href="/login"
           title="Login"
@@ -218,11 +216,16 @@
   .right {
     display: flex;
     justify-content: flex-end;
-    margin-right: 0.75em;
+    margin-right: 1em;
+    gap: .75em;
   }
 
   .icon-btn {
-    padding: 0.75rem;
+    appearance: none;
+    background: none;
+    border: none;
+
+    font-size: 1.8rem;
     user-select: none;
     color: var(--color-theme-1);
   }
@@ -243,7 +246,7 @@
 
   .accessibility:active {
     transition: transform 0.2s var(--curve);
-    transform: scale(0.95) rotate(180deg);
+    transform: rotate(180deg);
   }
 
   header {
