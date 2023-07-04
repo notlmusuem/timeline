@@ -84,41 +84,6 @@
                 >{timeline.name}</a>
             </li>
           {/each}
-          {#if user && user.email}
-            <li
-              aria-current={$page.url.pathname.startsWith("/login")
-                ? "page"
-                : undefined}>
-              <a
-                on:click={() => {
-                  if ($mobile) isMenuOpen = false;
-                }}
-                title="Logged in as {user.email}"
-                href="/"
-                on:click={(event) => {
-                  event.preventDefault();
-                  logout();
-                }}
-                >Log Out&nbsp;
-                <span class="material-symbols-rounded i">logout</span></a>
-            </li>
-          {:else}
-            <li
-              aria-current={$page.url.pathname.startsWith("/login")
-                ? "page"
-                : undefined}>
-              <a
-                title="Log in"
-                class="login"
-                href="/login"
-                on:click={() => {
-                  if ($mobile) isMenuOpen = false;
-                }}
-                >Log In&nbsp;<span class="material-symbols-rounded i"
-                  >login</span
-                ></a>
-            </li>
-          {/if}
         </ul>
       {/if}
     </div>
@@ -126,7 +91,7 @@
     <div class="right">
       <span
         title="Accessibility options"
-        class="material-symbols-rounded accessibility"
+        class="material-symbols-rounded icon-btn accessibility"
         style="scale: 1.2;"
         on:click={() => (isAccessibilityOpen = !isAccessibilityOpen)}
         on:keydown={(e) => {
@@ -135,6 +100,22 @@
           }
         }}>settings</span>
       <AccessibilityMenu bind:open={isAccessibilityOpen} />
+
+      {#if user && user.email}
+        <span
+          title="Logout"
+          class="material-symbols-rounded icon-btn"
+          style="scale: 1.2;"
+          on:click|preventDefault={() => { logout(); }}
+          on:keypress|preventDefault={() => { logout(); }}
+          >logout</span>
+      {:else}
+        <a href="/login"
+          title="Login"
+          class="material-symbols-rounded icon-btn"
+          style="scale: 1.2;"
+          >login</a>
+      {/if}
     </div>
   </nav>
 </header>
@@ -237,20 +218,27 @@
   .right {
     display: flex;
     justify-content: flex-end;
-    margin-right: 2em;
+    margin-right: 0.75em;
+  }
+
+  .icon-btn {
+    padding: 0.75rem;
+    user-select: none;
+    color: var(--color-theme-1);
+  }
+
+  .icon-btn:hover {
+    cursor: pointer;
+    text-decoration: unset;
   }
 
   .accessibility {
-    padding: 1rem;
-    user-select: none;
-    color: var(--color-theme-1);
     transform: rotate(0);
     transition: transform 0.5s var(--curve);
   }
 
   .accessibility:hover {
     transform: rotate(180deg);
-    cursor: pointer;
   }
 
   .accessibility:active {

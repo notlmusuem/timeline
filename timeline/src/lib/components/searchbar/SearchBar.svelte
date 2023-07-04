@@ -118,7 +118,7 @@
   .search-container {
     position: fixed;
     top: calc(1.85rem + (var(--font-size-xsmall) * -1));
-    right: calc(5rem + var(--font-size-base));
+    right: calc(6rem + var(--font-size-base));
     display: flex;
     flex-direction: column;
     align-items: center;
