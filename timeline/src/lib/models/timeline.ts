@@ -101,6 +101,22 @@ export class Entry implements Table {
     };
   }
 
+  static async select(conx: SupabaseClient, id: number, timelines_ref: Timeline[]): Promise<Entry|null> {
+    const { data, error } = await conx
+      .from("timeline")
+      .select(
+        `id, timeline, title, body,
+        image, image_caption, image_credit,
+        start_date, start_date_precision,
+        end_date, end_date_precision`
+      )
+      .eq("id", id);
+    if (error) { throw error as PostgrestError; }
+
+    if (data.length == 0) { return null; }
+    return Entry.from_obj(data[0], timelines_ref);
+  }
+
   static async select_all(conx: SupabaseClient): Promise<Entry[]> {
     const timeline = DEFAULT_TIMELINE;  // note: temp fix; see eof
     const { data, error } = await conx
