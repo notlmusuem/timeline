@@ -1,7 +1,7 @@
 <script lang="ts">
   import Modal from "$lib/components/Modal.svelte";
 
-  export let visible;
+  export let visible: boolean;
 </script>
 
 
