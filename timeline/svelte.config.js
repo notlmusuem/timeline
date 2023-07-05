@@ -1,9 +1,9 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from "@sveltejs/adapter-node";
 
-import { importAssets } from 'svelte-preprocess-import-assets';
-import { vitePreprocess } from '@sveltejs/kit/vite';
+import { importAssets } from "svelte-preprocess-import-assets";
+import { vitePreprocess } from "@sveltejs/kit/vite";
 
-/** @type {import('@sveltejs/kit').Config} */
+/** @type {import("@sveltejs/kit").Config} */
 export default {
   kit: {
     adapter: adapter(),
