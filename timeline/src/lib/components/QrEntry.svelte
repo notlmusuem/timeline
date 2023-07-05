@@ -1,5 +1,5 @@
 <script lang="ts">
-  import QrCode from "./QrCode.svelte";
+  import QrCode from "$lib/components/QrCode.svelte";
   import { type DotType, type Options } from "@loskir/styled-qr-code-node";
 
   import { Entry } from "$lib/models/timeline";
