@@ -135,9 +135,14 @@
             ><span class="material-symbols-rounded i">edit</span
             >Edit</button>
           <div class="line" />
-          <button on:click={startAdd} title="Add New item"
+          <button on:click={startAdd} title="Add new item"
             ><span class="material-symbols-rounded i">add</span
             >Add</button>
+          <div class="line" />
+          <button title="Generate QR code"
+            on:click={() => { dispatch("showQR"); }}
+            ><span class="material-symbols-rounded i">qr_code_2_add</span
+            >QR Code</button>
         {/if}
       </div>
     </div>

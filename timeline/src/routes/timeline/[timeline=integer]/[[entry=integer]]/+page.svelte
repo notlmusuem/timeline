@@ -15,11 +15,12 @@
   import EventEdit from "$lib/components/EventEdit.svelte";
   import ItemComponents from "$lib/components/ItemComponents.svelte";
   import ItemTransition from "$lib/components/ItemTransition.svelte";
+  import PageMeta from "$lib/components/PageMeta.svelte";
   import PageTransitionFade from "$lib/components/PageTransitionFade.svelte";
+  import QrModal from "$lib/components/QrModal.svelte";
   import QuickStartModal from "$lib/components/QuickStartModal.svelte";
   import SearchBar from "$lib/components/searchbar/SearchBar.svelte";
   import TimelineBar from "$lib/components/TimelineBar.svelte";
-  import PageMeta from "$lib/components/PageMeta.svelte";
 
   import { parseIntNull, sleep } from "$lib/utils";
   import { Entry, Timeline } from "$lib/models/timeline.js";
@@ -332,6 +333,7 @@
   }
 
 
+  let modal_qrcode = false;
   let modal_quick_start = false;
   let modal_editor_guide = false;
 
@@ -371,12 +373,16 @@
 
 <SearchBar bind:selection={search_selection} data={entries} />
 
+{#if $selected_entry != null}
+  <QrModal bind:visible={modal_qrcode} entry={$selected_entry} />
+{/if}
 
 <EventEdit
   entry={editing_entry}
   on:entryCreate={handleCreate}
   on:entryUpdate={handleUpdate}
-  on:entryDeleted={handleDelete} />
+  on:entryDeleted={handleDelete}
+  on:showQR={() => { modal_qrcode = true; }} />
 
 {#if entries.length > 0 && $selected_entry != null}
   <TimelineBar
