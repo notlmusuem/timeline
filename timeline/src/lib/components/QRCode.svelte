@@ -1,32 +1,35 @@
 <script lang="ts">
-  import { AwesomeQR, Options } from "awesome-qr";
-  import { ComponentOptions } from "awesome-qr/lib/awesome-qr";
+  import { browser } from "$app/environment";
+  import { onMount } from "svelte";
 
-  export let text: string;
-  export let size: number | undefined = undefined;
-  export let margin: number | undefined = undefined;
-  export let correctLevel: number | undefined = undefined;
-  export let maskPattern: number | undefined = undefined;
-  export let version: number | undefined = undefined;
-  export let components: ComponentOptions | undefined = undefined;
-  export let colorDark: string | undefined = undefined;
-  export let colorLight: string | undefined = undefined;
-  export let autoColor: boolean | undefined = undefined;
-  export let backgroundImage: string | Buffer | undefined = undefined;
-  export let backgroundDimming: string | undefined = undefined;
-  export let gifBackground: ArrayBuffer | undefined = undefined;
-  export let whiteMargin: boolean | undefined = undefined;
-  export let logoImage: string | Buffer | undefined = undefined;
-  export let logoScale: number | undefined = undefined;
-  export let logoMargin: number | undefined = undefined;
-  export let logoCornerRadius: number | undefined = undefined;
+  type FileExtension = "svg" | "png" | "jpeg" | "webp";
 
-  let qr: AwesomeQR;
-  $: {
+  export let options: object;
+
+
+  let QRCode;
+  onMount(async () => {
+    ({ default: QRCode } = await import("qr-code-styling"));
+  });
+
+
+  let datauri: string;
+  let canvas: HTMLCanvasElement;
+
+
+  $: if (browser && QRCode !== undefined) {
     (async () => {
-      qr = new AwesomeQR($$props);
+      let qr = new QRCode(options);
+      let data: Blob = await qr.getRawData("svg");
+      datauri = URL.createObjectURL(data);
     })();
+  }
+
+  export function download(format: FileExtension) {
+    let qr = new QRCode(options);
+    qr.download({ name: "qrcode", extension: format });
   }
 </script>
 
-<img src={(await qr.draw())?.toString()} alt="QR code" />
+<!-- <canvas bind:this={canvas}></canvas> -->
+<img src={datauri} alt="QR code" />

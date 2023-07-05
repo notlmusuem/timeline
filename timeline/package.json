@@ -39,6 +39,7 @@
     "d3": "^7.8.2",
     "date-fns-tz": "^2.0.0",
     "esbuild": "^0.17.11",
+    "qr-code-styling": "^1.6.0-rc.1",
     "svelte-fullscreen": "^2.0.0",
     "svelte-legos": "^0.0.6",
     "svelte-previous": "^2.1.3"
