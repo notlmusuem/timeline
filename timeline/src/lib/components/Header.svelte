@@ -66,14 +66,6 @@
         <ul
           transition:slide={{ axis: $mobile ? "y" : "x", easing: quintOut }}
           class="menu">
-          <li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
-            <a
-              title="Home"
-              href="/"
-              on:click={() => {
-                if ($mobile) isMenuOpen = false;
-              }}>Home</a>
-          </li>
           {#each $timelines as timeline}
             <li aria-current={
               $page.url.pathname.startsWith(`/timeline/${timeline.id}`)
@@ -100,6 +92,10 @@
         }}>settings</button>
       <AccessibilityMenu bind:open={isAccessibilityOpen} />
 
+      <a href="/about"
+        title="About"
+        class="material-symbols-rounded icon-btn"
+        >info</a>
       {#if user && user.email}
         <button
           title="Logout"
@@ -111,7 +107,6 @@
         <a href="/login"
           title="Login"
           class="material-symbols-rounded icon-btn"
-          style="scale: 1.2;"
           >login</a>
       {/if}
     </div>
@@ -217,15 +212,16 @@
     display: flex;
     justify-content: flex-end;
     margin-right: 1em;
-    gap: .75em;
+    gap: 1em;
   }
 
   .icon-btn {
     appearance: none;
     background: none;
     border: none;
+    padding: 0;
 
-    font-size: 1.8rem;
+    font-size: var(--font-size-large);
     user-select: none;
     color: var(--color-theme-1);
   }
