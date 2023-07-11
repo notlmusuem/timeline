@@ -1,27 +1,29 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { loadingAction } from "svelte-legos";
-  
+
   const dispatch = createEventDispatcher();
   function click() {
     dispatch("click");
   }
-  export let text = "Button";
-  export let autofocus = false;
-  export let disabled = false;
-  export let href = "#";
-  export let alt = false;
-  export let loading = false; 
+  export let text: string = "Button";
+  export let autofocus: boolean = false;
+  export let disabled: boolean = false;
+  export let href: string|null = null;
+  export let alt: boolean = false;
+  export let loading: boolean = false;
 </script>
 
 <!-- svelte-ignore a11y-autofocus -->
-{#if alt}
-  <a {href} >
-    <button {autofocus} use:loadingAction={loading} class="alt-button" on:click={click} {disabled}>{text}</button>
-  </a>
+{#if href == null}
+  <button use:loadingAction={loading}
+    class={alt ? "alt-button" : "button"}
+    on:click={click} {disabled} {autofocus}><slot /></button>
 {:else}
   <a {href}>
-    <button {autofocus} use:loadingAction={loading} class="button" on:click={click} {disabled}>{text}</button>
+    <button use:loadingAction={loading}
+      class={alt ? "alt-button" : "button"}
+      on:click={click} {disabled} {autofocus}><slot /></button>
   </a>
 {/if}
 

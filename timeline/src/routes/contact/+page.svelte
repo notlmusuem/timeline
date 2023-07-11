@@ -167,7 +167,7 @@
               placeholder="Message"
               bind:value={inquiry.message} />
             <div id="submit-btn">
-              <Button alt on:click={submitInquiry} text="Submit" />
+              <Button alt on:click={submitInquiry}>Submit</Button>
             </div>
           </form>
         </div>

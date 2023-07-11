@@ -36,9 +36,9 @@
       <p>Click the button below to log out</p>
       <div class="form">
         <div class="form-buttons">
-          <div><Button text="Back" href="/" /></div>
+          <div><Button href="/">Back</Button></div>
           <div>
-            <Button alt on:click={logout} text="Log Out" {loading} />
+            <Button alt on:click={logout} {loading}>Log Out</Button>
           </div>
         </div>
       </div>
@@ -61,13 +61,9 @@
           placeholder="password" />
 
         <div class="form-buttons">
-          <div><Button text="Back" href="/" /></div>
+          <div><Button href="/">Back</Button></div>
           <div>
-            <Button
-              alt
-              on:click={handleLogin}
-              text="Log In"
-              {loading} />
+            <Button alt on:click={handleLogin} {loading}>Log In</Button>
           </div>
         </div>
       </div>
