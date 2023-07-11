@@ -6,6 +6,7 @@
   let dialog: HTMLDialogElement;
 
   $: if (dialog && visible) dialog.showModal();
+  $: if (dialog && !visible) dialog.close();
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -19,7 +20,13 @@
     <div class=content><slot /></div>
     <hr />
     <slot name="footer" />
-    <div class=btn><Button autofocus text={"OK"} on:click={() => dialog.close()}/></div>
+    <div class="btns">
+      <slot name="btns">
+        <div class="btns-slot-placeholder">
+          <Button autofocus on:click={() => dialog.close()}>Ok</Button>
+        </div>
+      </slot>
+    </div>
   </div>
 </dialog>
 
@@ -80,8 +87,9 @@
     }
   }
 
-  .btn {
+  .btns > :global([slot="btns"]), .btns-slot-placeholder {
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 </style>
