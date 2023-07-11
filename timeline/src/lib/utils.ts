@@ -1,3 +1,4 @@
+import { browser } from "$app/environment";
 import { UTCDate } from "@date-fns/utc";
 import * as datefn from "date-fns-tz";
 
@@ -113,4 +114,35 @@ export function format_date_range_numbers(
     return `${start} – ${format_date_numbers(end_date, end_precision)}`;
   }
   return start;
+}
+
+
+
+export function buffer_to_datauri(buffer: Buffer, mime: string) {
+  if (!browser) {
+    // parameterized Buffer.toString is only available in node
+    return `data:${mime};base64,${buffer.toString("base64")}`;
+  } else {
+    const blob = new Blob([buffer], { type: mime });
+    return URL.createObjectURL(blob);
+  }
+}
+
+export function buffer_download(
+  buffer: Buffer, filename: string, mime: string = "application/octet-stream"
+) {
+  if (!browser) {
+    throw new Error("buffer_download can only be ran in the browser");
+  }
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([buffer], { type: mime }));
+  link.download = filename;
+
+  // Append anchor to body.
+  // document.body.appendChild(link)
+  link.click();
+
+  // Remove anchor from body
+  // document.body.removeChild(link)
 }
