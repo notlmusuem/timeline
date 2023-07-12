@@ -48,7 +48,7 @@
       An interactive timeline of the history of the Niagara-on-the-Lake
     </p>
     <div style="display:inline-block">
-      <Button href="/timeline">Explore the Timeline</Button>
+      <Button alt href="/timeline">Explore the Timeline</Button>
     </div>
   </section>
 </PageTransitionFly>

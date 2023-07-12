@@ -1,27 +1,27 @@
-<script>
+<script lang="ts">
+  import { type User } from "@supabase/supabase-js";
+  import * as navigation from "$app/navigation";
+  import { login_pw, logout, userStore } from "$lib/authStore";
+
   import PageTransition from "$lib/components/PageTransitionFly.svelte";
   import Button from "$lib/components/Button.svelte";
-  import { login_pw } from "$lib/authStore";
-  import { logout } from "$lib/authStore";
-  import { userStore } from "$lib/authStore";
-  import * as navigation from "$app/navigation";
 
 
-  let user;
+  let user: User|null;
   userStore.subscribe((value) => {
     user = value;
   });
 
   let loading = false;
 
-  let email = "";
-  let password = "";
-  const handleLogin = async () => {
+  let email: string;
+  let password: string;
+  async function handleLogin() {
     loading = true;
     await login_pw(email, password);
     navigation.goto("/");
     loading = false;
-  };
+  }
 </script>
 
 <svelte:head>
@@ -38,7 +38,9 @@
         <div class="form-buttons">
           <div><Button href="/">Back</Button></div>
           <div>
-            <Button alt on:click={logout} {loading}>Log Out</Button>
+            <Button alt on:click={logout} {loading}>
+              <i class="material-symbols-rounded">logout</i>Log Out
+            </Button>
           </div>
         </div>
       </div>
@@ -63,7 +65,9 @@
         <div class="form-buttons">
           <div><Button href="/">Back</Button></div>
           <div>
-            <Button alt on:click={handleLogin} {loading}>Log In</Button>
+            <Button alt on:click={handleLogin} {loading}>
+              <i class="material-symbols-rounded">login</i>Log In
+            </Button>
           </div>
         </div>
       </div>

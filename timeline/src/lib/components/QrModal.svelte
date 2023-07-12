@@ -26,14 +26,23 @@
       {#if visible}
         <QrEntry {entry} size={2048} {color} bind:this={qr} />
       {/if}
-      <Button autofocus on:click={() => { color = !color; }}>{color ? "Black/White" : "Color"}</Button>
     </div>
   </div>
 
   <div slot="btns">
-    <Button autofocus on:click={() => { qr.download(); }}>Save</Button>
-    <Button autofocus on:click={() => {}}>Print</Button>
-    <Button autofocus on:click={() => { visible = false; }}>Close</Button>
+    <Button autofocus on:click={() => { color = !color; }}>
+      <i class="material-symbols-rounded">palette</i>
+      {color ? "Grayscale" : "Color"}
+    </Button>
+    <Button autofocus on:click={() => { qr.download(); }}>
+      <i class="material-symbols-rounded">download</i>Save
+    </Button>
+    <Button autofocus on:click={() => {}}>
+      <i class="material-symbols-rounded">print</i>Print
+    </Button>
+    <Button autofocus on:click={() => { visible = false; }}>
+      <i class="material-symbols-rounded">close</i>Close
+    </Button>
   </div>
 </Modal>
 
