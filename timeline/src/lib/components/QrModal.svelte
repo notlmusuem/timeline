@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div slot="btns">
+    <svelte:fragment slot="btns">
       <Button autofocus on:click={() => { color = !color; }}>
         <i class="material-symbols-rounded">palette</i>
         {color ? "Grayscale" : "Color"}
@@ -44,7 +44,7 @@
       <Button autofocus on:click={() => { visible = false; }}>
         <i class="material-symbols-rounded">close</i>Close
       </Button>
-    </div>
+    </svelte:fragment>
   </Modal>
 </div>
 

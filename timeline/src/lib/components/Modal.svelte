@@ -21,10 +21,10 @@
     <hr />
     <slot name="footer" />
     <div class="btns">
+      <!-- use <svelte:fragment slot="btns"> for this slot to avoid creating
+      a wrapper element -->
       <slot name="btns">
-        <div class="btns-slot-placeholder">
-          <Button autofocus on:click={() => dialog.close()}>Ok</Button>
-        </div>
+        <Button autofocus on:click={() => dialog.close()}>Ok</Button>
       </slot>
     </div>
   </div>
@@ -87,7 +87,7 @@
     }
   }
 
-  .btns > :global([slot="btns"]), .btns-slot-placeholder {
+  .btns {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
