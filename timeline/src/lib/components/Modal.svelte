@@ -14,10 +14,10 @@
   bind:this={dialog}
   on:close={() => visible = false}
   on:click|self={() => dialog.close()}>
-  <div on:click|stopPropagation>
+  <div on:click|stopPropagation class="modal-container">
     <slot name="header" />
     <hr />
-    <div class=content><slot /></div>
+    <div class="content"><slot /></div>
     <hr />
     <slot name="footer" />
     <div class="btns">
@@ -89,6 +89,7 @@
 
   .btns > :global([slot="btns"]), .btns-slot-placeholder {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
   }

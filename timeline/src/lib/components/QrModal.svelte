@@ -16,35 +16,37 @@
   let qr: QrEntry;
 </script>
 
-<Modal bind:visible>
-  <h2 slot="header"><b>Generated QR Code</b></h2>
+<div class="modal">
+  <Modal bind:visible>
+    <h2 slot="header"><b>Generated QR Code</b></h2>
 
-  <div class="hcenter">
-    <div class="qr">
-      <!-- doing this only triggers reactivity when the modal is open, thus only
-      generating qr codes when the modal is open, instead of always -->
-      {#if visible}
-        <QrEntry {entry} size={2048} {color} bind:this={qr} />
-      {/if}
+    <div class="hcenter">
+      <div class="qr">
+        <!-- doing this only triggers reactivity when the modal is open, thus only
+        generating qr codes when the modal is open, instead of always -->
+        {#if visible}
+          <QrEntry {entry} size={2048} {color} bind:this={qr} />
+        {/if}
+      </div>
     </div>
-  </div>
 
-  <div slot="btns">
-    <Button autofocus on:click={() => { color = !color; }}>
-      <i class="material-symbols-rounded">palette</i>
-      {color ? "Grayscale" : "Color"}
-    </Button>
-    <Button autofocus on:click={() => { qr.download(); }}>
-      <i class="material-symbols-rounded">download</i>Save
-    </Button>
-    <Button autofocus on:click={() => {}}>
-      <i class="material-symbols-rounded">print</i>Print
-    </Button>
-    <Button autofocus on:click={() => { visible = false; }}>
-      <i class="material-symbols-rounded">close</i>Close
-    </Button>
-  </div>
-</Modal>
+    <div slot="btns">
+      <Button autofocus on:click={() => { color = !color; }}>
+        <i class="material-symbols-rounded">palette</i>
+        {color ? "Grayscale" : "Color"}
+      </Button>
+      <Button autofocus on:click={() => { qr.download(); }}>
+        <i class="material-symbols-rounded">download</i>Save
+      </Button>
+      <Button autofocus on:click={() => {}}>
+        <i class="material-symbols-rounded">print</i>Print
+      </Button>
+      <Button autofocus on:click={() => { visible = false; }}>
+        <i class="material-symbols-rounded">close</i>Close
+      </Button>
+    </div>
+  </Modal>
+</div>
 
 <style>
   .qr {
@@ -56,5 +58,9 @@
   .hcenter {
     display: flex;
     justify-content: center;
+  }
+
+  .modal :global(.modal-container) {
+    max-width: 25rem;
   }
 </style>
