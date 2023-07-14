@@ -57,7 +57,7 @@
 
   .content {
     max-height: 50vh;
-    min-height: 10rem;
+    min-height: 5rem;
     overflow-y: scroll;
   }
 
