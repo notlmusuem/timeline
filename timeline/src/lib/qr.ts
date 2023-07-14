@@ -12,8 +12,13 @@ export type Options = {
   size: number,
 };
 
+
+export function qr_entry_link(entry: Entry): string {
+  return `${base_url.origin}/qr/e${entry.id}`;
+}
+
 export function qr_from_entry(entry: Entry, options: Options): QrCode {
-  return qr(`${base_url.origin}/qr/e${entry.id}`, options);
+  return qr(qr_entry_link(entry), options);
 }
 
 export function qr(data: string, options: Options): QrCode {
