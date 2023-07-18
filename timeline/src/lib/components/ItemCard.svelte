@@ -1,17 +1,20 @@
 <script lang="ts">
-  import QrEntry from "$lib/components/QrEntry.svelte";
-
   import { Entry } from "$lib/models/timeline";
 
   export let entry: Entry;
-  export let url_origin: string;
+  export let qr_datauri: string;
+  export let qr_size: number;
 </script>
 
 <div class="item-card">
   <section class="item-component">
-    <div class="media-component" style="border: 2px solid red;">
+    <div class="media-component">
       <!-- <img src='$lib/assets/notl-museum.svg' width='400px' height='300px'/> -->
-      <QrEntry {entry} size={2048} {url_origin} ssr={true} />
+      <div class="media">
+        <img class="qr" src={qr_datauri} width={qr_size} height={qr_size}
+          alt="A QR code" />
+        <caption>Scan to discover more!</caption>
+      </div>
     </div>
     <div class="text-component">
       <h1 class="title">{entry.title}</h1>
@@ -211,7 +214,29 @@
     flex: 1 2 30%;
 
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+  }
 
+  .media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .media > caption {
+    font-size: @font-size-smallish;
+    margin-top: 0.75rem;
+    padding-top: 0.25rem;
+    border-top: @border;
+  }
+
+  .qr {
+    aspect-ratio: 1;
+    width: 15rem;
+    height: 15rem;
   }
 
   .text-component {
@@ -221,8 +246,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    padding: 1rem 2rem;
 
     text-align: justify;
   }
