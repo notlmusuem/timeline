@@ -8,6 +8,7 @@
   export let autofocus: boolean = false;
   export let disabled: boolean = false;
   export let href: string|null = null;
+  export let href_external: boolean = false;
   export let alt: boolean = false;
   export let loading: boolean = false;
 </script>
@@ -19,7 +20,7 @@
     on:click={() => { dispatch("click"); }}
     {disabled} {autofocus}><div><slot /></div></button>
 {:else}
-  <a {href}>
+  <a {href} target={href_external ? "_blank" : undefined}>
     <button use:loadingAction={loading}
       class={alt ? "alt-button" : "button"}
       on:click={() => { dispatch("click"); }}
