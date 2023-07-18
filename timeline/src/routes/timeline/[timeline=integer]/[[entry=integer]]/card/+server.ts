@@ -1,10 +1,12 @@
 import { error } from "@sveltejs/kit"
 import { image_from_component, type RenderOptions } from "svelte-component-to-image";
-import { parseIntNull } from "$lib/utils";
+import { buffer_to_datauri, parseIntNull } from "$lib/utils";
 import supabase from "$lib/supabaseClient";
 
 import ItemCard from "$lib/components/ItemCard.svelte";
+import QrEntry from "$lib/components/QrEntry.svelte";
 
+import { qr_from_entry } from "$lib/qr";
 import { Entry, Timeline } from "$lib/models/timeline";
 
 
@@ -40,6 +42,13 @@ export async function GET({url, params, fetch}) {
     };
   }
 
+  const qr_datauri = buffer_to_datauri(
+    await qr_from_entry(entry, {
+      size: 2048, color: true
+    }).toBuffer("png"),
+    "image/png"
+  );
+
   // todo: patch upstream library to support directly loading fonts from arraybuffer with fonts.data
   // todo: remove static/assets symlink after direct loading fonts from filesystem
   try {
@@ -49,6 +58,8 @@ export async function GET({url, params, fetch}) {
       props: {
         entry: entry,
         url_origin: url.origin,
+        qr_datauri: qr_datauri,
+        qr_size: 2048
       },
       fonts: [
         {
