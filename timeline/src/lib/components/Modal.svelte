@@ -1,19 +1,29 @@
 <script lang="ts">
   // based on https://svelte.dev/examples/modal from Svelte docs
   import Button from "$lib/components/Button.svelte";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
 
   export let visible: boolean;
   let dialog: HTMLDialogElement;
 
-  $: if (dialog && visible) dialog.showModal();
-  $: if (dialog && !visible) dialog.close();
+  $: if (dialog && visible) {
+    dialog.showModal();
+    dispatch("show", self);
+  }
+
+  $: if (dialog && !visible) {
+    dialog.close();
+    dispatch("close", self);
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
   bind:this={dialog}
-  on:close={() => visible = false}
-  on:click|self={() => dialog.close()}>
+  on:close={() => { visible = false; }}
+  on:click|self={() => { visible = false; }}>
   <div on:click|stopPropagation class="modal-container">
     <slot name="header" />
     <hr />
@@ -24,7 +34,7 @@
       <!-- use <svelte:fragment slot="btns"> for this slot to avoid creating
       a wrapper element -->
       <slot name="btns">
-        <Button autofocus on:click={() => dialog.close()}>Ok</Button>
+        <Button autofocus on:click={() => { visible = false; }}>Ok</Button>
       </slot>
     </div>
   </div>
