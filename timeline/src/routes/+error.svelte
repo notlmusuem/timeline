@@ -1,5 +1,4 @@
-<script>
-  // @ts-nocheck
+<script lang="ts">
   import { page } from "$app/stores";
 </script>
 
@@ -7,12 +6,12 @@
   <title>Error {$page.status}</title>
   <meta
     name="description"
-    content="Error {$page.status} {$page.error.message}" />
+    content="Error {$page.status} {$page?.error?.message}" />
 </svelte:head>
 
 <div>
   <h1>{$page.status}</h1>
-  <p>{$page.error.message}</p>
+  <p>{$page?.error?.message}</p>
   <a href="/">GO HOME</a>
 </div>
 

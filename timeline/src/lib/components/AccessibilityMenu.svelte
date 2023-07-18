@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
   import { fly } from "svelte/transition";
   import { reduceMotionStore } from "$lib/stores/store";
   import TextSizeSelector from "$lib/components/TextSizeSelector.svelte";
   import { themeStore } from "$lib/stores/store";
 
-  export let open;
+  export let open: boolean;
 
   let reduceMotion;
   reduceMotionStore.subscribe((value) => {

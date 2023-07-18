@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { fly, blur } from "svelte/transition";
   import { quintOut } from "svelte/easing";
 

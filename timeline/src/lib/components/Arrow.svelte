@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
   import { direction, mode } from "$lib/stores/store";
   import { createEventDispatcher } from "svelte";
 
-  export let down = false;
-  export let visible = true;
-  export let disabled = false;
+  export let down: boolean = false;
+  export let visible: boolean = true;
+  export let disabled: boolean = false;
 
   $: classes =
     "arrow-button " + (down ? "down" : "up") + (visible ? " " : " hidden");

@@ -248,8 +248,10 @@
               getSpacing(td.start_date.getUTCFullYear())
             }vh)">
             <Dot
-              eventOne={() => setDetails(td)}
-              eventTwo={() => change()}
+              on:click={() => {
+                setDetails(td)
+                change()
+              }}
               year={td.start_date.getUTCFullYear()} />
           </div>
         </a>

@@ -1,10 +1,10 @@
-<!-- Arrow.svelte -->
-<script>
+<script lang="ts">
   import { tweened } from "svelte/motion";
   import { quintOut } from "svelte/easing";
   import { mobile } from "$lib/stores/window";
 
-  export let open = false;
+  export let open: boolean = false;
+
   const flip = tweened(0, { duration: 300, easing: quintOut });
 
   const toggle = () => (open = !open);

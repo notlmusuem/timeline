@@ -1,7 +1,8 @@
-<script>
-  import {year  } from "$lib/stores/store";
-  export let pos;
-  export let tweening = false;
+<script lang="ts">
+  import { year } from "$lib/stores/store";
+
+  export let pos: number;
+  export let tweening: boolean = false;
 </script>
 
 <div class="cursor" style="transform:translateY(calc(5px + {pos}vh))">

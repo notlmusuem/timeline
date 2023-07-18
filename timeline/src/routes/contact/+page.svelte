@@ -1,11 +1,13 @@
-<script>
-  // @ts-nocheck
-  import PageTransition from "$lib/components/PageTransitionFly.svelte";
-  import Button from "$lib/components/Button.svelte";
-  import supabase from "$lib/supabaseClient";
+<script lang="ts">
+  import { type PostgrestError } from "@supabase/supabase-js";
   import { toast } from "@zerodevx/svelte-toast";
-  import { validatePhone, validateEmail } from "$lib/utils";
+  import supabase from "$lib/supabaseClient";
+
+  import Button from "$lib/components/Button.svelte";
+  import PageTransition from "$lib/components/PageTransitionFly.svelte";
   import Socials from "$lib/components/Socials.svelte";
+
+  import { validatePhone, validateEmail } from "$lib/utils";
 
   export let inquiry = {
     name: "",
@@ -51,7 +53,7 @@
         }
         toast.push("<b>Inquiry Submitted</b>");
       } catch (error) {
-        toast.push(`<b>Query Error</b><br>${error.message}`);
+        toast.push(`<b>Query Error</b><br>${(error as PostgrestError).message}`);
       }
     } else {
       toast.push(

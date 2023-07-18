@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Button from "$lib/components/Button.svelte";
   import { slide } from "svelte/transition";
   import { themeStore } from "$lib/stores/store";

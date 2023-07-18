@@ -1,5 +1,5 @@
-<script>
-  export let grey = false;
+<script lang="ts">
+  export let grey: boolean = false;
 </script>
 
 <div class={grey ? "socials grey" : "socials"}>

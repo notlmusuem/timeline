@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import { mobile } from "$lib/stores/window";
-  export let eventOne;
-  export let eventTwo;
-  export let year;
+
+  export let year: number;
+
+  const dispatch = createEventDispatcher();
 
   function handleClick() {
-    eventOne();
-    eventTwo();
+    dispatch("click");
   }
 </script>
 
