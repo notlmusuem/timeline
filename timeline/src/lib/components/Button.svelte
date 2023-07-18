@@ -49,7 +49,6 @@
     // the content inner container
     & > div {
       min-height: var(--font-size-medium);
-      min-width: 3em;
       white-space: nowrap;
 
       display: inline-flex;
