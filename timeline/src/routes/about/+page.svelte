@@ -284,9 +284,9 @@
     transform: scale(0.9);
   }
 
-  .member-card .team-content {
-    /* margin-bottom: 4rem; */
-  }
+  /* .member-card .team-content {
+     margin-bottom: 4rem;
+  } */
 
   .member-card .title {
     font-size: var(--font-size-base);
