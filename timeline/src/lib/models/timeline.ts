@@ -236,27 +236,29 @@ export class Timeline implements Table {
   /** A null id indicates this Item is not yet present in the table */
   id: number|null = null;
   name: string;
+  sort: number;
 
-  constructor(name: string) {
+  constructor(name: string, sort: number) {
     this.name = name;
+    this.sort = sort;
   }
 
-  static from_obj(obj: { id: number|null, name: string }): Timeline {
-    const self = new Timeline(obj.name);
+  static from_obj(obj: { id: number|null, name: string, sort: number }): Timeline {
+    const self = new Timeline(obj.name, obj.sort);
     self.id = obj.id;
     return self;
   }
 
-  public to_obj(): { id: number|null, name: string } {
-    return { id: this.id, name: this.name };
+  public to_obj(): { id: number|null, name: string, sort: number } {
+    return { id: this.id, name: this.name, sort: this.sort };
   }
 
   static async select(conx: SupabaseClient, id: number): Promise<Timeline|null> {
     const { data, error } = await conx
       .from("timelines")
-      .select("id, name")
+      .select("id, name, sort")
       .eq("id", id)
-      .order("id");
+      .order("sort");
     if (error) { throw error as PostgrestError; }
     return data.length == 1 ? Timeline.from_obj(data[0]) : null;
   }
@@ -264,8 +266,8 @@ export class Timeline implements Table {
   static async select_all(conx: SupabaseClient): Promise<Timeline[]> {
     const { data, error } = await conx
       .from("timelines")
-      .select("id, name")
-      .order("id");
+      .select("id, name, sort")
+      .order("sort");
     if (error) { throw error as PostgrestError; }
     return data.map(Timeline.from_obj);
   }
@@ -274,6 +276,7 @@ export class Timeline implements Table {
     const { data, error } = await conx.from("timelines").insert(
       {
         name: this.name,
+        sort: this.sort,
       }).select("id");
     if (error) { throw error as PostgrestError; }
     this.id = data[0].id;
@@ -283,6 +286,7 @@ export class Timeline implements Table {
   async update(conx: SupabaseClient) {
     const { error } = await conx.from("timelines").update({
       name: this.name,
+      sort: this.sort,
     }).eq("id", this.id);
     if (error) { throw error as PostgrestError; }
     return this;
@@ -304,4 +308,4 @@ export class Timeline implements Table {
 
 
 // note: temporary fix until function signature changes are final and refactored elsewhere
-const DEFAULT_TIMELINE: Timeline = Timeline.from_obj({ id: 1, name: "NOTL" });
+const DEFAULT_TIMELINE: Timeline = Timeline.from_obj({ id: 1, name: "NOTL", sort: 0 });
