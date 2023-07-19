@@ -1,52 +1,62 @@
 <script lang="ts">
-  import Button from '$lib/components/Button.svelte';
-  import Modal from '$lib/components/Modal.svelte';
+  import Button from "$lib/components/Button.svelte";
+  import Modal from "$lib/components/Modal.svelte";
+  import NameLabelInput from "$lib/components/NameLabelInput.svelte";
+  import TimelineLineSetting from "$lib/components/TimelineLineSetting.svelte";
 
-  import { Timeline } from '$lib/models/timeline';
-  import { sleep } from '$lib/utils.js';
+
+  import { Timeline } from "$lib/models/timeline";
+  import { sleep } from "$lib/utils";
 
   export let data;
   let timelines = (data.timelines ?? []).map(Timeline.from_obj);
+  let min_sort: number, max_sort: number;
+  $: min_sort = timelines.reduce((acc, val) => Math.min(val.sort, acc), Number.MAX_VALUE);
+  $: max_sort = timelines.reduce((acc, val) => Math.max(val.sort, acc), Number.MIN_VALUE);
+
+  let is_editing = false;
+  let label: string;
+  let name_label: NameLabelInput;
 
   let to_delete_timeline: Timeline|null = null;
   let show_delete_modal = false;
   let delete_btn_timer = 0;
   const delete_btn_undo_time = 9;
 
-  function delete_warning(timeline: Timeline) {
+  function flow_timeline_delete(timeline: Timeline) {
+    delete_btn_timer = 0;
     to_delete_timeline = timeline;
     show_delete_modal = true;
   }
-
 </script>
 
-<div class='timeline-grid'>
+<div class="timeline-grid">
   {#each timelines as timeline}
-    <div class='cell5'><a href='/timeline/{timeline.id}' target='_blank'>{timeline.name}</a></div>
-    <div class='cell3 btn-row'>
-      <!-- todo: set autofocus  on the first row's button -->
-      <Button href='/timeline/{timeline.id}' href_external>
-        <i class="material-symbols-rounded">open_in_new</i>
-      </Button>
-      <Button on:click={() => {  }}>
-        <i class="material-symbols-rounded">edit</i>
-      </Button>
-      <Button on:click={() => {  }}>
-        <i class="material-symbols-rounded">arrow_upward</i>
-      </Button>
-      <Button on:click={() => {  }}>
-        <i class="material-symbols-rounded">arrow_downward</i>
-      </Button>
-      <Button on:click={() => { delete_warning(timeline); }}>
-        <i class="material-symbols-rounded">delete</i>
-      </Button>
-    </div>
+    <TimelineLineSetting
+      timeline={timeline}
+      is_first={timeline.sort <= min_sort}
+      is_last={timeline.sort >= max_sort}
+      on:edit={() => {}}
+      on:delete={({detail: target}) => {
+        flow_timeline_delete(target);
+      }}
+      on:sort_prev={() => {}}
+      on:sort_next={() => {}}
+      />
   {/each}
+
+  <div></div>
+  <div class='create-new-btn'>
+    <Button alt on:click={() => {  }}>
+      <i class="material-symbols-rounded">add</i>
+      Create new timeline
+    </Button>
+  </div>
 </div>
 
 <Modal bind:visible={show_delete_modal}
   on:show={async () => {
-    delete_btn_timer = 0;  // reset the timer; and stop it if it's running
+    delete_btn_timer = 0;  // reset the timer; and stop it if it"s running
   }}
   on:close={() => {
     delete_btn_timer = 0;  // if the delete timer is running; this will stop it!
@@ -115,8 +125,12 @@
 <style lang="less">
 .timeline-grid {
   display: grid;
-  grid: auto-flow / repeat(8, 1fr);
+  grid: auto-flow / repeat(2, 1fr);
   gap: 8px;
+  align-items: center;
+  margin: 0 auto;
+
+  max-width: 45rem;
 }
 
 .cell(@size) {
@@ -136,6 +150,14 @@
 .btn-row {
   display: flex;
   flex-direction: row;
+}
+
+.create-new-btn {
+  display: flex;
+  & > :global(*) {
+    flex-basis: 100%;
+    justify-content: center;
+  }
 }
 
 
