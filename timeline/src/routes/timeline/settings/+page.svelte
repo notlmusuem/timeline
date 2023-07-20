@@ -5,12 +5,10 @@
 
   import Button from "$lib/components/Button.svelte";
   import Modal from "$lib/components/Modal.svelte";
-  import NameLabelInput from "$lib/components/NameLabelInput.svelte";
   import TimelineLineSetting from "$lib/components/TimelineLineSetting.svelte";
 
   import { sleep } from "$lib/utils";
   import { Timeline } from "$lib/models/timeline";
-
 
   export let data;
   let timelines: Writable<Timeline[]> = writable(
@@ -20,7 +18,7 @@
   let min_sort: number = 0;
   let max_sort: number = $timelines.length;
 
-  timelines.subscribe(timelines => {
+  timelines.subscribe((timelines) => {
     for (let i = 0; i < timelines.length; i++) {
       timelines[i].sort = i;
     }
@@ -36,15 +34,16 @@
   let delete_btn_timer = 0;
   const delete_btn_undo_time = 7;
 
-
   function flow_tl_create() {
     to_create_timeline = new Timeline("", $timelines.length);
     $timelines.push(to_create_timeline);
-    $timelines = $timelines;  // trigger reactivity
+    $timelines = $timelines; // trigger reactivity
   }
 
   async function flow_tl_create_done(save) {
-    if (to_create_timeline == null) { throw new Error("not creating a timeline"); }
+    if (to_create_timeline == null) {
+      throw new Error("not creating a timeline");
+    }
 
     if (!save) {
       $timelines.splice($timelines.indexOf(to_create_timeline));
@@ -63,7 +62,9 @@
   }
 
   async function flow_tl_delete_done() {
-    if (to_delete_timeline == null) { throw new Error("not deleting a timeline"); }
+    if (to_delete_timeline == null) {
+      throw new Error("not deleting a timeline");
+    }
 
     await to_delete_timeline.delete(supabase);
     await sync_sorts();
@@ -71,7 +72,7 @@
     // visually delete it from the menu
     const i = $timelines.indexOf(to_delete_timeline);
     $timelines.splice(i, 1);
-    $timelines = $timelines;  // trigger reactivity
+    $timelines = $timelines; // trigger reactivity
 
     show_delete_modal = false;
     to_delete_timeline = null;
@@ -119,23 +120,39 @@
   {#each $timelines as timeline}
     <TimelineLineSetting
       bind:this={iter_tl}
-      timeline={timeline}
+      {timeline}
       is_first={timeline.sort <= min_sort}
       is_last={timeline.sort >= max_sort}
       is_new={to_create_timeline == timeline}
-      on:create={() => { flow_tl_create_done(true); }}
-      on:create_cancel={() => { flow_tl_create_done(false); }}
-      on:edit={({detail: to_edit}) => { flow_tl_edit(to_edit); }}
-      on:delete={({detail: to_delete}) => { flow_tl_delete(to_delete); }}
-      on:sort_prev={({detail: to_swap}) => { flow_tl_sort_prev(to_swap); }}
-      on:sort_next={({detail: to_swap}) => { flow_tl_sort_next(to_swap); }}
-      />
+      on:create={() => {
+        flow_tl_create_done(true);
+      }}
+      on:create_cancel={() => {
+        flow_tl_create_done(false);
+      }}
+      on:edit={({ detail: to_edit }) => {
+        flow_tl_edit(to_edit);
+      }}
+      on:delete={({ detail: to_delete }) => {
+        flow_tl_delete(to_delete);
+      }}
+      on:sort_prev={({ detail: to_swap }) => {
+        flow_tl_sort_prev(to_swap);
+      }}
+      on:sort_next={({ detail: to_swap }) => {
+        flow_tl_sort_next(to_swap);
+      }}
+    />
   {/each}
 
-  <div></div>
+  <div />
   {#if to_create_timeline == null}
-    <div class='create-new-btn'>
-      <Button alt on:click={() => { flow_tl_create(); }}>
+    <div class="create-new-btn">
+      <Button
+        alt
+        on:click={() => {
+          flow_tl_create();
+        }}>
         <i class="material-symbols-rounded">add</i>
         Create new timeline
       </Button>
@@ -143,28 +160,38 @@
   {/if}
 </div>
 
-
-<Modal bind:visible={show_delete_modal}
+<Modal
+  bind:visible={show_delete_modal}
   on:show={async () => {
-    delete_btn_timer = 0;  // reset the timer; and stop it if it"s running
+    delete_btn_timer = 0; // reset the timer; and stop it if it"s running
   }}
   on:close={() => {
-    delete_btn_timer = 0;  // if the delete timer is running; this will stop it!
+    delete_btn_timer = 0; // if the delete timer is running; this will stop it!
     to_delete_timeline = null;
-  }}>
+  }}
+>
   <h2 slot="header"><b>Delete timeline</b></h2>
   <div class="small-dialog-msg">
-    <p>Are you certain you want to delete the timeline <i style="white-space: nowrap;">{to_delete_timeline?.name}</i>?</p>
-    <p><u>All items that are on this timeline will also be deleted!</u>
-      This action is unrecoverable and deleted data cannot be restored!</p>
+    <p>
+      Are you certain you want to delete the timeline <i
+        style="white-space: nowrap;">{to_delete_timeline?.name}</i
+      >?
+    </p>
+    <p>
+      <u>All items that are on this timeline will also be deleted!</u>
+      This action is unrecoverable and deleted data cannot be restored!
+    </p>
   </div>
 
   <svelte:fragment slot="btns">
-    <Button autofocus on:click={() => {
-      delete_btn_timer = 0;  // if the delete timer is running; this will stop it!
-      show_delete_modal = false;
-      to_delete_timeline = null;
-    }}>
+    <Button
+      autofocus
+      on:click={() => {
+        delete_btn_timer = 0; // if the delete timer is running; this will stop it!
+        show_delete_modal = false;
+        to_delete_timeline = null;
+      }}
+    >
       {#if delete_btn_timer >= 0}
         <i class="material-symbols-rounded">cancel</i>
         <span style="min-width: 8ch;">Cancel</span>
@@ -177,9 +204,16 @@
         </span>
       {/if}
     </Button>
-    <Button alt autofocus loading={delete_btn_timer != 0}
+    <Button
+      alt
+      autofocus
+      loading={delete_btn_timer != 0}
       on:click={async () => {
-        for (delete_btn_timer = -1; delete_btn_timer > -delete_btn_undo_time; delete_btn_timer--) {
+        for (
+          delete_btn_timer = -1;
+          delete_btn_timer > -delete_btn_undo_time;
+          delete_btn_timer--
+        ) {
           await sleep(1000);
           if (delete_btn_timer >= 0 || to_delete_timeline == null) {
             // our timer was reset by extraneous code; bail
@@ -197,66 +231,79 @@
 
         // do our delete routine
         flow_tl_delete_done();
-      }}>
+      }}
+    >
       <i class="material-symbols-rounded">delete_forever</i>
       <u>Delete Forever</u>
     </Button>
   </svelte:fragment>
 </Modal>
 
-
 <style lang="less">
-.timeline-grid {
-  display: grid;
-  grid: auto-flow / repeat(2, 1fr);
-  gap: 8px;
-  align-items: center;
-  margin: 0 auto;
+  .timeline-grid {
+    display: grid;
+    grid: auto-flow / repeat(2, 1fr);
+    gap: 8px;
+    align-items: center;
+    margin: 0 auto;
 
-  max-width: 45rem;
-}
-
-.cell(@size) {
-  grid-column-end: span @size;
-}
-
-.cell1 { .cell(1); }
-.cell2 { .cell(2); }
-.cell3 { .cell(3); }
-.cell4 { .cell(4); }
-.cell5 { .cell(5); }
-.cell6 { .cell(6); }
-.cell7 { .cell(7); }
-.cell8 { .cell(8); }
-
-
-.btn-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.create-new-btn {
-  display: flex;
-  & > :global(*) {
-    flex-basis: 100%;
-    justify-content: center;
+    max-width: 45rem;
   }
-}
 
+  .cell(@size) {
+    grid-column-end: span @size;
+  }
 
-.small-dialog-msg {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5em;
-}
+  .cell1 {
+    .cell(1);
+  }
+  .cell2 {
+    .cell(2);
+  }
+  .cell3 {
+    .cell(3);
+  }
+  .cell4 {
+    .cell(4);
+  }
+  .cell5 {
+    .cell(5);
+  }
+  .cell6 {
+    .cell(6);
+  }
+  .cell7 {
+    .cell(7);
+  }
+  .cell8 {
+    .cell(8);
+  }
 
-.small-dialog-msg > * {
-  // flex-basis: 15em;
-  max-width: 25em;
-  text-align: justify;
-  margin: 0;
-}
+  .btn-row {
+    display: flex;
+    flex-direction: row;
+  }
 
+  .create-new-btn {
+    display: flex;
+    & > :global(*) {
+      flex-basis: 100%;
+      justify-content: center;
+    }
+  }
+
+  .small-dialog-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+  }
+
+  .small-dialog-msg > * {
+    // flex-basis: 15em;
+    max-width: 25em;
+    text-align: justify;
+    margin: 0;
+  }
 </style>
