@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { structuredCloneProto } from "$lib/utils";
 
   import { Timeline } from "$lib/models/timeline";
@@ -22,15 +22,29 @@
   function exit_edit(save = true) {
     if (editing_timeline === null) { return; }
 
-    if (save) {
+    if (!is_new && save) {
       timeline.name = editing_timeline?.name;
       dispatch("edit", timeline);
     }
+
+    if (is_new && save) {
+      dispatch("create", timeline);
+    } else if (is_new && !save) {
+      dispatch("create_cancel", timeline);
+    }
+
     editing_timeline = null;
   }
 
   export let is_first: boolean;
   export let is_last: boolean;
+  export let is_new: boolean;
+
+  onMount(() => {
+    if (is_new) {
+      editing_timeline = timeline;
+    }
+  })
 </script>
 
 <div>
@@ -50,8 +64,13 @@
 <div class="btn-row">
   {#if editing_timeline != null}
     <Button alt on:click={() => { exit_edit(true); }}>
-      <i class="material-symbols-rounded">save</i>
-      Save Changes
+      {#if !is_new}
+        <i class="material-symbols-rounded">save</i>
+        Save Changes
+      {:else}
+        <i class="material-symbols-rounded">add_box</i>
+        Create
+      {/if}
     </Button>
     <Button on:click={() => { exit_edit(false); }}>
       <i class="material-symbols-rounded">cancel</i>
