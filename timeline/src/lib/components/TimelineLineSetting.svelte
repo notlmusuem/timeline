@@ -54,7 +54,9 @@
       >{timeline.name}</a>
   {:else}
     <input
-      type='text' bind:value={editing_timeline.name}
+      type="text"
+      placeholder="Timeline name"
+      bind:value={editing_timeline.name}
       on:keydown={(event) => {
         if (event.code == "Enter" ) { exit_edit(true); }
         if (event.code == "Escape") { exit_edit(false); }
@@ -69,7 +71,7 @@
         Save Changes
       {:else}
         <i class="material-symbols-rounded">add_box</i>
-        Create
+        Create New
       {/if}
     </Button>
     <Button on:click={() => { exit_edit(false); }}>
