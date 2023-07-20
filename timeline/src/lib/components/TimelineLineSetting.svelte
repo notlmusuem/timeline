@@ -106,20 +106,6 @@
     flex-basis: 100%;
   }
 
-  .cell(@size) {
-    grid-column-end: span @size;
-  }
-
-  .cell1 { .cell(1); }
-  .cell2 { .cell(2); }
-  .cell3 { .cell(3); }
-  .cell4 { .cell(4); }
-  .cell5 { .cell(5); }
-  .cell6 { .cell(6); }
-  .cell7 { .cell(7); }
-  .cell8 { .cell(8); }
-
-
   .btn-row {
     // for parent grid
     justify-content: end;

@@ -171,7 +171,7 @@
   }}
 >
   <h2 slot="header"><b>Delete timeline</b></h2>
-  <div class="small-dialog-msg">
+  <div class="small-dialog-msg btn-row">
     <p>
       Are you certain you want to delete the timeline <i
         style="white-space: nowrap;">{to_delete_timeline?.name}</i
@@ -254,30 +254,14 @@
     grid-column-end: span @size;
   }
 
-  .cell1 {
-    .cell(1);
-  }
-  .cell2 {
-    .cell(2);
-  }
-  .cell3 {
-    .cell(3);
-  }
-  .cell4 {
-    .cell(4);
-  }
-  .cell5 {
-    .cell(5);
-  }
-  .cell6 {
-    .cell(6);
-  }
-  .cell7 {
-    .cell(7);
-  }
-  .cell8 {
-    .cell(8);
-  }
+  .cell1 { .cell(1); }
+  .cell2 { .cell(2); }
+  .cell3 { .cell(3); }
+  .cell4 { .cell(4); }
+  .cell5 { .cell(5); }
+  .cell6 { .cell(6); }
+  .cell7 { .cell(7); }
+  .cell8 { .cell(8); }
 
   .btn-row {
     display: flex;
