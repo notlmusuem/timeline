@@ -79,9 +79,6 @@
       Cancel
     </Button>
   {:else}
-    <Button href="/timeline/{timeline.id}" href_external>
-      <i class="material-symbols-rounded">open_in_new</i>
-    </Button>
     <Button on:click={() => { enter_edit(); }}>
       <i class="material-symbols-rounded">edit</i>
     </Button>
