@@ -20,6 +20,12 @@
   onMount(async () => {
     await getSessionUser();
   });
+
+  // handling promise rejections
+  process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Promise Rejection:', err);
+  });
+
 </script>
 
 <svelte:window
