@@ -78,7 +78,12 @@
   .deco-box {
     padding: 1.5rem;
     backdrop-filter: blur(1rem);
-    background-color: color-mix(in srgb, var(--color-bg-1) 75%, transparent), var(--color-bg-1);
+
+    background-color: var(--color-bg-1);
+    // safari locks color-mix behind a flag; just don't do transparency in that case
+    @supports (background-color: color-mix(in srgb, var(--color-bg-1) 75%, transparent)) {
+      background-color: color-mix(in srgb, var(--color-bg-1) 75%, transparent);
+    }
 
     border: var(--border);
     box-shadow: 0 0 1em #100d2e33;
