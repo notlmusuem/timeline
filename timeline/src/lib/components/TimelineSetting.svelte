@@ -117,6 +117,7 @@
 </script>
 
 <div class="timeline-grid">
+  <h3 class="title">Timeline Settings</h3><div></div>
   {#each $timelines as timeline}
     <TimelineLineSetting
       {timeline}
@@ -247,6 +248,8 @@
 
 <style lang="less">
   .timeline-grid {
+    padding: 1.5rem;
+
     display: grid;
     grid: auto-flow / minmax(25ch, 1fr) 1fr;
     gap: 8px;
@@ -254,6 +257,12 @@
     margin: 0 auto;
 
     max-width: 45rem;
+    max-height: 70vh;
+    overflow-y: scroll;
+  }
+
+  .title {
+    margin: 0;
   }
 
   .cell(@size) {

@@ -76,7 +76,6 @@
   }
 
   .deco-box {
-    padding: 1.5rem;
     backdrop-filter: blur(1rem);
 
     background-color: var(--color-bg-1);
