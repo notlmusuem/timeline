@@ -18,7 +18,7 @@
 </script>
 
 
-<title>{titles.join(" | ")} | {site_name}</title>
+<title>{titles.length > 0 ? titles.join(" | ") + " | " : ""}{site_name}</title>
 <meta property="og:title" content={titles.join(" | ")}>
 <meta property="og:site_name" content={site_name}>
 <meta property="og:locale" content="en_CA">
