@@ -1,4 +1,6 @@
 <script lang="ts" context="module">
+  import { scale } from "svelte/transition";
+
   export type MountDir = "top"|"right"|"bottom"|"left";
 </script>
 
@@ -6,6 +8,11 @@
   export let direction: MountDir;
   export let offset: number = 0;
   export let fix_arrow: boolean = false;
+
+  export let class_: string|undefined = undefined;
+  const class_str = class_ ?? "";
+  export let id: string|undefined = undefined;
+
 
   let overlayStyle: string, arrowStyle: string;
   $: {
@@ -33,7 +40,8 @@
   }
 </script>
 
-<div class="zero {direction}">
+<div class="zero {direction} {class_str}" {id}
+  transition:scale={{ duration: 100 }}>
   <div class="overlay" style={overlayStyle}>
     <div class="deco-box"><slot/></div>
 
@@ -52,10 +60,6 @@
 </div>
 
 <style lang="less">
-  :root {
-    --bg-opacity: 0.5;
-  }
-
   .zero {
     position: relative;
     width: 0;
@@ -73,8 +77,8 @@
 
   .deco-box {
     padding: 1.5rem;
-    background-color: rgba(var(--color-bg-1), var(--bg-opacity));
-    backdrop-filter: blur(1em);
+    backdrop-filter: blur(1rem);
+    background-color: color-mix(in srgb, var(--color-bg-1) 75%, transparent), var(--color-bg-1);
 
     border: var(--border);
     box-shadow: 0 0 1em #100d2e33;
@@ -90,8 +94,6 @@
     & polyline {
       stroke-width: 1;
       stroke: var(--border-color);
-      // should be rgba(var(--color-bg-1), var(--bg-opacity)) but this isn't
-      // widely supported
       fill: var(--color-bg-1);
 
       filter: drop-shadow(0 0 1em #100d2e33);
