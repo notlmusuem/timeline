@@ -3,15 +3,42 @@
 </script>
 
 <script lang="ts">
-  export let mount_dir: MountDir;
+  export let direction: MountDir;
+  export let offset: number = 0;
+  export let fix_arrow: boolean = false;
+
+  let overlayStyle: string, arrowStyle: string;
+  $: {
+    let offsetPercent = `${(offset - .5) * 100}%`
+    let arrowPrecent = ((offset * (fix_arrow ? 1 : 0.6)) * 100) + "%";
+    switch (direction) {
+      case "top":
+        overlayStyle = `transform: translate(${offsetPercent}, -100%);`;
+        // account for the width of the arrow by adding half of it
+        arrowStyle = `right: calc(${arrowPrecent} + 1.5em);`;
+        break;
+      case "left":
+        overlayStyle = `transform: translate(-100%, ${offsetPercent});`;
+        arrowStyle = `bottom: calc(${arrowPrecent} + 1.5em);`;
+        break;
+      case "bottom":
+        overlayStyle = `transform: translate(${offsetPercent}, 0%);`;
+        arrowStyle = `right: calc(${arrowPrecent} + 1.5em);`;
+        break;
+      case "right":
+        overlayStyle = `transform: translate(0%, ${offsetPercent});`;
+        arrowStyle = `bottom: calc(${arrowPrecent} + 1.5em);`;
+        break;
+    }
+  }
 </script>
 
-<div class="zero {mount_dir}">
-  <div class="overlay">
+<div class="zero {direction}">
+  <div class="overlay" style={overlayStyle}>
     <div class="deco-box"><slot/></div>
 
-    <div class="arrow-box">
-      {#if mount_dir == "top" || mount_dir == "bottom"}
+    <div class="arrow-box" style={arrowStyle}>
+      {#if direction == "top" || direction == "bottom"}
         <svg class="arrow" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
           <polyline points="25, 0  50, 25  75, 0"/>
         </svg>
@@ -55,6 +82,8 @@
   }
 
   .arrow {
+    height: 3em; width: 6em;
+
     & polyline {
       stroke-width: 1;
       stroke: var(--border-color);
@@ -66,11 +95,15 @@
 
       // is missing backdrop-filter: blur(1em), but in practise it's not
       // significantly noticeable except on very contrasting backgrounds
+      // a solution is to put a div behind it with clip-path and backdrop-filter
     }
   }
 
   .arrow-box {
+    // for nudging the arrow such that it covers up .deco-box's border
     position: relative;
+
+    // change box size while allowing .arrow's drop-shadow to bleed through
     height: 3em; width: 6em;
   }
 
@@ -89,13 +122,18 @@
     .right & { flex-direction: row-reverse; transform: translate(0%, -50%); }
   }
 
-  .arrow-box {
+  .arrow {
     .top &, .bottom & { height: 3em; width: 6em; }
     .left &, .right & { width: 3em; height: 6em; }
+  }
 
-    .top & { top: -1px; }
-    .left & { left: -1px; }
-    .bottom & { bottom: -1px; transform: scaleY(-1); }
-    .right & { right: -1px; transform: scaleX(-1); }
+  .arrow-box {
+    .top &, .bottom & { height: 1.5em; width: 3em; }
+    .left &, .right & { width: 1.5em; height: 3em; }
+
+    .top & { top: -2px; }
+    .left & { left: -2px; }
+    .bottom & { bottom: -2px; transform: scaleY(-1); }
+    .right & { right: -2px; transform: scaleX(-1); }
   }
 </style>
