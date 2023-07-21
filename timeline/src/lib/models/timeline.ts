@@ -117,8 +117,7 @@ export class Entry implements Table {
     return Entry.from_obj(data[0], timelines_ref);
   }
 
-  static async select_all(conx: SupabaseClient): Promise<Entry[]> {
-    const timeline = DEFAULT_TIMELINE;  // note: temp fix; see eof
+  static async select_all_from(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
     const { data, error } = await conx
       .from("timeline")
       .select(
@@ -136,22 +135,18 @@ export class Entry implements Table {
     }, [timeline]));
   }
 
-  static async select_all_from(conx: SupabaseClient, timeline: Timeline): Promise<Entry[]> {
-    const { data, error } = await conx
+  static async count(conx: SupabaseClient, timeline: Timeline|null = null): Promise<number> {
+    let query = conx
       .from("timeline")
-      .select(
-        `id, title, body,
-        image, image_caption, image_credit,
-        start_date, start_date_precision,
-        end_date, end_date_precision`
-      )
-      .eq("timeline", timeline.id)
-      .order("start_date");
-    if (error) { throw error as PostgrestError; }
+      .select("*", {count: "exact", head: true});
 
-    return data.map(obj => Entry.from_obj({
-      ...obj, timeline: timeline.id as number
-    }, [timeline]));
+    if (timeline != null) {
+      query = query.eq("timeline", timeline.id);
+    }
+
+    const { count, error } = await query;
+    if (error) { throw error as PostgrestError; }
+    return count as number;
   }
 
   async insert(conx: SupabaseClient): Promise<this> {
@@ -270,6 +265,14 @@ export class Timeline implements Table {
       .order("sort");
     if (error) { throw error as PostgrestError; }
     return data.map(Timeline.from_obj);
+  }
+
+  static async count(conx: SupabaseClient, timeline: Timeline|null = null): Promise<number> {
+    const { count, error } = await conx
+      .from("timelines")
+      .select("*", {count: "exact", head: true});
+    if (error) { throw error as PostgrestError; }
+    return count as number;
   }
 
   async insert(conx: SupabaseClient): Promise<this> {
