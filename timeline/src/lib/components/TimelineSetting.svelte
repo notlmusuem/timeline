@@ -44,12 +44,12 @@
 
     if (!save) {
       $timelines.splice($timelines.indexOf(to_create_timeline));
-      $timelines = $timelines;
       to_create_timeline = null;
     } else {
       await to_create_timeline.insert(supabase);
       to_create_timeline = null;
     }
+    $timelines = $timelines;  // reactivity
   }
 
   async function flow_tl_delete(timeline: Timeline) {
@@ -79,6 +79,7 @@
   }
 
   async function flow_tl_edit(edited: Timeline) {
+    $timelines = $timelines;  // reactivity
     await edited.update(supabase);
   }
 
@@ -109,6 +110,7 @@
 
     min_sort = 0;
     max_sort = $timelines.length - 1;
+    $timelines = $timelines;  // reactivity
 
     await Promise.all(promises);
   }

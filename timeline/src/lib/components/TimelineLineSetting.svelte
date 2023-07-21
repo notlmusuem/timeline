@@ -24,6 +24,7 @@
 
     if (!is_new && save) {
       timeline.name = editing_timeline?.name;
+      timeline = timeline;  // reactivity
       dispatch("edit", timeline);
     }
 
@@ -49,7 +50,7 @@
 
 <div class='fillw'>
   {#if editing_timeline == null}
-    <a href="/timeline/{timeline.id}" target="_blank"
+    <a href="/timeline/{timeline.id}"
       style="word-break: break-all;"
       >{timeline.name}</a>
   {:else}
