@@ -47,14 +47,13 @@
   })
 </script>
 
-<div>
+<div class='fillw'>
   {#if editing_timeline == null}
     <a href="/timeline/{timeline.id}" target="_blank"
       style="word-break: break-all;"
       >{timeline.name}</a>
   {:else}
-    <input
-      type="text"
+    <input type="text" class="input-tl-name"
       placeholder="Timeline name"
       bind:value={editing_timeline.name}
       on:keydown={(event) => {
@@ -100,6 +99,52 @@
 </div>
 
 <style lang="less">
+  *, *::after, *::before {
+    box-sizing: border-box;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text);
+    opacity: 0.5;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.9em;
+
+    border-radius: var(--font-size-xsmall) var(--font-size-xsmall) 0 0;
+    border: var(--border);
+    outline: none;
+
+    background: transparent;
+    backdrop-filter: invert(0.1) sepia(0.1) saturate(0.1) brightness(1.1)
+    contrast(1.1);
+    box-shadow: inset 0 -4px 0 -1px var(--color-theme-1);
+
+    text-overflow: ellipsis;
+    text-align: start;
+    font-size: var(--font-size-small);
+    font-family: var(--font-sans);
+    color: var(--color-text);
+
+    transition: all 0.3s var(--curve);
+  }
+
+  textarea {
+    height: clamp(10rem, 20vh, 30rem);
+    resize: none;
+  }
+
+  input:focus,
+  textarea:focus {
+    box-shadow: inset 0 -6px 0 -1px var(--color-theme-1);
+  }
+
+
   .row {
     display: flex;
     flex-direction: row;
@@ -117,5 +162,9 @@
   .btn-row > :global(*) {
     flex: 1 0 auto;
     justify-content: center;
+  }
+
+  .fillw {
+    width: 100%;
   }
 </style>

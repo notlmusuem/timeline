@@ -246,7 +246,7 @@
 <style lang="less">
   .timeline-grid {
     display: grid;
-    grid: auto-flow / repeat(2, 1fr);
+    grid: auto-flow / minmax(25ch, 1fr) 1fr;
     gap: 8px;
     align-items: center;
     margin: 0 auto;
