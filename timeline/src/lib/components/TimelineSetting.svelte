@@ -8,7 +8,7 @@
   import TimelineLineSetting from "$lib/components/TimelineLineSetting.svelte";
 
   import { sleep } from "$lib/utils";
-  import { Timeline } from "$lib/models/timeline";
+  import { Entry, Timeline } from "$lib/models/timeline";
 
   export let timelines: Writable<Timeline[]>;
   let min_sort: number = 0;
@@ -28,6 +28,7 @@
   let to_delete_timeline: Timeline|null = null;
   let show_delete_modal = false;
   let delete_btn_timer = 0;
+  let delete_ref_rows: number|null = null;
   const delete_btn_undo_time = 7;
 
   function flow_tl_create() {
@@ -51,10 +52,12 @@
     }
   }
 
-  function flow_tl_delete(timeline: Timeline) {
+  async function flow_tl_delete(timeline: Timeline) {
     delete_btn_timer = 0;
     to_delete_timeline = timeline;
     show_delete_modal = true;
+    delete_ref_rows = null;
+    delete_ref_rows = await Entry.count(supabase, timeline);
   }
 
   async function flow_tl_delete_done() {
@@ -142,11 +145,8 @@
   <div />
   {#if to_create_timeline == null}
     <div class="create-new-btn">
-      <Button
-        alt
-        on:click={() => {
-          flow_tl_create();
-        }}>
+      <Button alt
+        on:click={() => { flow_tl_create(); }}>
         <i class="material-symbols-rounded">add</i>
         Create new timeline
       </Button>
@@ -165,15 +165,21 @@
   }}
 >
   <h2 slot="header"><b>Delete timeline</b></h2>
-  <div class="small-dialog-msg btn-row">
+  <div class="small-dialog-msg">
     <p>
       Are you certain you want to delete the timeline <i
-        style="white-space: nowrap;">{to_delete_timeline?.name}</i
-      >?
+        style="white-space: nowrap;">{to_delete_timeline?.name}?</i
+      >
     </p>
+    {#if delete_ref_rows != 0}
+      <p>
+        <u>There is {delete_ref_rows ?? "..."} item{delete_ref_rows == 1 ? "" : "s"} stored on this timeline which will also be deleted, including all text and images!</u>
+        Consider backing them up or transfer them to a different timeline first.
+      </p>
+    {/if}
     <p>
-      <u>All items that are on this timeline will also be deleted!</u>
       This action is unrecoverable and deleted data cannot be restored!
+      Are you certain you want to do this?
     </p>
   </div>
 
@@ -228,7 +234,11 @@
       }}
     >
       <i class="material-symbols-rounded">delete_forever</i>
-      <u>Delete Forever</u>
+      {#if delete_ref_rows != null && delete_ref_rows > 0}
+        <u>Delete {delete_ref_rows} Item{delete_ref_rows == 1 ? "" : "s"} Forever</u>
+      {:else}
+        <u>Delete Forever</u>
+      {/if}
     </Button>
   </svelte:fragment>
 </Modal>
@@ -273,14 +283,14 @@
   .small-dialog-msg {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     justify-content: center;
     gap: 0.5em;
   }
 
   .small-dialog-msg > * {
     // flex-basis: 15em;
-    max-width: 25em;
+    max-width: 30em;
     text-align: justify;
     margin: 0;
   }
