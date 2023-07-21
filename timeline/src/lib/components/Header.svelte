@@ -67,14 +67,16 @@
           transition:slide={{ axis: $mobile ? "y" : "x", easing: quintOut }}
           class="menu">
           {#each $timelines as timeline}
-            <li aria-current={
-              $page.url.pathname.startsWith(`/timeline/${timeline.id}`)
-              ? "page" : undefined
-            }>
-              <a title={timeline.name} href={`/timeline/${timeline.id}`}
-                on:click={() => { if ($mobile) { isMenuOpen = false; }}}
-                >{timeline.name}</a>
-            </li>
+            {#if timeline.in_table}
+              <li aria-current={
+                $page.url.pathname.startsWith(`/timeline/${timeline.id}`)
+                ? "page" : undefined
+              }>
+                <a title={timeline.name} href={`/timeline/${timeline.id}`}
+                  on:click={() => { if ($mobile) { isMenuOpen = false; }}}
+                  >{timeline.name}</a>
+              </li>
+            {/if}
           {/each}
         </ul>
       {/if}
