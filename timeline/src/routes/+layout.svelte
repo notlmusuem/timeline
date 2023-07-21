@@ -14,6 +14,7 @@
     mobile,
   } from "$lib/stores/window";
   import "./styles.css";
+  import { browser } from "$app/environment";
 
   $: mobile.set($windowWidth < 1000);
 
@@ -21,11 +22,16 @@
     await getSessionUser();
   });
 
-  // handling promise rejections
-  process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Promise Rejection:', err);
-  });
-
+  if (!browser) {
+    // handling promise rejections
+    process.on('unhandledRejection', (err) => {
+      console.error('Unhandled Promise Rejection:', err);
+    });
+  } else {
+    window.addEventListener('unhandledRejection', (err) => {
+      console.error('Unhandled Promise Rejection:', err);
+    });
+  }
 </script>
 
 <svelte:window
