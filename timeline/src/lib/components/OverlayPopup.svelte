@@ -84,6 +84,9 @@
   .arrow {
     height: 3em; width: 6em;
 
+    // since .arrow is sized larger than it's parent's box, stop clicks on it
+    pointer-events: none;
+
     & polyline {
       stroke-width: 1;
       stroke: var(--border-color);
