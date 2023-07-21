@@ -69,6 +69,8 @@
   --button-disabled-border: var(--button-disabled-background);
 
   --border: 1px solid #ccc;
+  --border-color: #ccc;
+
   color: var(--color-text);
 }
 
@@ -101,6 +103,8 @@
   --button-disabled-border: var(--button-disabled-background);
 
   --border: 1px solid #ccc;
+  --border-color: #ccc;
+
   color: var(--color-text);
 }
 
@@ -137,6 +141,7 @@
   --button-active-background: #ffffff;
 
   --border: 1px solid #666666;
+  --border-color: #666666;
 
   color: var(--color-text);
 }
@@ -173,6 +178,7 @@
   --button-active-background: #ffffff;
 
   --border: 1px solid white;
+  --border-color: white;
 
   color: var(--color-text);
 }
