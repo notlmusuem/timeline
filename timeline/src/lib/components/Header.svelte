@@ -14,6 +14,8 @@
   import ExpandButton from "$lib/components/ExpandButton.svelte";
   import AccessibilityMenu from "$lib/components/AccessibilityMenu.svelte";
   import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
+  import OverlayPopup from "$lib/components/OverlayPopup.svelte";
+  import TimelineSetting from "$lib/components/TimelineSetting.svelte";
 
 
   let user: User | null;
@@ -21,6 +23,12 @@
 
   let isAccessibilityOpen = false;
   let isMenuOpen = false;
+  let isTimelineSettingsOpen = false;
+
+  $: {
+    if (isAccessibilityOpen) { isTimelineSettingsOpen = false; }
+    if (isTimelineSettingsOpen) { isAccessibilityOpen = false; }
+  }
 
   let shadow = 0;
   $: { shadow = $scrollY > 25 ? 1 : 0; }
@@ -38,8 +46,19 @@
         !event.target.closest(".menu")
       ) {
         isMenuOpen = false;
+        event.preventDefault();
       }
     }
+
+    // fixme
+    // if (
+    //   isTimelineSettingsOpen
+    //   && !event.target.closest(".timeline_settings")
+    //   && !event.target.closest(".timeline_settings_menu")
+    // ) {
+    //   isTimelineSettingsOpen = false;
+    //   event.preventDefault();
+    // }
   }
 
   onMount(() => {
@@ -83,12 +102,39 @@
     </div>
 
     <div class="right">
+      {#if user && user.email}
+        <div>
+          {#if isTimelineSettingsOpen}
+            <OverlayPopup direction="bottom" offset={-.4} fix_arrow
+              class_="timeline_settings">
+              <TimelineSetting timelines={timelines} />
+            </OverlayPopup>
+          {/if}
+          <button
+            title="Timeline Settings"
+            class="material-symbols-rounded icon-btn timeline_settings_menu"
+            on:click|preventDefault={() => {
+              if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              isTimelineSettingsOpen = !isTimelineSettingsOpen;
+            }}
+            on:keypress|preventDefault={() => {
+              if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              isTimelineSettingsOpen = !isTimelineSettingsOpen;
+            }}
+            >tune</button>
+        </div>
+      {/if}
+
       <button
         title="Accessibility options"
         class="material-symbols-rounded icon-btn accessibility"
-        on:click={() => (isAccessibilityOpen = !isAccessibilityOpen)}
+        on:click={() => {
+          if (isTimelineSettingsOpen) { isTimelineSettingsOpen = false; }
+          isAccessibilityOpen = !isAccessibilityOpen;
+        }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
+            if (isTimelineSettingsOpen) { isTimelineSettingsOpen = false; }
             isAccessibilityOpen = !isAccessibilityOpen;
           }
         }}>settings</button>
@@ -98,6 +144,7 @@
         title="About"
         class="material-symbols-rounded icon-btn"
         >info</a>
+
       {#if user && user.email}
         <button
           title="Logout"
