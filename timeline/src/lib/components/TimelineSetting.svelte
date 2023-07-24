@@ -256,9 +256,15 @@
     align-items: center;
     margin: 0 auto;
 
-    max-width: 45rem;
-    max-height: 70vh;
+    // on small widths, don't take up more than 85% of the screen width
+    max-width: min(85vw, 45rem);
+    max-height: 65vh;
     overflow-y: scroll;
+
+    // collapse to one column on small screen widths
+    @media (max-width: 750px) {
+      grid: auto-flow / 1fr;
+    }
   }
 
   .title {

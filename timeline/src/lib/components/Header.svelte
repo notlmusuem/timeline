@@ -8,7 +8,7 @@
 
   import { themeStore } from "$lib/stores/store";
   import { timelines } from "$lib/stores/data";
-  import { scrollY, mobile } from "$lib/stores/window";
+  import { scrollY, mobile, windowWidth } from "$lib/stores/window";
   import { userStore, logout } from "$lib/authStore";
 
   import ExpandButton from "$lib/components/ExpandButton.svelte";
@@ -105,7 +105,7 @@
       {#if user && user.email}
         <div>
           {#if isTimelineSettingsOpen}
-            <OverlayPopup direction="bottom" offset={-.4} fix_arrow
+            <OverlayPopup direction="bottom" offset={$windowWidth >= 750 ? -.3 : $windowWidth >= 450 ? -.15 : -.1} fix_arrow
               class_="timeline_settings">
               <TimelineSetting timelines={timelines} />
             </OverlayPopup>
