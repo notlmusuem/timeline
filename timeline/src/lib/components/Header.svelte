@@ -10,12 +10,14 @@
   import { timelines } from "$lib/stores/data";
   import { scrollY, mobile, windowWidth } from "$lib/stores/window";
   import { userStore, logout } from "$lib/authStore";
+  import { elem_ancestor_has_child } from "$lib/utils";
 
   import ExpandButton from "$lib/components/ExpandButton.svelte";
   import AccessibilityMenu from "$lib/components/AccessibilityMenu.svelte";
-  import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
   import OverlayPopup from "$lib/components/OverlayPopup.svelte";
   import TimelineSetting from "$lib/components/TimelineSetting.svelte";
+  import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
+
 
 
   let user: User | null;
@@ -38,6 +40,7 @@
     isMenuOpen = !$mobile;
   }
 
+  let timelineSettingCont: HTMLDivElement;
   function handleClickOutside(event) {
     if ($mobile) {
       if (
@@ -51,14 +54,13 @@
     }
 
     // fixme
-    // if (
-    //   isTimelineSettingsOpen
-    //   && !event.target.closest(".timeline_settings")
-    //   && !event.target.closest(".timeline_settings_menu")
-    // ) {
-    //   isTimelineSettingsOpen = false;
-    //   event.preventDefault();
-    // }
+    if (
+      isTimelineSettingsOpen
+      && !elem_ancestor_has_child(timelineSettingCont, event.target)
+    ) {
+      isTimelineSettingsOpen = false;
+      event.preventDefault();
+    }
   }
 
   onMount(() => {
@@ -103,7 +105,7 @@
 
     <div class="right">
       {#if user && user.email}
-        <div>
+        <div bind:this={timelineSettingCont}>
           {#if isTimelineSettingsOpen}
             <OverlayPopup direction="bottom" offset={$windowWidth >= 750 ? -.3 : $windowWidth >= 450 ? -.15 : -.1} fix_arrow
               class_="timeline_settings">

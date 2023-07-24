@@ -73,6 +73,7 @@
 
     display: flex;
     align-items: center;
+    pointer-events: none;
   }
 
   .deco-box {
@@ -87,6 +88,7 @@
     border: var(--border);
     box-shadow: 0 0 1em #100d2e33;
     border-radius: 1em;
+    pointer-events: initial;
   }
 
   .arrow {
@@ -111,6 +113,9 @@
   .arrow-box {
     // for nudging the arrow such that it covers up .deco-box's border
     position: relative;
+    // this box is offset from the actual svg for some reason, so ignore pointer
+    // events in case the user clicks on the blank space it occupies
+    // pointer-events: initial;
 
     // change box size while allowing .arrow's drop-shadow to bleed through
     height: 3em; width: 6em;
