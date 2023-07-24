@@ -146,6 +146,10 @@ export function buffer_download(
  * tree. Also returns if ancestor == child.
  */
 export function elem_ancestor_has_child(ancestor: Element, child: Element) {
+  if (!browser) {
+    throw new Error("buffer_download can only be ran in the browser");
+  }
+
   let elem: Element|null = child;
   while (elem != null) {
     if (elem == ancestor) { return true; }

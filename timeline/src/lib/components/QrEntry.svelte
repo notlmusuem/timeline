@@ -13,7 +13,6 @@
   export let entry: Entry;
   export let size: number;
   export let color: boolean = true;
-  export let ssr: boolean = false;
 
   let qr: QrCode;
   let datauri: string|null = null;
@@ -24,7 +23,7 @@
     datauri = null;
   }
 
-  $: if (browser || ssr) {
+  $: if (browser) {
     qr = qr_from_entry(entry, {
       size: size, color: color
     });
@@ -37,6 +36,10 @@
   }
 
   export async function download(size: number|null = null) {
+    if (!browser) {
+      throw new Error("buffer_download can only be ran in the browser");
+    }
+
     const print_qr = qr_from_entry(entry, {
       size: size ?? $$props.size, color: color
     });
