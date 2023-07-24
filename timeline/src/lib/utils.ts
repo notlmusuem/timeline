@@ -138,11 +138,18 @@ export function buffer_download(
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([buffer], { type: mime }));
   link.download = filename;
-
-  // Append anchor to body.
-  // document.body.appendChild(link)
   link.click();
+}
 
-  // Remove anchor from body
-  // document.body.removeChild(link)
+/**
+ * Determines if the ancestor contains the child somewhere nested in it's child
+ * tree. Also returns if ancestor == child.
+ */
+export function elem_ancestor_has_child(ancestor: Element, child: Element) {
+  let elem: Element|null = child;
+  while (elem != null) {
+    if (elem == ancestor) { return true; }
+    elem = elem.parentElement;
+  }
+  return false;
 }
