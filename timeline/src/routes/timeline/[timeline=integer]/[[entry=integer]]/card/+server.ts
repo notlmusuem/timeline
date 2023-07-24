@@ -19,6 +19,8 @@ let fonts: null|{
 } = null;
 
 
+export const prerender = false;
+
 export async function GET({url, params, fetch}) {
   const entry_id: number|null = params.entry == undefined
     ? null : parseIntNull(params.entry) as number;
