@@ -79,11 +79,17 @@
       // don't hook navigation to other routes
       if (!$page.route.id?.startsWith("/timeline/")) { return; }
 
+      // hack: if navigating between timelines, just reload the page for now
+      // this is an awful solution and will be fixed by #38 in the future
+      if (parseIntNull($page.params.timeline) != timeline.id) {
+        location.reload();
+      }
+
       // don't bother changing the url if it is already correct; otherwise it'll
       // break the back button!
       if (
-        parseIntNull($page.params.timeline) == timeline.id
-        && parseIntNull($page.params.entry) == $selected_entry?.id
+        parseIntNull($page.params.timeline) != timeline.id
+        || parseIntNull($page.params.entry) == $selected_entry?.id
       ) { return; }
 
       await goto(`/timeline/${timeline.id}/${entry?.id ?? ""}`, {
