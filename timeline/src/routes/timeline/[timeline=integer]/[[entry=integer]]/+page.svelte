@@ -29,6 +29,25 @@
   export let data;
   let timelines = (data.timelines ?? []).map(Timeline.from_obj);
   let entries = (data.entries ?? []).map(e => Entry.from_obj(e, timelines));
+  console.log("Original entries");
+  console.log(entries);
+  // Create a writable store to hold the 2D array
+  const yearEntries = writable(Array().fill(Array().fill(null)));
+  let newEntries: Entry[] = [];
+
+  populateYearEntries();
+  sortingEntries();
+  console.log("These are sorted yearEntries: ");
+  //Subscribe to changes in the array
+  yearEntries.subscribe(arr => {
+    //newEntries = arr;
+    console.log(arr);
+  });
+  populateNewEntries();
+  console.log("This is newEntries:");
+  console.log(newEntries);
+
+  //const newEntries = Object.entries(yearEntries);
 
   let timeline_id: number = parseIntNull($page.params.timeline) as number;
   let entry_id: number|null = $page.params.entry == null
@@ -58,13 +77,13 @@
 
   // if we ever select a null entries try to switch to any other one if possible
   selected_entry.subscribe(() => {
-    if ($selected_entry == null && entries.length > 0) {
+    if ($selected_entry == null && newEntries.length > 0) {
       // if the previous entry is still in the timeline, then switch to it instead
-      if ($prev_entry != null && entries.indexOf($prev_entry) != -1) {
+      if ($prev_entry != null && newEntries.indexOf($prev_entry) != -1) {
         $selected_entry = $prev_entry;
       } else {
         // otherwise just fallback to the first
-        $selected_entry = entries[0];
+        $selected_entry = newEntries[0];
       }
     }
   });
@@ -111,12 +130,12 @@
   selected_entry.subscribe(entry => {
     if ($prev_entry == null || entry == null) { return; }
 
-    const last_idx = entries.indexOf($prev_entry as Entry);
+    const last_idx = newEntries.indexOf($prev_entry as Entry);
     if (last_idx == -1) {
       throw new Error(`Last entry ${$prev_entry?.id} was not in timeline!`);
     }
 
-    const idx = entries.indexOf(entry as Entry);
+    const idx = newEntries.indexOf(entry as Entry);
     if (idx == -1) {
       throw new Error(`Current entry ${entry?.id} was not in timeline!`);
     }
@@ -145,7 +164,7 @@
     if (entry_param == null) {
       $selected_entry = null;
     } else {
-      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+      $selected_entry = newEntries.find(e => e.id == entry_param) ?? null;
     }
   });
 
@@ -155,7 +174,7 @@
     if (entry_param == null) {
       $selected_entry = null;
     } else {
-      $selected_entry = entries.find(e => e.id == entry_param) ?? null;
+      $selected_entry = newEntries.find(e => e.id == entry_param) ?? null;
     }
 
     pageMeta = {
@@ -170,46 +189,287 @@
 
   let startSelected: boolean;
   let endSelected: boolean;
+  let startMonthSelected: boolean;
+  let endMonthSelected: boolean;
   // don't display buttons if there is no entry select or we're at the boundary
   $: startSelected = $selected_entry == null
-    ? true : entries.indexOf($selected_entry) == 0;
+    ? true : newEntries.indexOf($selected_entry) == 0;
   $: endSelected = $selected_entry == null
-    ? true : entries.indexOf($selected_entry) == entries.length - 1;
+    ? true : newEntries.indexOf($selected_entry) == newEntries.length - 1;
+
+  $: startMonthSelected = $selected_entry == null
+    ? true : prevMonthBtnFalse();
+  $: endMonthSelected = $selected_entry == null
+    ? true : nextMonthBtnFalse();
 
   function page_prev() {
     if (selected_entry == null) { return; }
-    const idx = entries.indexOf($selected_entry as Entry);
+    const idx = newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_prev!`)
     }
 
-    $selected_entry = entries[Math.max(0, idx - 1)];
+    $selected_entry = newEntries[Math.max(0, idx - 1)];
   }
 
   function page_next() {
     if (selected_entry == null) { return; }
-    const idx = entries.indexOf($selected_entry as Entry);
+    const idx = newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
     }
 
-    $selected_entry = entries[Math.min(entries.length - 1, idx + 1)];
+    $selected_entry = newEntries[Math.min(newEntries.length - 1, idx + 1)];
   }
 
+  function page_prev_Month() {
+    if (selected_entry == null) { return; }
+    const idx = newEntries.indexOf($selected_entry as Entry);
+    if (idx == -1) {
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
+    }
+
+    if($selected_entry != null)
+    {
+      const sameDateEntries = selectSameDateEntries($selected_entry);
+      const currentMonth = $selected_entry.start_date.getMonth();
+      //console.log("current month is: " + currentMonth);
+      for(let i = 0; i < sameDateEntries.length; i++)
+      {
+        // find the previous month entry
+        if(sameDateEntries[i].start_date.getMonth() === currentMonth - 1)
+        {
+          $selected_entry = sameDateEntries[i];
+          //console.log("Selected entry is: " + $selected_entry + " at index: " + i);
+          break;
+        }
+      }
+    }
+  }
+
+  function page_next_Month() {
+    if (selected_entry == null) { return; }
+    const idx = newEntries.indexOf($selected_entry as Entry);
+    if (idx == -1) {
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
+    }
+
+    if($selected_entry != null)
+    {
+      const sameDateEntries = selectSameDateEntries($selected_entry);
+      const currentMonth = $selected_entry.start_date.getMonth();
+      //console.log("current month is: " + currentMonth);
+      for(let i = 0; i < sameDateEntries.length; i++)
+      {
+        // find the next month entry
+        if(sameDateEntries[i].start_date.getMonth() === currentMonth + 1)
+        {
+          $selected_entry = sameDateEntries[i];
+          //console.log("Selected entry is: " + $selected_entry + " at index: " + i);
+          break;
+        }
+      }
+    }
+  }
+
+  function prevMonthBtnFalse()
+  {
+    const idx = newEntries.indexOf($selected_entry as Entry);
+    const sameDateEntries = selectSameDateEntries($selected_entry);
+
+    if (selected_entry == null) { return true; }
+
+    if (idx == -1)
+    {
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
+    }
+
+    if(sameDateEntries.length <= 1)
+    {
+      return true;
+    }
+
+    if($selected_entry != null)
+    {
+      // does selected entry have the same month as the last month entry?
+      if(sameDateEntries[0].start_date.getMonth() === $selected_entry.start_date.getMonth())
+      {
+        //console.log("selected entry is the first month entry");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function nextMonthBtnFalse()
+  {
+    const idx = newEntries.indexOf($selected_entry as Entry);
+    const sameDateEntries = selectSameDateEntries($selected_entry);
+
+    if (selected_entry == null) { return true; }
+
+    if (idx == -1)
+    {
+      throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
+    }
+
+    if(sameDateEntries.length <= 1)
+    {
+      return true;
+    }
+
+    if($selected_entry != null)
+    {
+      // is selected entry a year entry?
+      if($selected_entry.start_date_precision === "year")
+      {
+        return true;
+      }
+
+      // does selected entry have the same month as the last month entry?
+      if(sameDateEntries[sameDateEntries.length - 1].start_date.getMonth() === $selected_entry.start_date.getMonth())
+      {
+        //console.log("selected entry is the last month entry");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function selectSameDateEntries(selectedEntry)
+  {
+    const sameYearEntries: Entry[] = [];
+    const selectedYear = selectedEntry.start_date.getUTCFullYear();
+    for(let i = 0; i < newEntries.length; i++)
+    {
+      const year = newEntries[i].start_date.getUTCFullYear();
+      if(year === selectedYear && newEntries[i].start_date_precision !== "year")
+      {
+        sameYearEntries.push(newEntries[i]);
+      }
+    }
+    return sameYearEntries;
+  }
+
+  function populateYearEntries()
+  {
+    // Access and modify elements in the 2D array
+    yearEntries.update(arr => {
+      for(var i=0; i<entries.length; i++)
+      {
+        const year = entries[i].start_date.getUTCFullYear();
+        if(!arr[year])
+        {
+          arr[year] = [];
+        }
+        arr[year].push(entries[i]);
+      }
+      return arr;
+    });
+  }
+
+  function populateNewEntries()
+  {
+    yearEntries.subscribe(yearEntries => {
+      for(let i = 0; i < yearEntries.length; i++)
+      {
+        if (yearEntries[i] !== undefined)
+        {
+          for(let j = 0; j < yearEntries[i].length; j++)
+          {
+            newEntries.push(yearEntries[i][j]);
+          }
+        }
+      }
+    })
+  }
+
+  /* sort multiple events */
+  function sortingEntries()
+  {
+    // Access and modify elements in the 2D array
+    yearEntries.update(sortedArray => {
+      Object.keys(sortedArray).forEach(yr =>
+      {
+        sortedArray[yr].sort((a, b) =>
+        {
+          const aMonth = a.start_date.getMonth() + 1;
+          const bMonth = b.start_date.getMonth() + 1;
+
+          const aIsYear = a.start_date_precision === "year";
+          const aIsDay = a.start_date_precision === "day";
+
+          const bIsYear = b.start_date_precision === "year";
+          const bIsDay = b.start_date_precision === "day";
+
+          // non-year entries before year entries
+          if(!aIsYear && bIsYear)
+          {
+            return -1;
+          }
+          // year entries after non-year entries
+          else if(aIsYear && !bIsYear)
+          {
+            return 1;
+          }
+          // both a and b are not year entries
+          else if(!aIsYear && !bIsYear)
+          {
+            // January before February
+            if (aMonth < bMonth)
+            {
+              return -1;
+            }
+            // February after January
+            else if (aMonth > bMonth)
+            {
+              return 1;
+            }
+            // don't change order - same month
+            else
+            {
+              // a before b
+              if(aIsDay && !bIsDay)
+              {
+                return -1;
+              }
+              // b before a
+              else if(!aIsDay && bIsDay)
+              {
+                return 1;
+              }
+              else if(!aIsDay && !bIsDay)
+              {
+                return 0;
+              }
+            }
+          }
+        })
+      })
+
+      return sortedArray;
+    })
+  }
 
   // checks for multiple events in a year when dot on timeline is clicked
   async function multipleEventsCheck() {
     if (selected_entry == null) { return; }
-    const idx = entries.indexOf($selected_entry as Entry);
-    // const indexDate = timeline[currentIndex].start_date.getUTCFullYear();
-    // for(var i=0; timeline.length; i++)
-    // {
-    //   if(timeline[i].start_date.getUTCFullYear() == indexDate)
-    //   {
-    //     currentIndex = i;
-    //     break;
-    //   }
-    // }
+    let index = newEntries.indexOf($selected_entry as Entry);
+    const indexYear = newEntries[index].start_date.getUTCFullYear();
+    //console.log("index of selected entry is: " + index + " with year: " + indexYear);
+    for(var i=0; newEntries.length; i++)
+    {
+      if(newEntries[i].start_date.getUTCFullYear() == indexYear)
+      {
+        index = i;
+        $selected_entry = newEntries[index];
+        // console.log("Has multiple entries");
+        // console.log("index is now set to: " + index);
+        break;
+      }
+    }
   }
 
 
@@ -377,7 +637,7 @@
 
 <EditorModal bind:visible={modal_editor_guide} />
 
-<SearchBar bind:selection={search_selection} data={entries} />
+<SearchBar bind:selection={search_selection} data={newEntries} />
 
 {#if $selected_entry != null}
   <QrModal bind:visible={modal_qrcode} entry={$selected_entry} />
@@ -390,20 +650,24 @@
   on:entryDeleted={handleDelete}
   on:showQR={() => { modal_qrcode = true; }} />
 
-{#if entries.length > 0 && $selected_entry != null}
+{#if newEntries.length > 0 && $selected_entry != null}
   <TimelineBar
-    timeData={entries}
+    timeData={newEntries}
     bind:modalQuickStart={modal_quick_start}
     bind:modalEditorGuide={modal_editor_guide}
     bind:currentEntry={$selected_entry}
     bind:startSelected={startSelected}
     bind:endSelected={endSelected}
+    bind:startMonthSelected={startMonthSelected}
+    bind:endMonthSelected={endMonthSelected}
     on:change={multipleEventsCheck}
+    on:nextMonth={page_next_Month}
+    on:prevMonth={page_prev_Month}
     on:pagedown={page_next}
     on:pageup={page_prev} />
 {/if}
 
-{#if (entries.length > 0 || $mode != "default") && $selected_entry != null }
+{#if (newEntries.length > 0 || $mode != "default") && $selected_entry != null }
   <PageTransitionFade>
     {#key `${$selected_entry?.id}-${$direction}`}
       <section

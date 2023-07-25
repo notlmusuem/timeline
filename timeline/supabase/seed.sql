@@ -1,8 +1,15 @@
 insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1615-01-01', '1616-01-01', 'year', 'year', 'Etienne Brule visits the Attiwondaron', 1);
 insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1600-01-01', null, 'decade', null, 'Champlain coins the term “la nation neutre” in', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'month', null, 'Month 1', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'year', null, 'Year', 1);
 insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'year', null, 'Joseph de la Roche Daillon visits, and is welcomed by Neutrals', 1);
-insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'year', null, 'Joseph de la Roche Daillon visits, and is welcomed by Neutrals', 1);
-insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'year', null, 'Joseph de la Roche Daillon visits, and is welcomed by Neutrals', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-02', null, 'month', null, 'Month 2', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-02-20', null, 'day', null, 'Day 1', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-03', null, 'month', null, 'Month 4', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-02-10', null, 'month', null, 'Month 5', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-01', null, 'year', null, 'Year 2', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1626-01-21', null, 'day', null, 'Day 2', 1);
+insert into public.timeline (start_date, end_date, start_date_precision, end_date_precision, title, timeline) values ('1620-11-01', null, 'month', null, '1620 stuff', 1);
 
 /* playing with image credit column */
 UPDATE public.timeline

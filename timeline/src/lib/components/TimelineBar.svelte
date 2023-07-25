@@ -13,6 +13,7 @@
   import { mobile, windowHeight } from "$lib/stores/window";
 
   import { Entry } from "$lib/models/timeline";
+  import { debug } from "svelte/internal";
 
 
   export let timeData: Entry[];
@@ -26,6 +27,10 @@
 
   let disabled: boolean;
   $: disabled = $mode !== "default";
+
+  export let startMonthSelected: boolean;
+  export let endMonthSelected: boolean;
+
 
   let dragging = false;
   let arrowVisible = true;
@@ -49,6 +54,10 @@
 
 
   const dispatch = createEventDispatcher();
+
+  const callNextMonth = () => dispatch("nextMonth");
+
+  const callPrevMonth = () => dispatch("prevMonth");
 
   const callPageDown = () => dispatch("pagedown");
 
@@ -168,6 +177,25 @@
     tweening = true;
   }
 
+  function hasNextYearEntry(idx)
+  {
+    if(idx < timeData.length - 1)
+    {
+      if(timeData[idx].start_date.getUTCFullYear() == timeData[idx + 1].start_date.getUTCFullYear())
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+    else
+    {
+      return false;
+    }
+  }
+
   onMount(() => {
     handleResize();
     year.set(firstYear);
@@ -187,6 +215,18 @@
       ? "arrow-btns edit"
       : "arrow-btns"
     : "arrow-btns hidden"}>
+  <div class="arrow-button" title="Previous item">
+    <Arrow
+      on:moveup={() => {if (!startMonthSelected) { callPrevMonth(); }}}
+      disabled={startMonthSelected} />
+  </div>
+
+  <div class="arrow-button" title="Next item">
+    <Arrow down
+      on:movedown={() => {if (!endMonthSelected) { callNextMonth(); }}}
+      disabled={endMonthSelected} />
+  </div>
+
   <div class="arrow-button" title="Previous item">
     <Arrow
       on:moveup={() => {if (!startSelected) { callPageUp(); }}}
@@ -242,7 +282,7 @@
           href='{`/timeline/${td.timeline.id}/${td.id}`}'
           on:click={handleMove}
           on:click={() => year.set(td.start_date.getUTCFullYear())}>
-          <div
+          <!-- <div
             class="dot"
             style="transform:translateY({
               getSpacing(td.start_date.getUTCFullYear())
@@ -254,6 +294,22 @@
               }}
               year={td.start_date.getUTCFullYear()} />
           </div>
+        </a> -->
+            {#if hasNextYearEntry(i) || i == timeData.length - 1}
+            <!-- {console.log("td: " + td.start_date.getUTCFullYear() + " td.next: " + td[i + 1].start_date.getUTCFullYear())} -->
+              <div
+                class="dot"
+                style="transform:translateY({
+                  getSpacing(td.start_date.getUTCFullYear())
+                }vh)">
+                <Dot
+                  on:click={() => {
+                    setDetails(td)
+                    change()
+                  }}
+                  year={td.start_date.getUTCFullYear()} />
+              </div>
+            {/if}
         </a>
       {/each}
       <Cursor pos={getSpacing($year)} {tweening} />
