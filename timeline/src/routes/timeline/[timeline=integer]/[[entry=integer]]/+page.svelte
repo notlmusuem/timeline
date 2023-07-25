@@ -234,10 +234,10 @@
       const sameDateEntries = selectSameDateEntries($selected_entry);
       const currentMonth = $selected_entry.start_date.getMonth();
       //console.log("current month is: " + currentMonth);
-      for(let i = 0; i < sameDateEntries.length; i++)
+      for(let i = sameDateEntries.indexOf($selected_entry); i >= 0; i--)
       {
         // find the previous month entry
-        if(sameDateEntries[i].start_date.getMonth() === currentMonth - 1)
+        if(sameDateEntries[i].start_date.getMonth() <= currentMonth - 1)
         {
           $selected_entry = sameDateEntries[i];
           //console.log("Selected entry is: " + $selected_entry + " at index: " + i);
@@ -262,7 +262,7 @@
       for(let i = 0; i < sameDateEntries.length; i++)
       {
         // find the next month entry
-        if(sameDateEntries[i].start_date.getMonth() === currentMonth + 1)
+        if(sameDateEntries[i].start_date.getMonth() >= currentMonth + 1)
         {
           $selected_entry = sameDateEntries[i];
           //console.log("Selected entry is: " + $selected_entry + " at index: " + i);
@@ -291,8 +291,12 @@
 
     if($selected_entry != null)
     {
-      // does selected entry have the same month as the last month entry?
-      if(sameDateEntries[0].start_date.getMonth() === $selected_entry.start_date.getMonth())
+      if($selected_entry.start_date_precision === 'year')
+      {
+        return true;
+      }
+      // does selected entry have the same month as the last first entry?
+      else if(sameDateEntries[0].start_date.getMonth() === $selected_entry.start_date.getMonth())
       {
         //console.log("selected entry is the first month entry");
         return true;
@@ -322,13 +326,12 @@
     if($selected_entry != null)
     {
       // is selected entry a year entry?
-      if($selected_entry.start_date_precision === "year")
+      if($selected_entry.start_date_precision === 'year')
       {
         return true;
       }
-
       // does selected entry have the same month as the last month entry?
-      if(sameDateEntries[sameDateEntries.length - 1].start_date.getMonth() === $selected_entry.start_date.getMonth())
+      else if(sameDateEntries[sameDateEntries.length - 1].start_date.getMonth() === $selected_entry.start_date.getMonth())
       {
         //console.log("selected entry is the last month entry");
         return true;
