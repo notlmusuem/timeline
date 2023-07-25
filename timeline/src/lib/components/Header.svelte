@@ -53,7 +53,12 @@
       }
     }
 
-    // fixme
+    // hide the menu when it's clicked outside of it
+    // note: this condition only affects elements like the menu button which do
+    // not get reflowed by svelte. The svelte tick happens just before this
+    // event fires and so elem_ancestor_has_child will always fail for those
+    // elements. For this reason, we have a onclick handler on the popup
+    // container with stopPropagation.
     if (
       isTimelineSettingsOpen
       && !elem_ancestor_has_child(timelineSettingCont, event.target)
@@ -109,7 +114,13 @@
           {#if isTimelineSettingsOpen}
             <OverlayPopup direction="bottom" offset={$windowWidth >= 750 ? -.3 : $windowWidth >= 450 ? -.15 : -.1} fix_arrow
               class_="timeline_settings">
-              <TimelineSetting timelines={timelines} />
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <div on:click={(event) => {
+                // prevents clicks inside from getting handed by the window handler
+                event.stopPropagation();
+              }}>
+                <TimelineSetting timelines={timelines} />
+              </div>
             </OverlayPopup>
           {/if}
           <button
