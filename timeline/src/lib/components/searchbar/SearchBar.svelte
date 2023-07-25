@@ -2,6 +2,7 @@
   import { fly, fade } from "svelte/transition";
   import DropDownItem from "$lib/components/searchbar/DropDownItem.svelte";
   import { mode } from "$lib/stores/store";
+  import { userStore as user } from "$lib/authStore";
 
   import { Entry } from "$lib/models/timeline";
 
@@ -47,7 +48,7 @@
 <svelte:window on:click={handleClickOutside} on:keydown={handleShortcut} />
 
 <div
-  class="search-container"
+  class="search-container {$user && $user.email ? "loggedin" : ""}"
   style={disabled ? `top: -4rem !important;` : ``}
   transition:fly={{y:-25}}>
   <div class="bar">
@@ -131,6 +132,10 @@
     transition: opacity 0.1s var(--curve), width 0.5s var(--curve),
       right 0.5s var(--curve), border 0.1s var(--curve), top 0.5s var(--curve),
       box-shadow 0.5s var(--curve);
+  }
+
+  .search-container.loggedin {
+    right: calc(7.0rem + var(--font-size-large) * 3);
   }
 
   .search-container:focus-within {
