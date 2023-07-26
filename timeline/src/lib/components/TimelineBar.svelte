@@ -52,6 +52,8 @@
   let lastYear: number = timeData[timeData.length - 1].start_date.getUTCFullYear();
   $: lastYear = timeData[timeData.length - 1].start_date.getUTCFullYear();
 
+  let dotEntryArray: Entry[] = [];
+  createNewDotArray();
 
   const dispatch = createEventDispatcher();
 
@@ -177,6 +179,7 @@
     tweening = true;
   }
 
+  // checks if the entry after has a different year
   function hasNextYearEntry(idx)
   {
     if(idx < timeData.length - 1)
@@ -193,6 +196,39 @@
     else
     {
       return false;
+    }
+  }
+
+  // creates an array for same date entries
+  function selectSameDateEntries(selectedEntry)
+  {
+    const sameYearEntries: Entry[] = [];
+    const selectedYear = selectedEntry.start_date.getUTCFullYear();
+    for(let i = 0; i < timeData.length; i++)
+    {
+      const year = timeData[i].start_date.getUTCFullYear();
+      if(year === selectedYear)
+      {
+        sameYearEntries.push(timeData[i]);
+      }
+    }
+    return sameYearEntries;
+  }
+
+  // checks for multiple entries in a year when dot on timeline is clicked and creates a new array to traverse
+  function createNewDotArray()
+  {
+    for(let i = 0; i < timeData.length; i++)
+    {
+      if(hasNextYearEntry(i))
+      {
+        const newArr = selectSameDateEntries(timeData[i]);
+        dotEntryArray.push(newArr[0]);
+      }
+      else if(i === timeData.length - 1)
+      {
+        dotEntryArray.push(timeData[i]);
+      }
     }
   }
 
@@ -276,13 +312,13 @@
   <div>
     <span class="line" />
     <div class="line-components">
-      {#each timeData as td, i}
+      {#each dotEntryArray as td, i}
         <a
           class="lineItem"
           href='{`/timeline/${td.timeline.id}/${td.id}`}'
           on:click={handleMove}
           on:click={() => year.set(td.start_date.getUTCFullYear())}>
-          <!-- <div
+          <div
             class="dot"
             style="transform:translateY({
               getSpacing(td.start_date.getUTCFullYear())
@@ -290,26 +326,9 @@
             <Dot
               on:click={() => {
                 setDetails(td)
-                change()
               }}
               year={td.start_date.getUTCFullYear()} />
           </div>
-        </a> -->
-            {#if hasNextYearEntry(i) || i == timeData.length - 1}
-            <!-- {console.log("td: " + td.start_date.getUTCFullYear() + " td.next: " + td[i + 1].start_date.getUTCFullYear())} -->
-              <div
-                class="dot"
-                style="transform:translateY({
-                  getSpacing(td.start_date.getUTCFullYear())
-                }vh)">
-                <Dot
-                  on:click={() => {
-                    setDetails(td)
-                    change()
-                  }}
-                  year={td.start_date.getUTCFullYear()} />
-              </div>
-            {/if}
         </a>
       {/each}
       <Cursor pos={getSpacing($year)} {tweening} />

@@ -456,26 +456,7 @@
     })
   }
 
-  // checks for multiple events in a year when dot on timeline is clicked
-  async function multipleEventsCheck() {
-    if (selected_entry == null) { return; }
-    let index = newEntries.indexOf($selected_entry as Entry);
-    const indexYear = newEntries[index].start_date.getUTCFullYear();
-    //console.log("index of selected entry is: " + index + " with year: " + indexYear);
-    for(var i=0; newEntries.length; i++)
-    {
-      if(newEntries[i].start_date.getUTCFullYear() == indexYear)
-      {
-        index = i;
-        $selected_entry = newEntries[index];
-        // console.log("Has multiple entries");
-        // console.log("index is now set to: " + index);
-        break;
-      }
-    }
-  }
-
-
+  
   let search_selection: Entry|null;
   $: if (search_selection != null) {
     $selected_entry = search_selection;
@@ -663,7 +644,6 @@
     bind:endSelected={endSelected}
     bind:startMonthSelected={startMonthSelected}
     bind:endMonthSelected={endMonthSelected}
-    on:change={multipleEventsCheck}
     on:nextMonth={page_next_Month}
     on:prevMonth={page_prev_Month}
     on:pagedown={page_next}
