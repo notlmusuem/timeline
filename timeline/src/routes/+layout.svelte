@@ -1,20 +1,21 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { SvelteToast } from "@zerodevx/svelte-toast";
+  import { browser } from "$app/environment";
+  import { sleep } from "$lib/utils";
+  import { goto } from "$app/navigation";
+
+  import { page } from "$app/stores";
+  import { getSessionUser } from "$lib/authStore";
+  import { kioskMode, resetStores, themeStore } from "$lib/stores/store";
+  import {
+    windowWidth, windowHeight, scrollY, scrollX, mobile,
+  } from "$lib/stores/window";
+
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
-  import { SvelteToast } from "@zerodevx/svelte-toast";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { getSessionUser } from "$lib/authStore";
-  import { themeStore } from "$lib/stores/store";
-  import {
-    windowWidth,
-    windowHeight,
-    scrollY,
-    scrollX,
-    mobile,
-  } from "$lib/stores/window";
   import "./styles.css";
-  import { browser } from "$app/environment";
+
 
   $: mobile.set($windowWidth < 1000);
 
@@ -32,13 +33,53 @@
       console.error('Unhandled Promise Rejection:', err);
     });
   }
+
+
+  const inactivity_duration = 10 * 60 * 1000;  // 10 minutes
+  let current_reject: ((any) => void)|null = null;
+  function inactivity(): Promise<void> {
+    if (current_reject != null) { current_reject("User activity"); }
+
+    return new Promise(async (resolve, reject) => {
+      current_reject = reject;
+      await sleep(inactivity_duration);
+      if (current_reject == reject) { resolve(); }
+    });
+  }
+
+  function reset_inactivity() {
+    if (!$kioskMode) { return; }
+    // call the promise and handle all rejections
+    inactivity().then(handle_inactivity).catch(e => {});
+  }
+
+  async function handle_inactivity() {
+    if (!$kioskMode) { return; }
+    resetStores();
+    $kioskMode = true;
+
+    await goto("/");
+  }
+
+  onMount(() => {
+    reset_inactivity();
+  })
 </script>
 
 <svelte:window
   bind:innerHeight={$windowHeight}
   bind:innerWidth={$windowWidth}
   bind:scrollY={$scrollY}
-  bind:scrollX={$scrollX} />
+  bind:scrollX={$scrollX}
+  on:mousemove={reset_inactivity}
+  on:mousedown={reset_inactivity}
+  on:pointermove={reset_inactivity}
+  on:pointerdown={reset_inactivity}
+  on:touchmove={reset_inactivity}
+  on:touchstart={reset_inactivity}
+  on:keydown={reset_inactivity}
+  on:scroll={reset_inactivity}
+  on:focus={reset_inactivity} />
 
 <div class="{$themeStore} app">
   <Header />
