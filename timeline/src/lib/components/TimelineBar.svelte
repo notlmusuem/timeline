@@ -220,14 +220,10 @@
   {
     for(let i = 0; i < timeData.length; i++)
     {
-      if(hasNextYearEntry(i))
+      if(hasNextYearEntry(i) || i == timeData.length - 1)
       {
         const newArr = selectSameDateEntries(timeData[i]);
         dotEntryArray.push(newArr[0]);
-      }
-      else if(i === timeData.length - 1)
-      {
-        dotEntryArray.push(timeData[i]);
       }
     }
   }
