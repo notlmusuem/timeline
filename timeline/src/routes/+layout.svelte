@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import { browser } from "$app/environment";
   import { sleep } from "$lib/utils";
@@ -15,6 +15,7 @@
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import "./styles.css";
+  import { base_url } from "$lib/stores/env";
 
 
   $: mobile.set($windowWidth < 1000);
@@ -61,9 +62,46 @@
     await goto("/");
   }
 
-  onMount(() => {
+  let observer: MutationObserver;
+  onMount(async () => {
     reset_inactivity();
-  })
+    await tick();
+
+    observer = new MutationObserver((list, observer) => {
+      strip_links();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true, childList: true, subtree: true
+    });
+
+    page.subscribe(() => { strip_links(); });
+
+    strip_links();
+  });
+
+  onDestroy(() => {
+    if (browser) {
+      observer.disconnect();
+    }
+  });
+
+  async function strip_links() {
+    await tick();
+    for (let elem of document.getElementsByTagName("a") as HTMLCollectionOf<HTMLAnchorElement>) {
+      let href: URL;
+      try {
+        href = new URL(elem.href);
+      } catch (err) {
+        continue;
+      }
+
+      if (href.origin != base_url.origin) {
+        elem.href = "";
+        // elem.tagName
+      }
+    }
+  }
 </script>
 
 <svelte:window
