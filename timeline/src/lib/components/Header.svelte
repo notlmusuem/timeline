@@ -6,7 +6,7 @@
 
   import { type User } from "@supabase/supabase-js";
 
-  import { themeStore } from "$lib/stores/store";
+  import { kioskMode, themeStore } from "$lib/stores/store";
   import { timelines } from "$lib/stores/data";
   import { scrollY, mobile, windowWidth } from "$lib/stores/window";
   import { userStore, logout } from "$lib/authStore";
@@ -166,10 +166,12 @@
           on:keypress|preventDefault={() => { logout(); }}
           >logout</button>
       {:else}
-        <a href="/login"
-          title="Login"
-          class="material-symbols-rounded icon-btn"
-          >login</a>
+        {#if !$kioskMode}
+          <a href="/login"
+            title="Login"
+            class="material-symbols-rounded icon-btn"
+            >login</a>
+        {/if}
       {/if}
     </div>
   </nav>
