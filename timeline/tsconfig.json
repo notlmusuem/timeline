@@ -3,6 +3,7 @@
   "compilerOptions": {
     "lib": [
       "dom",
+      "dom.Iterable",
       "es2022",
     ],
     "module": "es2022",
