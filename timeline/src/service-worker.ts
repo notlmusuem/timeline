@@ -23,7 +23,6 @@ async function deleteOldCaches() {
 self.addEventListener("install", (event) => {
   event.waitUntil(new Promise<void>(async resolve => {
     await ssr_update_try();
-    await addFilesToCache();
     resolve();
   }));
 });
@@ -31,8 +30,6 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", async (event) => {
   event.waitUntil(new Promise<void>(async resolve => {
     await ssr_update_try();
-    if (!await caches.has(CACHE)) { await addFilesToCache(); }
-
     await deleteOldCaches();
     resolve();
   }));
@@ -43,7 +40,6 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(new Promise(async resolve => {
     await ssr_update_try();
-    if (!await caches.has(CACHE)) { await addFilesToCache(); }
 
     const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
@@ -61,7 +57,7 @@ self.addEventListener("fetch", (event) => {
 
       resolve(response);
     } catch {
-      return cache.match(event.request);
+      resolve(cache.match(event.request));
     }
   }));
 });
@@ -89,6 +85,8 @@ async function ssr_update_try() {
   if (ssr_version != null) {
     current_version = ssr_version;
     CACHE = `cache-${ssr_version}`;
+
+    await addFilesToCache();
 
     // ask controlled windows to reload themselves; see app.html
     for (const client of await (
