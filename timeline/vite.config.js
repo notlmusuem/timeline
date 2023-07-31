@@ -1,9 +1,10 @@
-import { sveltekit } from '@sveltejs/kit/vite';
+import { sveltekit } from "@sveltejs/kit/vite";
 
 /** @type {import('vite').UserConfig} */
 export default {
   plugins: [sveltekit()],
   build: {
-    target: "es2022"
-  }
+    target: "es2022",
+    rollupOptions: { treeshake: true, }
+  },
 };
