@@ -6,29 +6,36 @@ let CACHE = `cache-${version}`;
 const ASSETS = [...build, ...files];
 
 
-self.addEventListener("install", (event) => {
-  async function addFilesToCache() {
-    const cache = await caches.open(CACHE);
-    await cache.addAll(ASSETS);
-  }
+async function addFilesToCache() {
+  const cache = await caches.open(CACHE);
+  await cache.addAll(ASSETS);
+}
 
+async function deleteOldCaches() {
+  for (const key of await caches.keys()) {
+    if (key !== CACHE) { await caches.delete(key); }
+  }
+}
+
+
+self.addEventListener("install", (event) => {
   event.waitUntil(addFilesToCache());
 });
 
-self.addEventListener("activate", (event) => {
-  async function deleteOldCaches() {
-    for (const key of await caches.keys()) {
-      if (key !== CACHE) await caches.delete(key);
-    }
-  }
+self.addEventListener("activate", async (event) => {
+  event.waitUntil(new Promise(async () => {
+    if (!await caches.has(CACHE)) { await addFilesToCache(); }
 
-  event.waitUntil(deleteOldCaches());
+    await deleteOldCaches();
+  }));
 });
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  async function respond() {
+  event.respondWith(new Promise(async () => {
+    if (!await caches.has(CACHE)) { await addFilesToCache(); }
+
     const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
 
@@ -47,9 +54,7 @@ self.addEventListener("fetch", (event) => {
     } catch {
       return cache.match(event.request);
     }
-  }
-
-  event.respondWith(respond());
+  }));
 });
 
 async function ssr_update_check(): Promise<string|null> {
