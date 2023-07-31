@@ -21,28 +21,35 @@ async function deleteOldCaches() {
 
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(addFilesToCache());
+  event.waitUntil(new Promise<void>(async resolve => {
+    await ssr_update_try();
+    await addFilesToCache();
+    resolve();
+  }));
 });
 
 self.addEventListener("activate", async (event) => {
-  event.waitUntil(new Promise(async () => {
+  event.waitUntil(new Promise<void>(async resolve => {
+    await ssr_update_try();
     if (!await caches.has(CACHE)) { await addFilesToCache(); }
 
     await deleteOldCaches();
+    resolve();
   }));
 });
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  event.respondWith(new Promise(async () => {
+  event.respondWith(new Promise(async resolve => {
+    await ssr_update_try();
     if (!await caches.has(CACHE)) { await addFilesToCache(); }
 
     const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
 
     if (ASSETS.includes(url.pathname)) {
-      return cache.match(event.request);
+      resolve(cache.match(event.request));
     }
 
     try {
@@ -52,7 +59,7 @@ self.addEventListener("fetch", (event) => {
         cache.put(event.request, response.clone());
       }
 
-      return response;
+      resolve(response);
     } catch {
       return cache.match(event.request);
     }
@@ -61,6 +68,11 @@ self.addEventListener("fetch", (event) => {
 
 
 async function ssr_update_check(): Promise<string|null> {
+  // only check if the last check was longer than 10 minutes ago
+  if (Date.now() <= parseInt(current_version) + 30*1000) {
+    return null;
+  }
+
   const res = await fetch("/_app/version.json");
   if (res.status / 100 != 2) {
     // the server is down? we really want to avoid reloading and having a
@@ -95,5 +107,3 @@ async function ssr_update_try() {
     ).update();
   }
 }
-
-setInterval(ssr_update_try, 5*1000);  // 10 minutes
