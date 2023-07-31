@@ -22,6 +22,7 @@ async function deleteOldCaches() {
 
 self.addEventListener("install", (event) => {
   event.waitUntil(new Promise<void>(async resolve => {
+    await addFilesToCache();
     await ssr_update_try();
     resolve();
   }));
