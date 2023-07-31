@@ -6,7 +6,8 @@ let CACHE = `cache-${version}`;
 const ASSETS = [...build, ...files];
 
 let current_version = version;
-
+let last_update_check = parseInt(current_version);
+const UPDATE_FREQUENCY = 10*60*1000;  // 10 minutes
 
 async function addFilesToCache() {
   const cache = await caches.open(CACHE);
@@ -65,10 +66,12 @@ self.addEventListener("fetch", (event) => {
 
 
 async function ssr_update_check(): Promise<string|null> {
-  // only check if the last check was longer than 10 minutes ago
-  if (Date.now() <= parseInt(current_version) + 30*1000) {
+  // only fetch if we are overdue an update check
+  if (Date.now() <= last_update_check + UPDATE_FREQUENCY) {
     return null;
   }
+
+  last_update_check = Date.now();
 
   const res = await fetch("/_app/version.json");
   if (res.status / 100 != 2) {

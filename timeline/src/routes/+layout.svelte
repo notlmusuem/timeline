@@ -36,7 +36,7 @@
   }
 
 
-  const inactivity_duration = 10 * 60 * 1000;  // 10 minutes
+  const inactivity_duration = 10*60*1000;  // 10 minutes
   let current_reject: ((any) => void)|null = null;
   function inactivity(): Promise<void> {
     if (current_reject != null) { current_reject("User activity"); }
