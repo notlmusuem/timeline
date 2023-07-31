@@ -5,6 +5,8 @@ import { build, files, version } from "$service-worker";
 let CACHE = `cache-${version}`;
 const ASSETS = [...build, ...files];
 
+let current_version = version;
+
 
 async function addFilesToCache() {
   const cache = await caches.open(CACHE);
@@ -66,13 +68,14 @@ async function ssr_update_check(): Promise<string|null> {
   }
 
   const ssr_version = (await res.json()).version as string;
-  console.dir(ssr_version, version);
-  return ssr_version > version ? ssr_version : null;
+  console.dir(ssr_version, current_version);
+  return ssr_version > current_version ? ssr_version : null;
 }
 
 async function ssr_update_try() {
   const ssr_version = await ssr_update_check();
   if (ssr_version != null) {
+    current_version = ssr_version;
     CACHE = `cache-${ssr_version}`;
 
     for (const client of await (
