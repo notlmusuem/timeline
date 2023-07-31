@@ -1,65 +1,70 @@
 <script lang="ts">
-  import Socials from "./Socials.svelte";
+  import { kioskMode } from "$lib/stores/store";
+
+  import Socials from "$lib/components/Socials.svelte";
 </script>
 
 <footer class="footer">
   <div class="bar" />
+  {#if !$kioskMode}
   <div class="footer-container">
     <div class="footer-column">
-      <h4>Contact</h4>
-      <p>
-        <a
-          href="https://goo.gl/maps/Cpm4nsawtRitVMHx6"
-          target="_blank"
-          rel="noopener noreferrer"
-          ><span class="material-symbols-rounded i">location_on</span>&nbsp;43
-          Castlereagh St, Niagara-on-the-Lake, ON L0S 1J0</a>
-      </p>
-      <p>
-        <a href="tel:9054683912"
-          ><span class="material-symbols-rounded i">phone</span>&nbsp;(905)
-          468-3912</a>
-      </p>
-      <Socials grey />
-    </div>
-    <div class="footer-column">
-      <h4>Site Links</h4>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/timeline">Explore</a></li>
-        <li><a href="/contact">Contact Us</a></li>
-        <li><a href="/about">About Us</a></li>
-        <li><a href="/privacy">Privacy Policy</a></li>
-      </ul>
-    </div>
-    <div class="footer-column">
-      <h4>Related Links</h4>
-      <ul>
-        <li><a href="https://www.notlmuseum.ca">NOTL Museum</a></li>
-        <li><a href="https://www.notl.com">Niagara-on-the-Lake</a></li>
-        <li>
+        <h4>Contact</h4>
+        <p>
           <a
-            href="https://artsandculture.google.com/partner/niagara-historical-society-museum"
-            >Google Arts & Culture</a>
-        </li>
-        <li>
-          <a href="https://github.com/SWE-2023/COSC-4P02-Project"
-            >GitHub Repository</a>
-        </li>
-        <li>
-          <a
-            href="https://play.google.com/store/apps/details?id=app.notltimeline.twa"
-            >Google Play</a>
-        </li>
+            href="https://goo.gl/maps/Cpm4nsawtRitVMHx6"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><span class="material-symbols-rounded i">location_on</span>&nbsp;43
+            Castlereagh St, Niagara-on-the-Lake, ON L0S 1J0</a>
+        </p>
+        <p>
+          <a href="tel:9054683912"
+            ><span class="material-symbols-rounded i">phone</span>&nbsp;(905)
+            468-3912</a>
+        </p>
+        <Socials grey />
+      </div>
+      <div class="footer-column">
+        <h4>Site Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/timeline">Explore</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Related Links</h4>
+        <ul>
+          <li><a href="https://www.notlmuseum.ca">NOTL Museum</a></li>
+          <li><a href="https://www.notl.com">Niagara-on-the-Lake</a></li>
+          <li>
+            <a
+              href="https://artsandculture.google.com/partner/niagara-historical-society-museum"
+              >Google Arts & Culture</a>
+          </li>
+          <li>
+            <a href="https://github.com/SWE-2023/COSC-4P02-Project"
+              >GitHub Repository</a>
+          </li>
+          <li>
+            <a
+              href="https://play.google.com/store/apps/details?id=app.notltimeline.twa"
+              >Google Play</a>
+          </li>
 
-        <li><a href="https://brocku.ca">Brock University</a></li>
-      </ul>
+          <li><a href="https://brocku.ca">Brock University</a></li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; Niagara-on-the-Lake Museum 2023. All Rights Reserved.</p>
-  </div>
+    {/if}
+    <div class="footer-bottom">
+      <p>&copy; Brock University in partnership with Niagara-on-the-Lake Museum, 2023. Freely licensed under MIT.</p>
+    </div>
 </footer>
+
 
 <style>
   .footer {
