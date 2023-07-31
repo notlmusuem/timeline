@@ -5,7 +5,6 @@ import { build, files, version } from "$service-worker";
 let CACHE = `cache-${version}`;
 const ASSETS = [...build, ...files];
 
-window.onerror = e => console.error(e);
 
 self.addEventListener("install", (event) => {
   async function addFilesToCache() {
@@ -79,8 +78,6 @@ async function ssr_update_try() {
     )) {
       client.postMessage({ type: "reload" });
     }
-
-    location.reload();
   }
 }
 
