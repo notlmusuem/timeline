@@ -59,6 +59,7 @@ self.addEventListener("fetch", (event) => {
   }));
 });
 
+
 async function ssr_update_check(): Promise<string|null> {
   const res = await fetch("/_app/version.json");
   if (res.status / 100 != 2) {
@@ -68,7 +69,6 @@ async function ssr_update_check(): Promise<string|null> {
   }
 
   const ssr_version = (await res.json()).version as string;
-  console.dir(ssr_version, current_version);
   return ssr_version > current_version ? ssr_version : null;
 }
 
@@ -78,6 +78,7 @@ async function ssr_update_try() {
     current_version = ssr_version;
     CACHE = `cache-${ssr_version}`;
 
+    // ask controlled windows to reload themselves; see app.html
     for (const client of await (
       (
         // @ts-ignore
@@ -86,6 +87,12 @@ async function ssr_update_try() {
     )) {
       client.postMessage({ type: "reload" });
     }
+
+    // update ourselves if changed
+    await (
+      // @ts-ignore
+      registration as ServiceWorkerRegistration
+    ).update();
   }
 }
 
