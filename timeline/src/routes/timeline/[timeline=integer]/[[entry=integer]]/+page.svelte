@@ -29,25 +29,16 @@
   export let data;
   let timelines = (data.timelines ?? []).map(Timeline.from_obj);
   let entries = (data.entries ?? []).map(e => Entry.from_obj(e, timelines));
-  console.log("Original entries");
-  console.log(entries);
-  // Create a writable store to hold the 2D array
-  const yearEntries = writable(Array().fill(Array().fill(null)));
-  let newEntries: Entry[] = [];
 
-  populateYearEntries();
-  sortingEntries();
-  console.log("These are sorted yearEntries: ");
-  //Subscribe to changes in the array
-  yearEntries.subscribe(arr => {
-    //newEntries = arr;
-    console.log(arr);
+  let newEntries: Writable<Entry[]> = writable(entries);
+
+  newEntries.subscribe(updated => {
+    console.dir("newEntries updated!");
+    let yearEntries = Array().fill(Array().fill(null));
+    yearEntries = populateYearEntries(updated);
+    sortingEntries(yearEntries);
+    return populateNewEntries(updated);
   });
-  populateNewEntries();
-  console.log("This is newEntries:");
-  console.log(newEntries);
-
-  //const newEntries = Object.entries(yearEntries);
 
   let timeline_id: number = parseIntNull($page.params.timeline) as number;
   let entry_id: number|null = $page.params.entry == null
@@ -79,11 +70,11 @@
   selected_entry.subscribe(() => {
     if ($selected_entry == null && newEntries.length > 0) {
       // if the previous entry is still in the timeline, then switch to it instead
-      if ($prev_entry != null && newEntries.indexOf($prev_entry) != -1) {
+      if ($prev_entry != null && $newEntries.indexOf($prev_entry) != -1) {
         $selected_entry = $prev_entry;
-      } else {
+      } else if ($newEntries.length > 0) {
         // otherwise just fallback to the first
-        $selected_entry = newEntries[0];
+        $selected_entry = $newEntries[0];
       }
     }
   });
@@ -130,12 +121,12 @@
   selected_entry.subscribe(entry => {
     if ($prev_entry == null || entry == null) { return; }
 
-    const last_idx = newEntries.indexOf($prev_entry as Entry);
+    const last_idx = $newEntries.indexOf($prev_entry as Entry);
     if (last_idx == -1) {
       throw new Error(`Last entry ${$prev_entry?.id} was not in timeline!`);
     }
 
-    const idx = newEntries.indexOf(entry as Entry);
+    const idx = $newEntries.indexOf(entry as Entry);
     if (idx == -1) {
       throw new Error(`Current entry ${entry?.id} was not in timeline!`);
     }
@@ -164,7 +155,7 @@
     if (entry_param == null) {
       $selected_entry = null;
     } else {
-      $selected_entry = newEntries.find(e => e.id == entry_param) ?? null;
+      $selected_entry = $newEntries.find(e => e.id == entry_param) ?? null;
     }
   });
 
@@ -174,7 +165,7 @@
     if (entry_param == null) {
       $selected_entry = null;
     } else {
-      $selected_entry = newEntries.find(e => e.id == entry_param) ?? null;
+      $selected_entry = $newEntries.find(e => e.id == entry_param) ?? null;
     }
 
     pageMeta = {
@@ -193,9 +184,9 @@
   let endMonthSelected: boolean;
   // don't display buttons if there is no entry select or we're at the boundary
   $: startSelected = $selected_entry == null
-    ? true : newEntries.indexOf($selected_entry) == 0;
+    ? true : $newEntries.indexOf($selected_entry) == 0;
   $: endSelected = $selected_entry == null
-    ? true : newEntries.indexOf($selected_entry) == newEntries.length - 1;
+    ? true : $newEntries.indexOf($selected_entry) == $newEntries.length - 1;
 
   $: startMonthSelected = $selected_entry == null
     ? true : prevMonthBtnFalse();
@@ -204,27 +195,27 @@
 
   function page_prev() {
     if (selected_entry == null) { return; }
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_prev!`)
     }
 
-    $selected_entry = newEntries[Math.max(0, idx - 1)];
+    $selected_entry = $newEntries[Math.max(0, idx - 1)];
   }
 
   function page_next() {
     if (selected_entry == null) { return; }
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
     }
 
-    $selected_entry = newEntries[Math.min(newEntries.length - 1, idx + 1)];
+    $selected_entry = $newEntries[Math.min($newEntries.length - 1, idx + 1)];
   }
 
   function page_prev_Month() {
     if (selected_entry == null) { return; }
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
     }
@@ -249,7 +240,7 @@
 
   function page_next_Month() {
     if (selected_entry == null) { return; }
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     if (idx == -1) {
       throw new Error(`Entry ${$selected_entry?.id} is not in timeline for page_next!`)
     }
@@ -274,7 +265,7 @@
 
   function prevMonthBtnFalse()
   {
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     const sameDateEntries = selectSameDateEntries($selected_entry);
 
     if (selected_entry == null) { return true; }
@@ -308,7 +299,7 @@
 
   function nextMonthBtnFalse()
   {
-    const idx = newEntries.indexOf($selected_entry as Entry);
+    const idx = $newEntries.indexOf($selected_entry as Entry);
     const sameDateEntries = selectSameDateEntries($selected_entry);
 
     if (selected_entry == null) { return true; }
@@ -345,118 +336,118 @@
   {
     const sameYearEntries: Entry[] = [];
     const selectedYear = selectedEntry.start_date.getUTCFullYear();
-    for(let i = 0; i < newEntries.length; i++)
+    for(let i = 0; i < $newEntries.length; i++)
     {
-      const year = newEntries[i].start_date.getUTCFullYear();
-      if(year === selectedYear && newEntries[i].start_date_precision !== "year")
+      const year = $newEntries[i].start_date.getUTCFullYear();
+      if(year === selectedYear && $newEntries[i].start_date_precision !== "year")
       {
-        sameYearEntries.push(newEntries[i]);
+        sameYearEntries.push($newEntries[i]);
       }
     }
     return sameYearEntries;
   }
 
-  function populateYearEntries()
+  function populateYearEntries(entries: Entry[]): Entry[][]
   {
+    // using an array here is potentially really bad for performance!
+    // we are effectively creating an array with 2024 elements in it; most of
+    // which won't be used! this should probably be object of arrays keyed by year
+
+    // this is the same as yearEntries = [] ..?
+    let yearEntries: Entry[][] = Array().fill(Array().fill(null));
     // Access and modify elements in the 2D array
-    yearEntries.update(arr => {
-      for(var i=0; i<entries.length; i++)
+    for(var i=0; i<entries.length; i++)
+    {
+      const year = entries[i].start_date.getUTCFullYear();
+      if(yearEntries[year] === undefined)
       {
-        const year = entries[i].start_date.getUTCFullYear();
-        if(!arr[year])
-        {
-          arr[year] = [];
-        }
-        arr[year].push(entries[i]);
+        yearEntries[year] = [];
       }
-      return arr;
-    });
+      yearEntries[year].push(entries[i]);
+    }
+    return yearEntries;
   }
 
-  function populateNewEntries()
+  function populateNewEntries(yearEntries: Entry[][]): Entry[]
   {
-    yearEntries.subscribe(yearEntries => {
-      for(let i = 0; i < yearEntries.length; i++)
+    let newEntries: Entry[] = [];
+    for(let i = 0; i < yearEntries.length; i++)
+    {
+      if (yearEntries[i] !== undefined)
       {
-        if (yearEntries[i] !== undefined)
+        for(let j = 0; j < yearEntries[i].length; j++)
         {
-          for(let j = 0; j < yearEntries[i].length; j++)
-          {
-            newEntries.push(yearEntries[i][j]);
-          }
+          newEntries.push(yearEntries[i][j]);
         }
       }
-    })
+    }
+    return newEntries;
   }
 
   /* sort multiple events */
-  function sortingEntries()
+  function sortingEntries(yearEntries: Entry[][])
   {
     // Access and modify elements in the 2D array
-    yearEntries.update(sortedArray => {
-      Object.keys(sortedArray).forEach(yr =>
+    Object.keys(yearEntries).forEach(yr =>
+    {
+      yearEntries[yr].sort((a, b) =>
       {
-        sortedArray[yr].sort((a, b) =>
+        const aMonth = a.start_date.getMonth() + 1;
+        const bMonth = b.start_date.getMonth() + 1;
+
+        const aIsYear = a.start_date_precision === "year";
+        const aIsDay = a.start_date_precision === "day";
+
+        const bIsYear = b.start_date_precision === "year";
+        const bIsDay = b.start_date_precision === "day";
+
+        // non-year entries before year entries
+        if(!aIsYear && bIsYear)
         {
-          const aMonth = a.start_date.getMonth() + 1;
-          const bMonth = b.start_date.getMonth() + 1;
-
-          const aIsYear = a.start_date_precision === "year";
-          const aIsDay = a.start_date_precision === "day";
-
-          const bIsYear = b.start_date_precision === "year";
-          const bIsDay = b.start_date_precision === "day";
-
-          // non-year entries before year entries
-          if(!aIsYear && bIsYear)
+          return -1;
+        }
+        // year entries after non-year entries
+        else if(aIsYear && !bIsYear)
+        {
+          return 1;
+        }
+        // both a and b are not year entries
+        else if(!aIsYear && !bIsYear)
+        {
+          // January before February
+          if (aMonth < bMonth)
           {
             return -1;
           }
-          // year entries after non-year entries
-          else if(aIsYear && !bIsYear)
+          // February after January
+          else if (aMonth > bMonth)
           {
             return 1;
           }
-          // both a and b are not year entries
-          else if(!aIsYear && !bIsYear)
+          // don't change order - same month
+          else
           {
-            // January before February
-            if (aMonth < bMonth)
+            // a before b
+            if(aIsDay && !bIsDay)
             {
               return -1;
             }
-            // February after January
-            else if (aMonth > bMonth)
+            // b before a
+            else if(!aIsDay && bIsDay)
             {
               return 1;
             }
-            // don't change order - same month
-            else
+            else if(!aIsDay && !bIsDay)
             {
-              // a before b
-              if(aIsDay && !bIsDay)
-              {
-                return -1;
-              }
-              // b before a
-              else if(!aIsDay && bIsDay)
-              {
-                return 1;
-              }
-              else if(!aIsDay && !bIsDay)
-              {
-                return 0;
-              }
+              return 0;
             }
           }
-        })
+        }
       })
-
-      return sortedArray;
-    })
+    });
   }
 
-  
+
   let search_selection: Entry|null;
   $: if (search_selection != null) {
     $selected_entry = search_selection;
@@ -621,7 +612,7 @@
 
 <EditorModal bind:visible={modal_editor_guide} />
 
-<SearchBar bind:selection={search_selection} data={newEntries} />
+<SearchBar bind:selection={search_selection} data={$newEntries} />
 
 {#if $selected_entry != null}
   <QrModal bind:visible={modal_qrcode} entry={$selected_entry} />
@@ -634,9 +625,9 @@
   on:entryDeleted={handleDelete}
   on:showQR={() => { modal_qrcode = true; }} />
 
-{#if newEntries.length > 0 && $selected_entry != null}
+{#if $newEntries.length > 0 && $selected_entry != null}
   <TimelineBar
-    timeData={newEntries}
+    timeData={$newEntries}
     bind:modalQuickStart={modal_quick_start}
     bind:modalEditorGuide={modal_editor_guide}
     bind:currentEntry={$selected_entry}
@@ -650,7 +641,7 @@
     on:pageup={page_prev} />
 {/if}
 
-{#if (newEntries.length > 0 || $mode != "default") && $selected_entry != null }
+{#if ($newEntries.length > 0 || $mode != "default") && $selected_entry != null }
   <PageTransitionFade>
     {#key `${$selected_entry?.id}-${$direction}`}
       <section
