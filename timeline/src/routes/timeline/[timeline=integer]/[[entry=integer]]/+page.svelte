@@ -33,11 +33,10 @@
   let newEntries: Writable<Entry[]> = writable(entries);
 
   newEntries.subscribe(updated => {
-    console.dir("newEntries updated!");
     let yearEntries = Array().fill(Array().fill(null));
     yearEntries = populateYearEntries(updated);
     sortingEntries(yearEntries);
-    return populateNewEntries(updated);
+    return populateNewEntries(yearEntries);
   });
 
   let timeline_id: number = parseIntNull($page.params.timeline) as number;
