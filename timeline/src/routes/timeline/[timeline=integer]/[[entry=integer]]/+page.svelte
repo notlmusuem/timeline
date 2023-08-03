@@ -63,19 +63,20 @@
 
 
   let [selected_entry, prev_entry]: [Writable<Entry|null>, Readable<Entry|null>]
-  = writablePrev(null);
+    = writablePrev(null);
   let editing_entry = Entry.new_default();
 
   // if we ever select a null entries try to switch to any other one if possible
   selected_entry.subscribe(() => {
-    if ($selected_entry == null && newEntries.length > 0) {
+    if ($selected_entry == null) {
       // if the previous entry is still in the timeline, then switch to it instead
       if ($prev_entry != null && $newEntries.indexOf($prev_entry) != -1) {
         $selected_entry = $prev_entry;
       } else if ($newEntries.length > 0) {
-        // otherwise just fallback to the first
+        // otherwise just fallback to the first if it exists
         $selected_entry = $newEntries[0];
       }
+      // else: screw it just keep it null
     }
   });
 
