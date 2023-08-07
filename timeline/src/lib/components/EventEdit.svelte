@@ -9,6 +9,7 @@
   import { direction, mode } from "$lib/stores/store";
 
   import { Entry } from "$lib/models/timeline";
+  import OverlayPopup from "./OverlayPopup.svelte";
 
   export let entry: Entry;
 
@@ -17,6 +18,9 @@
   userStore.subscribe(value => {
     user = value?.email ? value : null;
   });
+
+  let moreShown: boolean = false;
+  mode.subscribe(() => { moreShown = false; });
 
   const dispatch = createEventDispatcher();
 
@@ -144,6 +148,28 @@
             ><span class="material-symbols-rounded i">qr_code_2_add</span
             >QR Code</button>
         {/if}
+        <div class="line" />
+        <div style="flex-basis: 10rem">
+          {#if moreShown}
+            <OverlayPopup direction="top" offset={-0.0}>
+              <div class="more-items">
+                <button class="options" title="Transfer to a different timeline"
+                  on:click={() => { moreShown = false; }}
+                  ><span class="material-symbols-rounded i">category</span
+                    >Transfer</button>
+                <div class="hline" />
+                <button class="options" title="Duplicate this item"
+                  on:click={() => { moreShown = false; }}
+                  ><span class="material-symbols-rounded i">content_copy</span
+                    >Duplicate</button>
+              </div>
+            </OverlayPopup>
+          {/if}
+          <button title="More options"
+            on:click={() => { moreShown = !moreShown; }}
+            ><span class="material-symbols-rounded i">more_vert</span
+            ></button>
+        </div>
       </div>
     </div>
   {/key}
@@ -177,6 +203,24 @@
     border: var(--border);
     transition: all 0.5s var(--curve);
     box-shadow: 5px 5px 7px #00000020;
+  }
+
+  .more-items {
+    user-select: none;
+
+    border-radius: var(--font-size-small);
+    background: var(--color-bg-1);
+    border: var(--border);
+
+    display: flex;
+    flex-flow: column;
+
+    align-items: center;
+  }
+
+  .more-items > button {
+    flex-basis: calc(3 * var(--font-size-base));
+    padding: 0 1rem;
   }
 
   .notice {
@@ -230,6 +274,15 @@
     align-self: center;
     height: 66%;
     width: 1px;
+    background-color: #00000020;
+    transition: all 0.5s var(--curve);
+  }
+
+  .hline {
+    display: flex;
+    align-self: center;
+    height: 1px;
+    width: 66%;
     background-color: #00000020;
     transition: all 0.5s var(--curve);
   }
