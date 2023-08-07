@@ -67,21 +67,23 @@
     reset_inactivity();
     await tick();
 
-    observer = new MutationObserver((list, observer) => {
+    if ($kioskMode) {
       strip_links();
-    });
 
-    observer.observe(document.documentElement, {
-      attributes: true, childList: true, subtree: true
-    });
+      observer = new MutationObserver((list, observer) => {
+        strip_links();
+      });
 
-    page.subscribe(() => { strip_links(); });
+      observer.observe(document.documentElement, {
+        attributes: true, childList: true, subtree: true
+      });
 
-    strip_links();
+      page.subscribe(() => { strip_links(); });
+    }
   });
 
   onDestroy(() => {
-    if (browser) {
+    if (browser && observer != undefined) {
       observer.disconnect();
     }
   });
