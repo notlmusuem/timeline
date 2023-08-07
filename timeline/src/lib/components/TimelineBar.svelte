@@ -13,7 +13,6 @@
   import { mobile, windowHeight } from "$lib/stores/window";
 
   import { Entry } from "$lib/models/timeline";
-  import { debug } from "svelte/internal";
 
 
   export let timeData: Entry[];
@@ -53,7 +52,10 @@
   $: lastYear = timeData[timeData.length - 1].start_date.getUTCFullYear();
 
   let dotEntryArray: Entry[] = [];
-  createNewDotArray();
+  $: {
+    timeData;
+    createNewDotArray();
+  }
 
   const dispatch = createEventDispatcher();
 
@@ -218,6 +220,7 @@
   // checks for multiple entries in a year when dot on timeline is clicked and creates a new array to traverse
   function createNewDotArray()
   {
+    dotEntryArray = [];
     for(let i = 0; i < timeData.length; i++)
     {
       if(hasNextYearEntry(i) || i == timeData.length - 1)
