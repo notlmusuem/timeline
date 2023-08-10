@@ -7,6 +7,7 @@
 
   export let autofocus: boolean = false;
   export let disabled: boolean = false;
+  export let title: string|null = null;
   export let href: string|null = null;
   export let href_external: boolean = false;
   export let alt: boolean = false;
@@ -18,13 +19,13 @@
   <button use:loadingAction={loading}
     class={alt ? "alt-button nolink" : "button nolink"}
     on:click={() => { dispatch("click"); }}
-    {disabled} {autofocus}><div><slot /></div></button>
+    {title} {disabled} {autofocus}><div><slot /></div></button>
 {:else}
   <a {href} target={href_external ? "_blank" : undefined}>
     <button use:loadingAction={loading}
       class={alt ? "alt-button" : "button"}
       on:click={() => { dispatch("click"); }}
-      {disabled} {autofocus}><div><slot /></div></button>
+      {title} {disabled} {autofocus}><div><slot /></div></button>
   </a>
 {/if}
 
