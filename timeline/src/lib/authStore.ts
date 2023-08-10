@@ -1,5 +1,5 @@
 import supabase from "$lib/supabaseClient";
-import { AuthError, User } from "@supabase/supabase-js";
+import { AuthError, User, type UserAttributes } from "@supabase/supabase-js";
 import { Writable, writable } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 
@@ -13,6 +13,10 @@ export async function getSessionUser() {
 
   userStore.set(session?.user ?? null);
   return session?.user ?? null;
+}
+
+export function is_admin(user: User) {
+  return true || user?.role === "admin";  // todo: fix this to use the correct role!
 }
 
 // Login using a one-time-password delivered via a magic link.
@@ -64,3 +68,26 @@ export async function logout() {
   }
   return;
 };
+
+export async function update_user(
+  attributes: UserAttributes,
+  options?: {emailRedirectTo?: string|undefined}|undefined
+): Promise<boolean> {
+  try {
+    const { error } = await supabase.auth.updateUser(attributes, options);
+    if (error) { throw error; }
+    return true;
+  } catch (error) {
+    toast.push("<b>Error</b><br>" + (error as AuthError).message);
+    return false;
+  }
+};
+
+export function password_requirements(password: string): string[] {
+  let conditions: string[] = [];
+  if (password.length <= 12) {
+    conditions.push("Password must be at least 12 characters long");
+  }
+
+  return conditions;
+}
