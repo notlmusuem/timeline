@@ -32,8 +32,13 @@
 <style lang="less">
   a, .nolink {
     display: flex;
+    justify-content: space-around;
     margin: 0.5em;
     text-decoration: none !important;
+  }
+
+  a > button {
+    flex-basis: 100%;
   }
 
   .button,
