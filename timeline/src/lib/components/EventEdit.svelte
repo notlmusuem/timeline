@@ -10,6 +10,7 @@
 
   import { Entry } from "$lib/models/timeline";
   import OverlayPopup from "./OverlayPopup.svelte";
+  import { windowWidth } from "$lib/stores/window";
 
   export let entry: Entry;
 
@@ -149,9 +150,9 @@
             >QR Code</button>
         {/if}
         <div class="line" />
-        <div style="flex-basis: 10rem">
+        <div style="flex-basis: 10rem; z-index: 5;">
           {#if moreShown}
-            <OverlayPopup direction="top" offset={-0.0}>
+            <OverlayPopup direction="top" offset={$windowWidth >= 750 ? 0.0 : -0.35} fix_arrow>
               <div class="more-items">
                 <button class="options" title="Transfer to a different timeline"
                   on:click={() => { moreShown = false; }}
