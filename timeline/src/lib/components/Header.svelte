@@ -17,6 +17,7 @@
   import OverlayPopup from "$lib/components/OverlayPopup.svelte";
   import TimelineSetting from "$lib/components/TimelineSetting.svelte";
   import { setFontSize } from "$lib/components/TextSizeSelector.svelte";
+  import UserSettingsPopup from "$lib/components/UserSettingsPopup.svelte";
 
 
 
@@ -26,11 +27,7 @@
   let isAccessibilityOpen = false;
   let isMenuOpen = false;
   let isTimelineSettingsOpen = false;
-
-  $: {
-    if (isAccessibilityOpen) { isTimelineSettingsOpen = false; }
-    if (isTimelineSettingsOpen) { isAccessibilityOpen = false; }
-  }
+  let isUserSettingsOpen = false;
 
   let shadow = 0;
   $: { shadow = $scrollY > 25 ? 1 : 0; }
@@ -41,6 +38,7 @@
   }
 
   let timelineSettingCont: HTMLDivElement;
+  let userSettingsCont: HTMLDivElement;
   function handleClickOutside(event) {
     if ($mobile) {
       if (
@@ -64,6 +62,14 @@
       && !elem_ancestor_has_child(timelineSettingCont, event.target)
     ) {
       isTimelineSettingsOpen = false;
+      event.preventDefault();
+    }
+
+    if (
+      isUserSettingsOpen
+      && !elem_ancestor_has_child(userSettingsCont, event.target)
+    ) {
+      isUserSettingsOpen = false;
       event.preventDefault();
     }
   }
@@ -128,10 +134,12 @@
             class="material-symbols-rounded icon-btn timeline_settings_menu"
             on:click|preventDefault={() => {
               if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              if (isUserSettingsOpen) { isUserSettingsOpen = false; }
               isTimelineSettingsOpen = !isTimelineSettingsOpen;
             }}
             on:keypress|preventDefault={() => {
               if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              if (isUserSettingsOpen) { isUserSettingsOpen = false; }
               isTimelineSettingsOpen = !isTimelineSettingsOpen;
             }}
             >tune</button>
@@ -148,6 +156,7 @@
         on:keydown={(e) => {
           if (e.key === "Enter") {
             if (isTimelineSettingsOpen) { isTimelineSettingsOpen = false; }
+            if (isUserSettingsOpen) { isUserSettingsOpen = false; }
             isAccessibilityOpen = !isAccessibilityOpen;
           }
         }}>settings</button>
@@ -159,12 +168,34 @@
         >info</a>
 
       {#if user && user.email}
-        <button
-          title="Logout"
-          class="material-symbols-rounded icon-btn"
-          on:click|preventDefault={() => { logout(); }}
-          on:keypress|preventDefault={() => { logout(); }}
-          >logout</button>
+        <div bind:this={userSettingsCont}>
+          {#if isUserSettingsOpen}
+            <OverlayPopup direction="bottom" offset={-.40} fix_arrow
+              class_="timeline_settings">
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <div on:click={(event) => {
+                // prevents clicks inside from getting handed by the window handler
+                event.stopPropagation();
+              }}>
+                <UserSettingsPopup />
+              </div>
+            </OverlayPopup>
+          {/if}
+          <button
+            title="Account Settings"
+            class="material-symbols-rounded icon-btn timeline_settings_menu"
+            on:click|preventDefault={() => {
+              if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              if (isTimelineSettingsOpen) { isTimelineSettingsOpen = false; }
+              isUserSettingsOpen = !isUserSettingsOpen;
+            }}
+            on:keypress|preventDefault={() => {
+              if (isAccessibilityOpen) { isAccessibilityOpen = false; }
+              if (isTimelineSettingsOpen) { isTimelineSettingsOpen = false; }
+              isUserSettingsOpen = !isUserSettingsOpen;
+            }}
+            >account_circle</button>
+        </div>
       {:else}
         {#if !$kioskMode}
           <a href="/login"
