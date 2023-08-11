@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { loadingAction } from "svelte-legos";
+  import * as navigation from "$app/navigation";
 
 
   const dispatch = createEventDispatcher();
@@ -21,7 +22,19 @@
     on:click={() => { dispatch("click"); }}
     {title} {disabled} {autofocus}><div><slot /></div></button>
 {:else}
-  <a {href} target={href_external ? "_blank" : undefined}>
+  <a {href} target={href_external ? "_blank" : undefined}
+    on:click={(event) => {
+      // Svelte is very dumb & inconsistent sometimes... the magic link handling
+      // for svelte apparently doesn't trigger on links in components which are
+      // dynamically shown with {#if} blocks only if they are hidden by default
+      // in the ssr. why?
+      if (!href_external) {
+        // this code wont execute anyways until svelte has hydrated the page
+        // before that, it'll act just like a normal link; exactly what we want
+        navigation.goto(href ?? "", { replaceState: false });
+        event.preventDefault();
+      }
+    }}>
     <button use:loadingAction={loading}
       class={alt ? "alt-button" : "button"}
       on:click={() => { dispatch("click"); }}
