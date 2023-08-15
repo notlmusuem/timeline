@@ -34,6 +34,7 @@
         navigation.goto(href ?? "", { replaceState: false });
         event.preventDefault();
       }
+      dispatch("click");
     }}>
     <button use:loadingAction={loading}
       class={alt ? "alt-button" : "button"}

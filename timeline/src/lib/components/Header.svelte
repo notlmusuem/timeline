@@ -177,7 +177,7 @@
                 // prevents clicks inside from getting handed by the window handler
                 event.stopPropagation();
               }}>
-                <UserSettingsPopup />
+                <UserSettingsPopup on:close={() => { isUserSettingsOpen = false; }}/>
               </div>
             </OverlayPopup>
           {/if}
