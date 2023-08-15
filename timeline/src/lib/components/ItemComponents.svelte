@@ -119,56 +119,66 @@
                 title={editingItem.image_caption ?? editingItem.title}
                 alt={editingItem.image_caption ?? editingItem.title} />
 
-              <div class="input-cont">
-                <label for="image_url">Image URL</label>
-                <input
-                  type="text"
-                  name="image_url"
-                  placeholder="https://example.com/image.jpg"
-                  bind:value={editingItem.image}
-                  on:change={event => {
-                    if(editingItem)
-                    {
-                      editingItem.image = editingItem.image?.trim() ?? null;
-                      if (editingItem.image == "") {
-                        editingItem.image = null;
+              <div class="edit-options">
+                <div style="width:100%;text-align:center;">
+                  <p
+                    style="font-size:var(--font-size-small);align-content:center">
+                    <i>Paste image URL or drag and drop onto image section (4MB
+                      limit).</i>
+                  </p>
+                </div>
+
+                <div class="input-cont">
+                  <label for="image_url">Image URL</label>
+                  <input
+                    type="text"
+                    name="image_url"
+                    placeholder="https://example.com/image.jpg"
+                    bind:value={editingItem.image}
+                    on:change={event => {
+                      if(editingItem)
+                      {
+                        editingItem.image = editingItem.image?.trim() ?? null;
+                        if (editingItem.image == "") {
+                          editingItem.image = null;
+                        }
                       }
-                    }
-                  }} />
-              </div>
-              <div class="input-cont">
-                <label for="image_credit">Image source</label>
-                <input
-                  type="text"
-                  name="image_credit"
-                  placeholder="https://example.com"
-                  bind:value={editingItem.image_credit}
-                  on:change={event => {
-                    if(editingItem)
-                    {
-                      editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
-                      if (editingItem.image_credit == "") {
-                        editingItem.image_credit = null;
+                    }} />
+                </div>
+                <div class="input-cont">
+                  <label for="image_credit">Image source</label>
+                  <input
+                    type="text"
+                    name="image_credit"
+                    placeholder="https://example.com"
+                    bind:value={editingItem.image_credit}
+                    on:change={event => {
+                      if(editingItem)
+                      {
+                        editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
+                        if (editingItem.image_credit == "") {
+                          editingItem.image_credit = null;
+                        }
                       }
-                    }
-                  }} />
-              </div>
-              <div class="input-cont">
-                <label for="image_caption">Image caption</label>
-                <input
-                  type="text"
-                  name="image_caption"
-                  placeholder="Picture of a ..."
-                  bind:value={editingItem.image_caption}
-                  on:change={event => {
-                    if(editingItem)
-                    {
-                      editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
-                      if (editingItem.image_caption == "") {
-                        editingItem.image_caption = null;
+                    }} />
+                </div>
+                <div class="input-cont">
+                  <label for="image_caption">Image caption</label>
+                  <input
+                    type="text"
+                    name="image_caption"
+                    placeholder="Picture of a ..."
+                    bind:value={editingItem.image_caption}
+                    on:change={event => {
+                      if(editingItem)
+                      {
+                        editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
+                        if (editingItem.image_caption == "") {
+                          editingItem.image_caption = null;
+                        }
                       }
-                    }
-                  }} />
+                    }} />
+                </div>
               </div>
             </div>
           {/if}
@@ -333,64 +343,67 @@
                     title={editingItem.image_caption ?? editingItem.title}
                     alt={editingItem.image_caption ?? editingItem.title} />
                 </div>
-                <div style="width:100%;text-align:center;">
-                  <p
-                    style="font-size:var(--font-size-small);align-content:center">
-                    <i>Paste image URL or drag and drop onto image section (4MB
-                      limit).</i>
-                  </p>
-                </div>
 
-                <div class="input-cont">
-                  <label for="image_url">Image URL</label>
-                  <input
-                    type="text"
-                    name="image_url"
-                    placeholder="https://example.com/image.jpg"
-                    bind:value={editingItem.image}
-                    on:change={event => {
-                    if(editingItem)
-                    {
-                      editingItem.image = editingItem.image?.trim() ?? null;
-                      if (editingItem.image == "") {
-                        editingItem.image = null;
-                      }
-                    }
-                    }} />
-                </div>
-                <div class="input-cont">
-                  <label for="image_credit">Image source</label>
-                  <input
-                    type="text"
-                    name="image_credit"
-                    placeholder="https://example.com"
-                    bind:value={editingItem.image_credit}
-                    on:change={event => {
-                    if(editingItem)
-                    {
-                      editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
-                      if (editingItem.image_credit == "") {
-                        editingItem.image_credit = null;
-                      }
-                    }
-                    }} />
-                </div>
-                <div class="input-cont">
-                  <label for="image_caption">Image caption</label>
-                  <input
-                    type="text"
-                    name="image_caption"
-                    placeholder="Picture of a ..."
-                    bind:value={editingItem.image_caption}
-                    on:change={event => {
+                <div class="edit-options">
+                  <div style="width:100%;text-align:center;">
+                    <p
+                      style="font-size:var(--font-size-small);align-content:center">
+                      <i>Paste image URL or drag and drop onto image section (4MB
+                        limit).</i>
+                    </p>
+                  </div>
+
+                  <div class="input-cont">
+                    <label for="image_url">Image URL</label>
+                    <input
+                      type="text"
+                      name="image_url"
+                      placeholder="https://example.com/image.jpg"
+                      bind:value={editingItem.image}
+                      on:change={event => {
                       if(editingItem)
                       {
-                        editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
-                        if (editingItem.image_caption == "") {
-                          editingItem.image_caption = null;
+                        editingItem.image = editingItem.image?.trim() ?? null;
+                        if (editingItem.image == "") {
+                          editingItem.image = null;
                         }
                       }
-                    }} />
+                      }} />
+                  </div>
+                  <div class="input-cont">
+                    <label for="image_credit">Image source</label>
+                    <input
+                      type="text"
+                      name="image_credit"
+                      placeholder="https://example.com"
+                      bind:value={editingItem.image_credit}
+                      on:change={event => {
+                      if(editingItem)
+                      {
+                        editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
+                        if (editingItem.image_credit == "") {
+                          editingItem.image_credit = null;
+                        }
+                      }
+                      }} />
+                  </div>
+                  <div class="input-cont">
+                    <label for="image_caption">Image caption</label>
+                    <input
+                      type="text"
+                      name="image_caption"
+                      placeholder="Picture of a ..."
+                      bind:value={editingItem.image_caption}
+                      on:change={event => {
+                        if(editingItem)
+                        {
+                          editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
+                          if (editingItem.image_caption == "") {
+                            editingItem.image_caption = null;
+                          }
+                        }
+                      }} />
+                  </div>
                 </div>
               </div>
             {:else if $mode == "default" && entry.image != null}
@@ -425,11 +438,9 @@
                         }
                       }} />
                   </Fullscreen>
-                  <!-- {#if entry.image_caption != null}
-                    <div class="image_caption">
-                      <span>{entry.image_caption}</span>
-                    </div>
-                  {/if} -->
+                  {#if entry.image_caption != null}
+                    <caption class="image-caption">{entry.image_caption}</caption>
+                  {/if}
                 </div>
               {/if}
             {/if}
@@ -589,6 +600,10 @@
     --vid-ratio: 0.5625;
   }
 
+  *, *::after, *::before {
+    box-sizing: border-box;
+  }
+
   hr {
     margin-top: 2rem;
     width: 66%;
@@ -603,18 +618,9 @@
     font-size: var(--font-size-base);
   }
 
-  .image_caption {
-    max-width: fit;
-    width: 100%;
-    padding: 1em;
-    min-width: 40ch;
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-  }
-
-  .image_caption > span {
-    vertical-align: middle;
+  caption {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
   }
 
   .cont-tts {
@@ -650,13 +656,15 @@
     align-items: center;
     margin-bottom: 3rem;
     gap: 1.5rem;
+    max-width: 60rem;
   }
+
+  .media-component {}
 
   .text-component {
     flex: 1 2 50%;
-    padding: 1rem 2rem;
+    padding: 1rem 1.5rem;
     border-radius: 1.5rem;
-    max-width: 60rem;
     border: var(--border);
     background: var(--color-text-card);
     filter: drop-shadow(5px 5px 7px 0 #00000020);
@@ -691,19 +699,28 @@
   }
 
   .image-placeholder {
-    display: flex;
+    border-radius: 1.5rem;
+    border-bottom: var(--border);
   }
 
   .image {
     z-index: 2;
     cursor: pointer;
-    min-height: 60vh;
-    max-height: 50vh;
-    max-width: 100%;
+    min-height: 10em;
+    max-height: 20em;
     object-position: center center;
     object-fit: contain;
     border-radius: 1.5rem;
-    box-shadow: 5px 5px 7px 0 #00000020;
+  }
+
+  .image-caption {
+    width: 100%;
+    min-width: 40ch;
+    align-items: center;
+    font-size: var(--font-size-smallish);
+
+    padding: 0.5em;
+    word-break: break-all;
   }
 
   @media (max-width: 1000px) {
@@ -745,12 +762,19 @@
     flex-flow: row wrap;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
     max-width: 60rem;
   }
 
-  .image-cont .edit-cont {
-    margin: 1rem;
+  .edit-options {
+    padding: 0 1.5rem 1rem 1.5rem ;
+    width: 100%;
+
+    display: flex;
+    flex: 1 1 49%;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
   }
 
   .input-cont {
@@ -809,7 +833,7 @@
 
   .image-edit {
     position: relative;
-    width: clamp(5rem, 70vw, 60rem);
+    width: clamp(5rem, 70vw, min(60rem, 100%));
     height: clamp(10rem, 30vw, 30rem);
     border: 3px solid var(--color-theme-1);
     z-index: 2;
@@ -817,6 +841,13 @@
     object-fit: contain;
     border-radius: var(--font-size-medium);
     background: var(--color-bg-2);
+  }
+
+  .image-edit > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--font-size-medium);
   }
 
   .upload {
