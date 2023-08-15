@@ -2,6 +2,7 @@
   import { kioskMode } from "$lib/stores/store";
 
   import Socials from "$lib/components/Socials.svelte";
+  import Copyright from "./Copyright.svelte";
 </script>
 
 <footer class="footer">
@@ -9,8 +10,17 @@
   {#if !$kioskMode}
   <div class="footer-container">
     <div class="footer-column">
-        <h4>Contact</h4>
+        <h4>Niagara-on-the-Lake Musuem</h4>
         <p>
+          <a
+            href="https://www.notlmuseum.ca/"
+            target="_blank"
+            rel="noopener"
+            ><span class="material-symbols-rounded i">web</span>&nbsp;
+            <a href="https://www.notlmuseum.ca/" on:click|preventDefault>notlmuseum.ca</a>
+          </a>
+        </p>
+        <!-- <p>
           <a
             href="https://goo.gl/maps/Cpm4nsawtRitVMHx6"
             target="_blank"
@@ -22,15 +32,13 @@
           <a href="tel:9054683912"
             ><span class="material-symbols-rounded i">phone</span>&nbsp;(905)
             468-3912</a>
-        </p>
+        </p> -->
         <Socials grey />
       </div>
       <div class="footer-column">
         <h4>Site Links</h4>
         <ul>
           <li><a href="/">Home</a></li>
-          <li><a href="/timeline">Explore</a></li>
-          <li><a href="/contact">Contact Us</a></li>
           <li><a href="/about">About Us</a></li>
           <li><a href="/privacy">Privacy Policy</a></li>
         </ul>
@@ -39,29 +47,16 @@
         <h4>Related Links</h4>
         <ul>
           <li><a href="https://www.notlmuseum.ca">NOTL Museum</a></li>
-          <li><a href="https://www.notl.com">Niagara-on-the-Lake</a></li>
-          <li>
-            <a
-              href="https://artsandculture.google.com/partner/niagara-historical-society-museum"
-              >Google Arts & Culture</a>
-          </li>
-          <li>
-            <a href="https://github.com/SWE-2023/COSC-4P02-Project"
-              >GitHub Repository</a>
-          </li>
-          <li>
-            <a
-              href="https://play.google.com/store/apps/details?id=app.notltimeline.twa"
-              >Google Play</a>
-          </li>
-
-          <li><a href="https://brocku.ca">Brock University</a></li>
+          <li><a
+            href="https://artsandculture.google.com/partner/niagara-historical-society-museum"
+            >Google Arts & Culture</a></li>
+          <li><a href="https://brocku.ca/">Brock University</a></li>
         </ul>
       </div>
     </div>
     {/if}
     <div class="footer-bottom">
-      <p>&copy; Brock University in partnership with Niagara-on-the-Lake Museum, 2023. Freely licensed under MIT.</p>
+      <p style="font-size: var(--font-size-small); max-width: 80ch;"><Copyright short/></p>
     </div>
 </footer>
 
@@ -110,13 +105,13 @@
     font-size: var(--font-size-small);
   }
 
-  a {
+  * :global(a) {
     color: var(--color-text);
     text-decoration: none;
     transition: all 0.5s var(--curve);
   }
 
-  a:hover {
+  * :global(a):hover {
     text-decoration: underline;
     color: var(--color-theme-1);
   }

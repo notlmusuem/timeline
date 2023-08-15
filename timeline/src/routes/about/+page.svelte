@@ -1,13 +1,21 @@
 <script lang="ts">
   import { slide } from "svelte/transition";
-  import PageTransition from "$lib/components/PageTransitionFly.svelte";
 
+  import { kioskMode } from "$lib/stores/store";
+  import { base_url } from "$lib/stores/env";
   import { strip_end, strip_start } from "$lib/utils";
+
+  import Button from "$lib/components/Button.svelte";
+  import Copyright from "$lib/components/Copyright.svelte";
+  import PageTransition from "$lib/components/PageTransitionFly.svelte";
+  import QrCodeDyn from "$lib/components/QrCodeDyn.svelte";
 
   // This json file was automatically generated with the package
   // https://www.npmjs.com/package/license-report and the command line:
   // npx license-report --output=json
   import projects_m from "./projects.json";
+
+
   const projects = projects_m as {
     department: string;
     relatedTo: string;
@@ -99,6 +107,7 @@
       linkedin: "https://www.linkedin.com/in/haaris-yahya-398ba9195/",
     },
   ];
+
 </script>
 
 <svelte:head>
@@ -111,51 +120,68 @@
   <section class="page" in:slide>
     <div>
       <h1>About Niagara-on-the-Lake</h1>
-      <div class="row v-align">
-        <p>
-          Niagara-on-the-Lake (NOTL) is a small town located in southern
-          Ontario, Canada. Despite its size, it has a rich history dating back
-          to the 19th century. The town was home to Fort George, which was built
-          by the British to defend against American offensives in the 19th
-          century. Today, NOTL is known for its beautiful flowers and trees and
-          is home to the summer Shaw Festival and its iconic wineries.
-        </p>
-        <img class="radius" src="$lib/assets/clock-tower.webp" alt="Clock Tower" />
-      </div>
+      <img class="radius fright" src="$lib/assets/clock-tower.webp"
+        alt="Clock Tower" style="max-width: 50%;" />
+      <p>
+        Niagara-on-the-Lake is a small town located in southern
+        Ontario, Canada. Despite its size, it has a rich history dating back
+        to the 19th century: the town was home to Fort George, which was built
+        by the British to defend against American offensives in the 19th
+        century.
+        Today, Niagara-on-the-Lake is known for its beautiful flowers & trees,
+        is home to the summer Shaw Festival, it’s old heritage downtown, and its
+        iconic wineries.
+      </p>
+
+      <h1 class='fclear'>About the Museum</h1>
+      <img class="radius fleft" src="$lib/assets/museum.jpg"
+        alt="Niagara-on-the-Lake Museum Logo" style="max-width: 50%;"/>
+      <p>
+        The Niagara Historical Society was established in 1895 to foster an
+        appreciation of Niagara-on-the-Lake’s rich heritage. Within a year, the
+        Society had a significant collection of artefacts that it decided to
+        open a Museum in the local Courthouse. In 1907, under the leadership of
+        the Society’s President, Janet Carnochan, they opened Memorial Hall,
+        Ontario’s first purpose-built Museum.
+      </p>
+      <p>
+        The NOTL Museum is operated by the Niagara Historical
+        Society and continues to preserve, present, and represent
+        Niagara-on-the-Lake’s rich heritage.
+        Containing artefacts from Indigenous settlement to the present day, the
+        Museum is home to over 8,500 artefacts, 41,000 documents, 4,000
+        photographs and 900 books.
+      </p>
+      {#if $kioskMode}
+        <div class='fright'>
+          <QrCodeDyn data="https://notlmuseum.ca/" size={200}></QrCodeDyn>
+        </div>
+      {/if}
+      <p>
+        The museum hosts a permanent exhibition called “Our Story,” which
+        documents the local history of Niagara-on-the-Lake.
+        It hosts several temporary exhibitions throughout the year, as well
+        as over 80 engaging programs that are enjoyed by people from all walks of life.
+      </p>
+      {#if !$kioskMode}
+        <p>Visit our website at <a href="https://www.notlmuseum.ca/" on:click|preventDefault>notlmuseum.ca</a> to learn about about the musuem, and to get involved in the Niagara Historical Society.</p>
+      {:else}
+        <p>Visit our website at <a href="https://www.notlmuseum.ca/" on:click|preventDefault>https://notlmuseum.ca</a> on your mobile device or scan the QR code to learn about about the musuem, and to get involved in the Niagara Historical Society.</p>
+      {/if}
     </div>
     <div>
-      <h1>About the Museum</h1>
-      <div class="row v-align">
-        <img
-          class="radius"
-          src="$lib/assets/museum.jpg"
-          alt="Niagara-on-the-Lake Museum Logo" />
-        <p>
-          The NOTL Museum is operated and owned by the Niagara Historical
-          Society (est. 1895) and continues to present and represent
-          Niagara-on-the-Lake’s rich heritage and history. The museum has over
-          8,500 artifacts, 41,000 documents, 400 photographs, and 900 books
-          ranging from the Indigenous settlement period to the present day. The
-          museum hosts a permanent exhibition called “Our Story,” which
-          documents the history of NOTL. It also hosts two temporary exhibitions
-          yearly and over 80 engaging programs that are enjoyed by people from
-          all walks of life.
-        </p>
-      </div>
-    </div>
-    <div>
-      <h1>About the Timeline</h1>
+      <h1 id="about-this-timeline">About this Timeline</h1>
       <div>
-        <p>
-          The Niagara-on-the-Lake Timeline is a project created by a team of
-          student developers from Brock University for the
-          Niagara-on-the-Lake Museum. The project is an interactive timeline
-          that documents the history of Niagara-on-the-Lake and other historical
-          events from 1726 to the present day.
-          The timeline is developed as a project spanning over multiple terms
-          and multiple teams of developers, and was supervised by Professor Naser
-          Ezzati-Jivan.
-        </p>
+        {#if $kioskMode}
+          <div class='fleft'>
+            <QrCodeDyn data={base_url.toString()} size={200}></QrCodeDyn>
+          </div>
+        {/if}
+        {#if $kioskMode}
+          <p>This timeline is also available as a website
+            at <a href={base_url.toString()}>{base_url.toString()}</a>
+            or scan the QR code to visit it on your mobile device.</p>
+        {/if}
         <!-- we will need to actually update the app first -->
         <!-- <p>
           Want to download the app? Click the button below!
@@ -166,53 +192,38 @@
               alt="Get it on Google Play"
               src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" /></a>
         </p> -->
-        <p>This project would not be possible without the extensive open source libraries used, as outlined below:</p>
-        <ul>
+        <p>
+          The Niagara-on-the-Lake Timeline is a project created by several teams
+          of undergraduate software developers from Brock University for the
+          Niagara-on-the-Lake Museum.
+          It is an interactive timeline that documents, teaches, and presents
+          the rich history of Niagara-on-the-Lake, and other historical events &
+          artefacts from the musuem's collection.
+        </p>
+        <p>
+          This project was graciously funded by ... through the ... grant,
+          and was supported by Brock University in partnership with
+          Niagara-on-the-Lake Museum.
+        </p>
+        <div class="row">
+          <img src='$lib/assets/brock.png' alt='Brock University Logo'
+            width=1268 height=768
+            style="width: 100%; height: auto; max-width: 25rem;"/>
+        </div>
+        <p>This project would also not be possible without the use of the following open source libraries:</p>
+        <ul class='col-list'>
           {#each projects as project}
             <li>
               <b><a
                 href={strip_end(strip_start(project.link, "git+"), ".git")}
                 >{project.name}</a></b>
-              — licensed under
+              —
               <a href={project.licenseLink}
                 >{project.licenseType}</a>
             </li>
           {/each}
         </ul>
-        <p>This project itself is licensed under <a href='https://github.com/SWE-2023/COSC-4P02-Project/LICENSE'>MIT.</a> An <a href="https://github.com/SWE-2023/COSC-4P02-Project">older version of the source is freely available.</a> A current version will follow in the near future.</p>
-      </div>
-    </div>
-    <div>
-      <h1>Our Team</h1>
-      <div class="row v-align">
-        <p style="text-align: center">
-          Meet the software development team behind the timeline.
-        </p>
-        <!-- Team container  -->
-        <div class="container">
-          <!-- {#each members as {name, pic, github}} -->
-          {#each members as member}
-            <div class="member-card">
-              <div class="avatar">
-                <a href={member.github}
-                  ><img src={member.pic} alt={member.name} /></a>
-              </div>
-              <div class="team-content">
-                <h3 class="title">{member.name}</h3>
-                <span class="role">{member.role}</span>
-              </div>
-              <ul class="social">
-                {#if typeof member.linkedin === "string"}<li>
-                  <a href={member.linkedin}
-                    ><span class="fab fa-linkedin" /></a>
-                </li>{/if}
-                {#if typeof member.github === "string"}<li>
-                  <a href={member.github}><span class="fab fa-github" /></a>
-                </li>{/if}
-              </ul>
-            </div>
-          {/each}
-        </div>
+        <p style="font-size: var(--font-size-smallish);"><Copyright/></p>
       </div>
     </div>
   </section>
@@ -335,6 +346,8 @@
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
+    max-width: 90ch;
+    margin: 0 auto;
   }
 
   section .row p {
@@ -345,15 +358,22 @@
     flex-flow: column;
     margin-left: auto;
     margin-right: auto;
-    max-width: 60ch;
   }
 
   section p {
     text-align: justify;
-    max-width: 60ch;
   }
 
-  .row > img {
+  .col-list {
+    columns: auto 25ch;
+    font-size: var(--font-size-smallish);
+  }
+
+  .col-list li {
+    font-size: var(--font-size-smallish);
+  }
+
+  .row > * {
     flex: 1 1 50%;
     display: flex;
     margin-left: auto;
@@ -365,4 +385,13 @@
   .row {
     gap: 3rem;
   }
+
+  .fright {
+    float: right; margin: 0.5em 0 0.5em 2em;
+  }
+  .fleft {
+    float: left; margin: 0.5em 2em 0.5em 0;
+  }
+
+  .fclear { clear: both; }
 </style>

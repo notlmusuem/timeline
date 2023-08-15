@@ -11,11 +11,13 @@
     ><span class="fab fa-instagram" /></a>
   <a href="https://www.youtube.com/user/NOTLMuseum" title="YouTube"
     ><span class="fab fa-youtube" /></a>
-    <div class=line/>
-  <a href="https://github.com/SWE-2023/COSC-4P02-Project" title="GitHub"
-    ><span class="fab fa-github" /></a>
-    <a href="https://play.google.com/store/apps/details?id=app.notltimeline.twa" title="GitHub"
-    ><span class="fab fa-google-play" /></a>
+
+  <!-- <div class="line" /> -->
+
+  <!-- <a href="https://github.com/notlmusuem/timeline" title="GitHub"
+    ><span class="fab fa-github" /></a> -->
+  <!-- <a href="https://play.google.com/store/apps/details?id=app.notltimeline.twa" title="GitHub"
+    ><span class="fab fa-google-play" /></a> -->
 </div>
 
 <style>
