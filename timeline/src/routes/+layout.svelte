@@ -213,11 +213,15 @@
     .background.background.ontimeline {
       opacity: 0.1;
     }
+
+    main { max-width: 85%; }
   }
 
   @media (max-width: 600px) {
     .background.background.ontimeline {
       opacity: 0;
     }
+
+    main { max-width: 90%; }
   }
 </style>
