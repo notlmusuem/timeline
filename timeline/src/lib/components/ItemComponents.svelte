@@ -336,7 +336,21 @@
                 <div class="image-edit">
                   <div class="upload-container">
                     <!-- <Button class="upload-button" on:click={triggerInput}>Upload Image</button> -->
-                    <Button on:click={() => { triggerInput() }}>Upload Image</Button>
+                    <Button alt on:click={() => { triggerInput() }}>
+                      <i class="material-symbols-rounded">cloud_upload</i>
+                      Upload Image
+                    </Button>
+                    {#if editingItem.image != null}
+                      <Button alt on:click={() => {
+                        if (editingItem == null) { return; }
+                        editingItem.image = null;
+                        editingItem.image_credit = null;
+                        editingItem.image_caption = null;
+                      }}>
+                        <i class="material-symbols-rounded">delete</i>
+                        Remove Image
+                      </Button>
+                    {/if}
                   </div>
                   <img
                     src={editingItem.image}
