@@ -116,6 +116,7 @@
               <img
                 class="image-edit"
                 src={editingItem.image}
+                title={editingItem.image_caption ?? editingItem.title}
                 alt={editingItem.image_caption ?? editingItem.title} />
 
               <div class="input-cont">
@@ -329,6 +330,7 @@
                   </div>
                   <img
                     src={editingItem.image}
+                    title={editingItem.image_caption ?? editingItem.title}
                     alt={editingItem.image_caption ?? editingItem.title} />
                 </div>
                 <div style="width:100%;text-align:center;">
@@ -408,6 +410,7 @@
                       on:load={() => (loading = false)}
                       class="image"
                       src={entry.image}
+                      title={entry.image_caption ?? entry.title}
                       alt={entry.image_caption ?? entry.title}
                       on:keydown={event => {
                         if (event.key === "Escape") {
