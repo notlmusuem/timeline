@@ -116,14 +116,7 @@
               <img
                 class="image-edit"
                 src={editingItem.image}
-                alt={editingItem.title} />
-              <div style="width:100%;text-align:center;">
-                <p
-                  style="font-size:var(--font-size-small);align-content:center">
-                  <i>Paste image URL or drag and drop onto image section (4MB
-                    limit).</i>
-                </p>
-              </div>
+                alt={editingItem.image_caption ?? editingItem.title} />
 
               <div class="input-cont">
                 <label for="image_url">Image URL</label>
@@ -335,9 +328,8 @@
                     <Button on:click={() => { triggerInput() }}>Upload Image</Button>
                   </div>
                   <img
-
                     src={editingItem.image}
-                    alt={editingItem.title} />
+                    alt={editingItem.image_caption ?? editingItem.title} />
                 </div>
                 <div style="width:100%;text-align:center;">
                   <p
