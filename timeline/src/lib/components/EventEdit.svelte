@@ -6,13 +6,18 @@
   import type { PostgrestError } from "@supabase/supabase-js";
 
   import { userStore } from "$lib/authStore";
-  import { direction, mode } from "$lib/stores/store";
+  import { direction, mode, selectedTimelineStore } from "$lib/stores/store";
 
   import { Entry } from "$lib/models/timeline";
   import OverlayPopup from "./OverlayPopup.svelte";
   import { windowWidth } from "$lib/stores/window";
+  import { structuredCloneProto } from "$lib/utils";
+
 
   export let entry: Entry;
+  export let selectedEntry: Entry | null;
+  export let disableButton;
+  export let entryTransfer: boolean;
 
 
   let user;
@@ -36,7 +41,7 @@
     return !isNaN(date.getTime());
   }
 
-  async function saveChanges(insert) {
+  async function saveChanges(entry) {
     let inserting = !entry.in_table;  // insert the item if it is locally created
 
     if ((entry.title ?? "").trim() == "") {
@@ -102,6 +107,21 @@
       toast.push(`<b>Database Error</b><br>${error.message}`);
     }
   };
+
+  function updateSelectedTimeline()
+  {
+    let currentTimeline = selectedEntry?.timeline;
+    selectedTimelineStore.set(currentTimeline?.id);
+  }
+
+  function duplicateEntry()
+  {
+    let clonedEntry = structuredCloneProto(selectedEntry);
+    if(clonedEntry)
+    clonedEntry.id = null;
+    saveChanges(clonedEntry);
+    return clonedEntry;
+  }
 </script>
 
 {#if user && user.email}
@@ -119,7 +139,7 @@
             >Cancel</button>
           <div class="line" />
           <button class="options" title="Save changes"
-            on:click={() => saveChanges(false)}
+            on:click={() => saveChanges(entry)}
             ><span class="material-symbols-rounded i">save</span
             >Save</button>
           <div class="line" />
@@ -132,11 +152,11 @@
             >Cancel</button>
           <div class="line" />
           <button class="options" title="Save changes"
-            on:click={() => saveChanges(true)}
+            on:click={() => saveChanges(entry)}
             ><span class="material-symbols-rounded i">save</span
             >Save</button>
         {:else}
-          <button on:click={startEdit} title="Edit items"
+          <button class:disabled={disableButton} on:click={startEdit} title="Edit items" disabled={disableButton}
             ><span class="material-symbols-rounded i">edit</span
             >Edit</button>
           <div class="line" />
@@ -145,7 +165,7 @@
             >Add</button>
           <div class="line" />
           <button title="Generate QR code"
-            on:click={() => { dispatch("showQR"); }}
+            class:disabled={disableButton} on:click={() => { dispatch("showQR"); }} disabled={disableButton}
             ><span class="material-symbols-rounded i">qr_code_2_add</span
             >QR Code</button>
         {/if}
@@ -155,12 +175,12 @@
             <OverlayPopup direction="top" offset={$windowWidth >= 750 ? 0.0 : -0.35} fix_arrow>
               <div class="more-items">
                 <button class="options" title="Transfer to a different timeline"
-                  on:click={() => { moreShown = false; }}
+                  on:click={() => { moreShown = false; entryTransfer = true; updateSelectedTimeline(); }}
                   ><span class="material-symbols-rounded i">category</span
                     >Transfer</button>
                 <div class="hline" />
                 <button class="options" title="Duplicate this item"
-                  on:click={() => { moreShown = false; }}
+                  on:click={() => { moreShown = false; console.log(duplicateEntry()); }}
                   ><span class="material-symbols-rounded i">content_copy</span
                     >Duplicate</button>
               </div>
@@ -222,6 +242,11 @@
   .more-items > button {
     flex-basis: calc(3 * var(--font-size-base));
     padding: 0 1rem;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .notice {

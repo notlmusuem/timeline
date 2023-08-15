@@ -39,6 +39,8 @@ kioskMode.update(_ =>
   || false
 );
 
+// current selected timeline store
+export const selectedTimelineStore = writable();
 
 // year tweened
 export const year: Tweened<number> = tweened(0, {

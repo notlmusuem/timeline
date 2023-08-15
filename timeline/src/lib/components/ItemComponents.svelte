@@ -7,6 +7,7 @@
   import { toast } from "@zerodevx/svelte-toast";
   import supabase from "$lib/supabaseClient";
   import { format_date_numbers, structuredCloneProto } from "$lib/utils";
+  import Button from "$lib/components/Button.svelte";
 
   import { mobile } from "$lib/stores/window";
   import { mode } from "$lib/stores/store";
@@ -19,8 +20,8 @@
   let loading = true;
   let uploading = false;
 
-  export let entry: Entry;
-  export let editingItem: Entry = Entry.new_default();
+  export let entry: Entry| null = null;
+  export let editingItem: Entry| null = Entry.new_default();
 
   const full = writable(false);
 
@@ -70,7 +71,7 @@
         .from("images")
         .getPublicUrl(filename);
 
-      if ($mode !== "default") {
+      if ($mode !== "default" && editingItem !== null) {
         editingItem.image = publicUrl;
       } else {
         toast.push(`<b>Error</b><br>Not currently editing an item; image was not uploaded`);
@@ -78,25 +79,34 @@
     }
     uploading = false;
   }
+
+  function triggerInput()
+  {
+    const fileInput = document.getElementById("file_upload");
+    if(fileInput != null)
+    {
+      fileInput.click();
+    }
+  }
 </script>
 
 {#key $mode}
-  <section class="item-components">
-    {#if entry.image || $mode !== "default"}
+  {#if entry == null && $mode === "add"}
+    <section class="item-components">
       <div class="media-component">
-        {#if $mode !== "default"}
-          <p class={uploading ? "upload-notice red" : "upload-notice"}>
-            <span
-              style="font-size:var(--font-size-small)"
-              class={uploading
-                ? "material-symbols-rounded i"
-                : "material-symbols-rounded"}
-              >{uploading ? "autorenew" : "cloud_upload"}</span
-            >{uploading ? "Uploading..." : "Upload image"}
-          </p>
-        {/if}
+        <p class={uploading ? "upload-notice red" : "upload-notice"}>
+          <span
+            style="font-size:var(--font-size-small)"
+            class={uploading
+              ? "material-symbols-rounded i"
+              : "material-symbols-rounded"}
+            >{uploading ? "autorenew" : "cloud_upload"}
+          </span>
+          {uploading ? "Uploading..." : "Upload image"}
+          {"hello I am under the water"}
+        </p>
         <div class="image-cont">
-          {#if $mode !== "default"}
+          {#if editingItem != null}
             <div class="edit-cont">
               <input
                 type="file"
@@ -123,9 +133,12 @@
                   placeholder="https://example.com/image.jpg"
                   bind:value={editingItem.image}
                   on:change={event => {
-                    editingItem.image = editingItem.image?.trim() ?? null;
-                    if (editingItem.image == "") {
-                      editingItem.image = null;
+                    if(editingItem)
+                    {
+                      editingItem.image = editingItem.image?.trim() ?? null;
+                      if (editingItem.image == "") {
+                        editingItem.image = null;
+                      }
                     }
                   }} />
               </div>
@@ -137,9 +150,12 @@
                   placeholder="https://example.com"
                   bind:value={editingItem.image_credit}
                   on:change={event => {
-                    editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
-                    if (editingItem.image_credit == "") {
-                      editingItem.image_credit = null;
+                    if(editingItem)
+                    {
+                      editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
+                      if (editingItem.image_credit == "") {
+                        editingItem.image_credit = null;
+                      }
                     }
                   }} />
               </div>
@@ -151,58 +167,22 @@
                   placeholder="Picture of a ..."
                   bind:value={editingItem.image_caption}
                   on:change={event => {
-                    editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
-                    if (editingItem.image_caption == "") {
-                      editingItem.image_caption = null;
+                    if(editingItem)
+                    {
+                      editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
+                      if (editingItem.image_caption == "") {
+                        editingItem.image_caption = null;
+                      }
                     }
                   }} />
               </div>
             </div>
-          {:else if $mode == "default" && entry.image != null}
-            {#if entry.image.includes("youtube.com")}
-              <iframe
-                class="video"
-                title="youtube video"
-                src={entry.image.replace("watch?v=", "embed/")}
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen />
-            {:else}
-              <div class="image-placeholder" use:loadingAction={loading}>
-                <!-- svelte-ignore -->
-                <Fullscreen let:onToggle let:onExit>
-                  <img
-                    on:load={() => (loading = false)}
-                    class="image"
-                    src={entry.image}
-                    alt={entry.image_caption ?? entry.title}
-                    on:keydown={event => {
-                      if (event.key === "Escape") {
-                        onExit();
-                        $full = false;
-                      }
-                    }}
-                    on:click={() => {
-                      if (!$mobile) {
-                        onToggle();
-                        $full = !$full;
-                      }
-                    }} />
-                </Fullscreen>
-                <!-- {#if entry.image_caption != null}
-                  <div class="image_caption">
-                    <span>{entry.image_caption}</span>
-                  </div>
-                {/if} -->
-              </div>
-            {/if}
           {/if}
         </div>
       </div>
-    {/if}
 
     <div class="text-component">
-      {#if $mode !== "default"}
+      {#if editingItem != null}
         <form>
           <div class='edit-cont'>
             <div class="input-cont">
@@ -214,7 +194,10 @@
                 placeholder="Title"
                 bind:value={editingItem.title}
                 on:change={event => {
-                  editingItem.title = editingItem.title?.trim() ?? null;
+                  if(editingItem)
+                  {
+                    editingItem.title = editingItem.title?.trim() ?? null;
+                  }
                 }} />
             </div>
           </div>
@@ -232,8 +215,10 @@
                   // because this isn't in a script lang="ts" block. Ew.
                   // @ts-ignore
                   const value = event.target?.value;
-
-                  editingItem.start_date = new UTCDate(UTCDate.parse(value));
+                  if(editingItem)
+                  {
+                    editingItem.start_date = new UTCDate(UTCDate.parse(value));
+                  }
                 }}
                 value={format_date_numbers(editingItem.start_date, "day")}
                 max={
@@ -256,12 +241,14 @@
                 on:change={event => {
                   // @ts-ignore Not in a script lang="ts" block.
                   const value = event.target?.value;
+                  if(editingItem)
+                  {
+                    editingItem.end_date = value == "" || value == null
+                      ? null : new UTCDate(UTCDate.parse(value));
 
-                  editingItem.end_date = value == "" || value == null
-                    ? null : new UTCDate(UTCDate.parse(value));
-
-                  editingItem.end_date_precision = editingItem.end_date == null
-                    ? null : editingItem.start_date_precision;
+                    editingItem.end_date_precision = editingItem.end_date == null
+                      ? null : editingItem.start_date_precision;
+                  }
                 }}
                 value={
                   editingItem.end_date == null
@@ -281,8 +268,11 @@
                 on:change={event => {
                   // @ts-ignore Not in a script lang="ts" block.
                   const value = event.target?.value;
-                  editingItem.end_date_precision =
-                    editingItem.end_date == null ? null : value;
+                  if(editingItem)
+                  {
+                    editingItem.end_date_precision =
+                      editingItem.end_date == null ? null : value;
+                  }
                 }}>
                 <option value="day">Exact Day</option>
                 <option value="month">Month & Year</option>
@@ -299,39 +289,304 @@
               placeholder="Description"
               bind:value={editingItem.body}
               on:change={event => {
-                editingItem.body = editingItem.body?.trim() ?? null;
-                if (editingItem.body == "") {
-                  editingItem.body = null;
+                if(editingItem)
+                {
+                  editingItem.body = editingItem.body?.trim() ?? null;
+                  if (editingItem.body == "") {
+                    editingItem.body = null;
+                  }
                 }
               }}/>
           </div>
         </form>
-      {:else}  <!-- $mode === "default" -->
-        <h1 class="title">{entry.title}</h1>
-        <p class="date"><i>{entry.format_date()}</i></p>
-        <hr />
-        {#if entry.body}<p class="desc">{entry.body}</p>{/if}
-        <div class="cont-tts">
-          <div class="tts">
-            <Text2Speech texts={[
-              entry.title,
-              entry.format_date(),
-              entry?.body,
-              entry.image_caption == null ? null
-                : `The above image is an ${entry.image_caption}`
-            ]}/>
-          </div>
-          <div class="image_cred">
-            {#if entry.image_credit != null}
-              <a href="{entry.image_credit}" target="_blank" rel="noreferrer"
-                >Image source</a>
+      {/if}
+    </div>
+    </section>
+    <gap />
+  {:else if entry && editingItem != null}
+    <section class="item-components">
+      {#if entry.image || $mode !== "default"}
+        <div class="media-component">
+          {#if $mode !== "default"}
+            <p class={uploading ? "upload-notice red" : "upload-notice"}>
+              <span
+                style="font-size:var(--font-size-small)"
+                class={uploading
+                  ? "material-symbols-rounded i"
+                  : "material-symbols-rounded"}
+                >{uploading ? "autorenew" : "cloud_upload"}
+              </span>
+              {uploading ? "Uploading..." : "Upload image"}
+              {"hello I am under the water"}
+            </p>
+          {/if}
+          <div class="image-cont">
+            {#if $mode !== "default"}
+              <div class="edit-cont">
+                  <input
+                    type="file"
+                    class="image-edit upload"
+                    id="file_upload"
+                    on:change={upload}
+                    style="display:none"/>
+                <div class="image-edit">
+                  <div class="upload-container">
+                    <!-- <Button class="upload-button" on:click={triggerInput}>Upload Image</button> -->
+                    <Button on:click={() => { triggerInput() }}>Upload Image</Button>
+                  </div>
+                  <img
+
+                    src={editingItem.image}
+                    alt={editingItem.title} />
+                </div>
+                <div style="width:100%;text-align:center;">
+                  <p
+                    style="font-size:var(--font-size-small);align-content:center">
+                    <i>Paste image URL or drag and drop onto image section (4MB
+                      limit).</i>
+                  </p>
+                </div>
+
+                <div class="input-cont">
+                  <label for="image_url">Image URL</label>
+                  <input
+                    type="text"
+                    name="image_url"
+                    placeholder="https://example.com/image.jpg"
+                    bind:value={editingItem.image}
+                    on:change={event => {
+                    if(editingItem)
+                    {
+                      editingItem.image = editingItem.image?.trim() ?? null;
+                      if (editingItem.image == "") {
+                        editingItem.image = null;
+                      }
+                    }
+                    }} />
+                </div>
+                <div class="input-cont">
+                  <label for="image_credit">Image source</label>
+                  <input
+                    type="text"
+                    name="image_credit"
+                    placeholder="https://example.com"
+                    bind:value={editingItem.image_credit}
+                    on:change={event => {
+                    if(editingItem)
+                    {
+                      editingItem.image_credit = editingItem.image_credit?.trim() ?? null;
+                      if (editingItem.image_credit == "") {
+                        editingItem.image_credit = null;
+                      }
+                    }
+                    }} />
+                </div>
+                <div class="input-cont">
+                  <label for="image_caption">Image caption</label>
+                  <input
+                    type="text"
+                    name="image_caption"
+                    placeholder="Picture of a ..."
+                    bind:value={editingItem.image_caption}
+                    on:change={event => {
+                      if(editingItem)
+                      {
+                        editingItem.image_caption = editingItem.image_caption?.trim() ?? null;
+                        if (editingItem.image_caption == "") {
+                          editingItem.image_caption = null;
+                        }
+                      }
+                    }} />
+                </div>
+              </div>
+            {:else if $mode == "default" && entry.image != null}
+              {#if entry.image.includes("youtube.com")}
+                <iframe
+                  class="video"
+                  title="youtube video"
+                  src={entry.image.replace("watch?v=", "embed/")}
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen />
+              {:else}
+                <div class="image-placeholder" use:loadingAction={loading}>
+                  <!-- svelte-ignore -->
+                  <Fullscreen let:onToggle let:onExit>
+                    <img
+                      on:load={() => (loading = false)}
+                      class="image"
+                      src={entry.image}
+                      alt={entry.image_caption ?? entry.title}
+                      on:keydown={event => {
+                        if (event.key === "Escape") {
+                          onExit();
+                          $full = false;
+                        }
+                      }}
+                      on:click={() => {
+                        if (!$mobile) {
+                          onToggle();
+                          $full = !$full;
+                        }
+                      }} />
+                  </Fullscreen>
+                  <!-- {#if entry.image_caption != null}
+                    <div class="image_caption">
+                      <span>{entry.image_caption}</span>
+                    </div>
+                  {/if} -->
+                </div>
+              {/if}
             {/if}
           </div>
         </div>
       {/if}
-    </div>
-  </section>
-  <gap />
+
+      <div class="text-component">
+        {#if $mode !== "default"}
+          <form>
+            <div class='edit-cont'>
+              <div class="input-cont">
+                <label for="title"
+                  >Title <span style="color:var(--color-theme-1)">*</span></label>
+                <input
+                  name="title"
+                  type="text"
+                  placeholder="Title"
+                  bind:value={editingItem.title}
+                  on:change={event => {
+                    if(editingItem)
+                    {
+                      editingItem.title = editingItem.title?.trim() ?? null;
+                    }
+                  }} />
+              </div>
+            </div>
+
+            <div class="edit-cont">
+              <div class="input-cont row-4">
+                <label for="start_date"
+                  >Start Date <span style="color:var(--color-theme-1)">*</span></label>
+                <input
+                  name="start_date"
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  on:change={event => {
+                    // We can't actually use typescript casts in this context
+                    // because this isn't in a script lang="ts" block. Ew.
+                    // @ts-ignore
+                    const value = event.target?.value;
+                    if(editingItem)
+                    {
+                      editingItem.start_date = new UTCDate(UTCDate.parse(value));
+                    }
+                  }}
+                  value={format_date_numbers(editingItem.start_date, "day")}
+                  max={
+                    editingItem.end_date == null
+                      ? undefined
+                      : format_date_numbers(editingItem.end_date, "day")
+                  } />
+              </div>
+
+              <div class="input-cont row-4">
+                <!-- svelte-ignore a11y-invalid-attribute -->
+                <label for="end_date"
+                  >End Date (<a href=""
+                  on:click|preventDefault={() => { endDateInput.value = null; }}
+                  on:keypress|preventDefault={() => { endDateInput.value = null; }}>remove end date</a>)</label>
+                <input
+                  name="end_date"
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  on:change={event => {
+                    // @ts-ignore Not in a script lang="ts" block.
+                    const value = event.target?.value;
+                    if(editingItem)
+                    {
+                      editingItem.end_date = value == "" || value == null
+                        ? null : new UTCDate(UTCDate.parse(value));
+
+                      editingItem.end_date_precision = editingItem.end_date == null
+                        ? null : editingItem.start_date_precision;
+                    }
+                  }}
+                  value={
+                    editingItem.end_date == null
+                      ? undefined
+                      : format_date_numbers(editingItem.end_date, "day")
+                  }
+                  bind:this={endDateInput}
+                  min={format_date_numbers(editingItem.start_date, "day")} />
+              </div>
+
+              <div class="input-cont row-4">
+                <label for="date_precision"
+                  >Date Precision <span style="color:var(--color-theme-1)">*</span></label>
+                <select
+                  name="date_precision"
+                  bind:value={editingItem.start_date_precision}
+                  on:change={event => {
+                    // @ts-ignore Not in a script lang="ts" block.
+                    const value = event.target?.value;
+                    if(editingItem)
+                    {
+                      editingItem.end_date_precision =
+                        editingItem.end_date == null ? null : value;
+                    }
+                  }}>
+                  <option value="day">Exact Day</option>
+                  <option value="month">Month & Year</option>
+                  <option value="year">Year</option>
+                  <option value="decade">Decade</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-cont">
+              <label for="body">Description</label>
+              <textarea
+                name="body"
+                placeholder="Description"
+                bind:value={editingItem.body}
+                on:change={event => {
+                  if(editingItem)
+                  {
+                    editingItem.body = editingItem.body?.trim() ?? null;
+                    if (editingItem.body == "") {
+                      editingItem.body = null;
+                    }
+                  }
+                }}/>
+            </div>
+          </form>
+        {:else}  <!-- $mode === "default" -->
+          <h1 class="title">{entry.title}</h1>
+          <p class="date"><i>{entry.format_date()}</i></p>
+          <hr />
+          {#if entry.body}<p class="desc">{entry.body}</p>{/if}
+          <div class="cont-tts">
+            <div class="tts">
+              <Text2Speech texts={[
+                entry.title,
+                entry.format_date(),
+                entry?.body,
+                entry.image_caption == null ? null
+                  : `The above image is an ${entry.image_caption}`
+              ]}/>
+            </div>
+            <div class="image_cred">
+              {#if entry.image_credit != null}
+                <a href="{entry.image_credit}" target="_blank" rel="noreferrer"
+                  >Image source</a>
+              {/if}
+            </div>
+          </div>
+        {/if}
+      </div>
+    </section>
+    <gap />
+  {/if}
 {/key}
 
 <style>
@@ -581,6 +836,21 @@
     z-index: 3;
   }
 
+  .upload-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .upload-button {
+    z-index: 3;
+  }
+
   .upload-notice {
     font-size: var(--font-size-small);
     margin-bottom: 0;
@@ -589,6 +859,10 @@
     align-items: center;
     display: flex;
     gap: 0.5rem;
+  }
+
+  .image-div {
+    position:relative;
   }
 
   .i {

@@ -24,6 +24,7 @@
 
   import { parseIntNull, sleep } from "$lib/utils";
   import { Entry, Timeline } from "$lib/models/timeline.js";
+  import EntryTimelineTransfer from "$lib/components/EntryTimelineTransfer.svelte";
 
 
   export let data;
@@ -64,6 +65,8 @@
   let [selected_entry, prev_entry]: [Writable<Entry|null>, Readable<Entry|null>]
     = writablePrev(null);
   let editing_entry = Entry.new_default();
+  // assigns editing_entry with the current timeline id
+  editing_entry.timeline.id = timeline.id;
 
   // if we ever select a null entries try to switch to any other one if possible
   selected_entry.subscribe(() => {
@@ -177,6 +180,7 @@
     };
   }
 
+  let disableButton: boolean;
 
   let startSelected: boolean;
   let endSelected: boolean;
@@ -192,6 +196,8 @@
     ? true : prevMonthBtnFalse();
   $: endMonthSelected = $selected_entry == null
     ? true : nextMonthBtnFalse();
+
+  $: disableButton = $userStore?.email == null;
 
   function page_prev() {
     if (selected_entry == null) { return; }
@@ -224,18 +230,35 @@
     {
       const sameDateEntries = selectSameDateEntries($selected_entry);
       const currentMonth = $selected_entry.start_date.getMonth();
-      //console.log("current month is: " + currentMonth);
-      for(let i = sameDateEntries.indexOf($selected_entry); i >= 0; i--)
+      for(let i = 0; i < sameDateEntries.length; i++)
       {
-        // find the previous month entry
-        if(sameDateEntries[i].start_date.getMonth() <= currentMonth - 1)
+        // find next entry of each element except for last element
+        if(i < sameDateEntries.length - 1)
         {
-          $selected_entry = sameDateEntries[i];
-          //console.log("Selected entry is: " + $selected_entry + " at index: " + i);
-          break;
+          const nextMonth = nextMonthEntry(sameDateEntries, sameDateEntries[i]);
+
+          // check if that entry = currentMonth entry
+          if(nextMonth.start_date.getMonth() === currentMonth)
+          {
+            $selected_entry = sameDateEntries[i];
+            break;
+          }
         }
       }
     }
+  }
+
+  function nextMonthEntry(sameDateEntries, entry)
+  {
+    const currentMonth = entry.start_date.getMonth();
+    for(let i = sameDateEntries.indexOf(entry); i < sameDateEntries.length; i++)
+    {
+      if(sameDateEntries[i].start_date.getMonth() > currentMonth)
+      {
+        return sameDateEntries[i];
+      }
+    }
+    return null;
   }
 
   function page_next_Month() {
@@ -577,6 +600,7 @@
   let modal_qrcode = false;
   let modal_quick_start = false;
   let modal_editor_guide = false;
+  export let entry_transfer = false;
 
   let first_visit = false;
   $: if (first_visit && $mode == "default") {
@@ -610,6 +634,10 @@
 
 <QuickStartModal bind:visible={modal_quick_start} />
 
+<EntryTimelineTransfer
+  entry={$selected_entry}
+  bind:visible={entry_transfer} />
+
 <EditorModal bind:visible={modal_editor_guide} />
 
 <SearchBar bind:selection={search_selection} data={$newEntries} />
@@ -617,13 +645,6 @@
 {#if $selected_entry != null}
   <QrModal bind:visible={modal_qrcode} entry={$selected_entry} />
 {/if}
-
-<EventEdit
-  entry={editing_entry}
-  on:entryCreate={handleCreate}
-  on:entryUpdate={handleUpdate}
-  on:entryDeleted={handleDelete}
-  on:showQR={() => { modal_qrcode = true; }} />
 
 {#if $newEntries.length > 0 && $selected_entry != null}
   <TimelineBar
@@ -642,6 +663,16 @@
 {/if}
 
 {#if ($newEntries.length > 0 || $mode != "default") && $selected_entry != null }
+  <EventEdit
+    entry={editing_entry}
+    selectedEntry={$selected_entry}
+    disableButton = {false}
+    bind:entryTransfer={entry_transfer}
+    on:entryCreate={handleCreate}
+    on:entryUpdate={handleUpdate}
+    on:entryDeleted={handleDelete}
+    on:showQR={() => { modal_qrcode = true; }} />
+
   <PageTransitionFade>
     {#key `${$selected_entry?.id}-${$direction}`}
       <section
@@ -661,7 +692,17 @@
     {/key}
   </PageTransitionFade>
 {:else}
-  <section class="layout col">
+  <PageTransitionFade>
+    {#key `${$selected_entry?.id}-${$direction}`}
+        <ItemTransition>
+          <ItemComponents
+            bind:editingItem={editing_entry}
+            entry={$selected_entry} />
+        </ItemTransition>
+    {/key}
+  </PageTransitionFade>
+
+  <!-- <section class="layout col"> -->
     <img
       alt="google dino"
       width="64"
@@ -674,7 +715,17 @@
       {:else}
       <h2>No items in this timeline.</h2>
     {/if}
-  </section>
+
+    <EventEdit
+      entry={editing_entry}
+      selectedEntry={$selected_entry}
+      disableButton = {true}
+      bind:entryTransfer={entry_transfer}
+      on:entryCreate={handleCreate}
+      on:entryUpdate={handleUpdate}
+      on:entryDeleted={handleDelete}
+      on:showQR={() => { modal_qrcode = true; }} />
+  <!-- </section> -->
 {/if}
 
 

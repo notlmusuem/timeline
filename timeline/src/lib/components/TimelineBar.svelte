@@ -250,13 +250,13 @@
       ? "arrow-btns edit"
       : "arrow-btns"
     : "arrow-btns hidden"}>
-  <div class="arrow-button" title="Previous item">
+  <div class="arrow-button" title="Previous month item">
     <Arrow
       on:moveup={() => {if (!startMonthSelected) { callPrevMonth(); }}}
       disabled={startMonthSelected} />
   </div>
 
-  <div class="arrow-button" title="Next item">
+  <div class="arrow-button" title="Next month item">
     <Arrow down
       on:movedown={() => {if (!endMonthSelected) { callNextMonth(); }}}
       disabled={endMonthSelected} />
