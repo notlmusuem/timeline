@@ -80,8 +80,6 @@
       } else {
         toast.push("<b>Success</b><br>Changes saved. Refreshing items...");
       }
-      // fixme: a page reload isn't necessary and hinders the editing experience; see #26
-      location.reload();
     } catch (err) {
       let error = err as PostgrestError;
       toast.push(`<b>Database Error</b><br>${error.message}`);
@@ -95,13 +93,11 @@
 
     try {
       await entry.delete(supabase);
-      dispatch("entryDeleted");
+      dispatch("entryDeleted", entry);
 
       stopChange();
 
       toast.push("<b>Success</b><br>Entry deleted successfully. Refreshing items...");
-      // fixme: a page reload isn't necessary and hinders the editing experience; see #26
-      location.reload();
     } catch (err) {
       let error = err as PostgrestError;
       toast.push(`<b>Database Error</b><br>${error.message}`);

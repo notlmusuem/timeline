@@ -478,49 +478,41 @@
 
 
   function handleCreate({ detail: new_entry }) {
-    // entries.push(new_entry);
-    // entries.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
+    $newEntries.push(new_entry);
+    $newEntries = $newEntries;
 
-    // currentIndex = entries.findIndex(entry => entry.id == new_entry.id);
-    // selectedItem = entries[currentIndex];
-    // currentItemIndexStore.set(currentIndex);
-    // update();
-    // mode.set("add");
-    // mode.set("default");
+    $selected_entry = new_entry;
+
+    mode.set("default");
   }
 
-  function handleUpdate({ detail: new_entry }) {
-    // console.log("updated entry", new_entry)
-    // let idx = entries.findIndex(entry => entry.id == new_entry.id);
-    // if (idx != -1) {
-    //   entries[idx] = new_entry;
-    // }
+  function handleUpdate({ detail: update_entry }) {
+    console.log("updated entry", update_entry)
+    let idx = $newEntries.findIndex(entry => entry.id == update_entry.id);
+    if (idx == -1) {
+      throw new Error(`Entry id ${update_entry.id} not found in entries to update!`);
+    }
 
-    // entries.sort((l, r) => l.start_date.getTime() - r.start_date.getTime())
-    // idx = entries.findIndex(entry => entry.id == new_entry.id);
-
-    // currentIndex = idx;
-    // selectedItem = entries[currentIndex];
-    // currentItemIndexStore.set(currentIndex);
-    // update();
-    // mode.set("add");
-    // mode.set("default");
+    $newEntries[idx] = Object.assign($newEntries[idx], update_entry);
+    $selected_entry = $selected_entry;
   }
 
   function handleDelete({ detail: rm_entry }) {
-    // let idx = entries.findIndex(entry => entry.id == rm_entry.id);
-    // if (idx != -1) {
-    //   entries.splice(idx, 1);
-    // }
+    const idx = $newEntries.findIndex(entry => entry.id == rm_entry.id);
+    if (idx == -1) {
+      throw new Error(`Entry id ${rm_entry.id} not found in entries to remove!`);
+    }
 
-    // selectedItem = entries[currentIndex--];
-    // currentItemIndexStore.set(currentIndex);
+    $newEntries.splice(idx, 1);
+    $newEntries = $newEntries;
 
-    // if (entries.length >= 1) {
-    //   update();
-    //   mode.set("add");
-    //   mode.set("default");
-    // }
+    if ($selected_entry != null && $selected_entry.id == rm_entry.id) {
+      if ($newEntries.length > 0) {
+        $selected_entry = $newEntries[Math.max(idx - 1, 0)];
+      } else {
+        $selected_entry = null;
+      }
+    }
   }
 
   // todo: live reload the entries array **and the timelines array** when changes
@@ -648,7 +640,7 @@
 
 {#if $newEntries.length > 0 && $selected_entry != null}
   <TimelineBar
-    timeData={$newEntries}
+    bind:timeData={$newEntries}
     bind:modalQuickStart={modal_quick_start}
     bind:modalEditorGuide={modal_editor_guide}
     bind:currentEntry={$selected_entry}
