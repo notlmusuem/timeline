@@ -56,14 +56,18 @@
 
 <div class="qr_modal">
   <Modal bind:visible>
-    <h2 slot="header"><b>Select a timeline</b></h2>
+    <h2 slot="header"><b>Transfer item</b></h2>
 
     <div class="hcenter">
       <div class="popup-content">
+        <label>Timeline to Transfer to</label>
         <select bind:value={selected}>
           {#each $timelines as timeline}
             {#if timeline.in_table}
-              <option value={timeline.id}>{timeline.name}</option>
+              <option value={timeline.id}
+                disabled={entry?.timeline.id == timeline.id}>
+                {timeline.name}
+              </option>
             {/if}
           {/each}
         </select>
@@ -72,7 +76,7 @@
 
     <svelte:fragment slot="btns">
         <Button autofocus on:click={async () => { transferEntry() }}>
-          <i class="material-symbols-rounded">print</i>OK
+          <i class="material-symbols-rounded">check</i>Transfer
         </Button>
         <Button autofocus on:click={() => { hideOverlay() }}>
           <i class="material-symbols-rounded">close</i>Close
