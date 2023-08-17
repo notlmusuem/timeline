@@ -97,7 +97,7 @@
       {#if isMenuOpen}
         <ul
           transition:slide={{ axis: $mobile ? "y" : "x", easing: quintOut }}
-          class="menu">
+          class="menu timeline-menu">
           {#each $timelines as timeline}
             {#if timeline.in_table}
               <li aria-current={
