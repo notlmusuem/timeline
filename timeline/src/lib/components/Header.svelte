@@ -303,6 +303,12 @@
     margin-left: 0.75em;
   }
 
+  .timeline-menu {
+    overflow-y: scroll;
+    /* todo: figure out the proper max width */
+    max-width: 40vw;
+  }
+
   .right {
     display: flex;
     justify-content: flex-end;
