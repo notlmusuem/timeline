@@ -103,7 +103,6 @@
             >{uploading ? "autorenew" : "cloud_upload"}
           </span>
           {uploading ? "Uploading..." : "Upload image"}
-          {"hello I am under the water"}
         </p>
         <div class="image-cont">
           {#if editingItem != null}
@@ -321,24 +320,26 @@
                 >{uploading ? "autorenew" : "cloud_upload"}
               </span>
               {uploading ? "Uploading..." : "Upload image"}
-              {"hello I am under the water"}
             </p>
           {/if}
           <div class="image-cont">
             {#if $mode !== "default"}
               <div class="edit-cont">
-                  <input
-                    type="file"
-                    class="image-edit upload"
-                    id="file_upload"
-                    on:change={upload}
-                    style="display:none"/>
+                <input
+                  type="file"
+                  class="image-edit upload"
+                  id="file_upload"
+                  on:change={upload}
+                  style="display:none"/>
                 <div class="image-edit">
                   <div class="upload-container">
-                    <!-- <Button class="upload-button" on:click={triggerInput}>Upload Image</button> -->
                     <Button alt on:click={() => { triggerInput() }}>
                       <i class="material-symbols-rounded">cloud_upload</i>
-                      Upload Image
+                      {#if editingItem.image == null}
+                        Upload Image
+                      {:else}
+                        Upload New Image
+                      {/if}
                     </Button>
                     {#if editingItem.image != null}
                       <Button alt on:click={() => {
