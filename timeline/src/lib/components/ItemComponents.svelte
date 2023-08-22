@@ -115,8 +115,8 @@
               <img
                 class="image-edit"
                 src={editingItem.image}
-                title={editingItem.image_caption ?? editingItem.title}
-                alt={editingItem.image_caption ?? editingItem.title} />
+                title={editingItem.image != null ? editingItem.image_caption ?? editingItem.title : undefined}
+                alt={editingItem.image != null ? editingItem.image_caption ?? editingItem.title : undefined} />
 
               <div class="edit-options">
                 <div style="width:100%;text-align:center;">
@@ -355,8 +355,8 @@
                   </div>
                   <img
                     src={editingItem.image}
-                    title={editingItem.image_caption ?? editingItem.title}
-                    alt={editingItem.image_caption ?? editingItem.title} />
+                    title={editingItem.image != null ? editingItem.image_caption ?? editingItem.title : undefined}
+                    alt={editingItem.image != null ? editingItem.image_caption ?? editingItem.title : undefined} />
                 </div>
 
                 <div class="edit-options">
@@ -438,8 +438,8 @@
                       on:load={() => (loading = false)}
                       class="image"
                       src={entry.image}
-                      title={entry.image_caption ?? entry.title}
-                      alt={entry.image_caption ?? entry.title}
+                      title={entry.image != null ? entry.image_caption ?? entry.title : undefined}
+                      alt={entry.image != null ? entry.image_caption ?? entry.title : undefined}
                       on:keydown={event => {
                         if (event.key === "Escape") {
                           onExit();
