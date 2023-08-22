@@ -588,8 +588,12 @@
                 <!-- svelte-ignore a11y-invalid-attribute -->
                 <label for="end_date"
                   >End Date (<a href=""
-                  on:click|preventDefault={() => { endDateInput.value = null; }}
-                  on:keypress|preventDefault={() => { endDateInput.value = null; }}>remove end date</a>)</label>
+                  on:click|preventDefault={() => {
+                    if (editingItem != null) { editingItem.end_date = null; }
+                  }}
+                  on:keypress|preventDefault={() => {
+                    if (editingItem != null) { editingItem.end_date = null; }
+                  }}>remove end date</a>)</label>
                 <input
                   name="end_date"
                   type="date"
