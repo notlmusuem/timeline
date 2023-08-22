@@ -25,8 +25,10 @@
 
   const full = writable(false);
 
-  let startDateInput;
-  let endDateInput;
+  let startDateInput: HTMLInputElement;
+  let endDateInput: HTMLInputElement;
+  let imageInput: HTMLInputElement;
+  let imageDragging: boolean = false;
 
   // dynamically reset editingItem when the edit/add buttons are pressed
   mode.subscribe(v => {
@@ -42,10 +44,14 @@
   });
 
 
-  async function upload(event) {
+  async function upload(file: File) {
     uploading = true;
-    const file = event.target.files[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.push("<b>Error:</b><br>File is not an image");
+        return;
+      }
+
       if (file.size > 4 * 1024 * 1024) {
         toast.push(`<b>Error:</b><br>File size must be less than 4MB`);
         return;
@@ -80,15 +86,63 @@
     uploading = false;
   }
 
-  function triggerInput()
-  {
-    const fileInput = document.getElementById("file_upload");
-    if(fileInput != null)
-    {
-      fileInput.click();
+  async function dropContent(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement; }) {
+    async function setFile(file: File) {
+      let dt = new DataTransfer();
+      dt.items.add(file);
+      imageInput.files = dt.files;
+      await upload(file);
+    }
+
+    event.preventDefault();
+
+    if (imageInput === undefined) { return; }
+
+    if (event.dataTransfer == null) { return; }
+
+    // prefer files first
+    if (event.dataTransfer.files.length > 0) {
+      return await setFile(event.dataTransfer.files[0]);
+    }
+
+    for (const item of event.dataTransfer.items) {
+      // interpret it as a file and work from that
+      if (item.kind == "file") {
+        return await setFile(item.getAsFile() as File);
+      } else if (item.kind == "string" && item.type.startsWith("text/plain")) {
+        // otherwise interpret the string as a url and try to make a get request to it
+        let file = await new Promise<File|null>(resolve => {
+          item.getAsString(async str => {
+            try {
+              let url = new URL(str);
+
+              // for whatever reason some browsers return the url duplicated
+              // twice on a new newline
+              if (url.pathname.search(url.origin) > -1) { return resolve(null); }
+
+              let response = await fetch(url, {
+                mode: "cors"
+              });
+              let blob = await response.blob();
+
+              resolve(new File(
+                [blob],
+                url.pathname.split("/").pop() ?? url.pathname.replace("/", "_"),
+                { "type": blob.type }
+              ));
+            } catch (e) {
+              // invalid url or cors failed :(
+              resolve(null);
+            }
+          });
+        });
+
+        if (file != null) { return await setFile(file); }
+      }
     }
   }
 </script>
+
 
 {#key $mode}
   {#if entry == null && $mode === "add"}
@@ -111,7 +165,12 @@
                 type="file"
                 class="image-edit upload"
                 id="file_upload"
-                on:change={upload} />
+                bind:this={imageInput}
+                on:change={(event) => {
+                  if (imageInput.files != null && imageInput.files.length > 0) {
+                    upload(imageInput.files[0]);
+                  }
+                }} />
               <img
                 class="image-edit"
                 src={editingItem.image}
@@ -329,13 +388,28 @@
                   type="file"
                   class="image-edit upload"
                   id="file_upload"
-                  on:change={upload}
-                  style="display:none"/>
+                  bind:this={imageInput}
+                  on:change={(event) => {
+                    if (imageInput.files != null && imageInput.files.length > 0) {
+                      upload(imageInput.files[0]);
+                    }
+                  }}
+                  style="display:none" />
                 <div class="image-edit">
-                  <div class="upload-container">
-                    <Button alt on:click={() => { triggerInput() }}>
+                  <div class="upload-container"
+                    on:dragover|preventDefault={() => { imageDragging = true; }}
+                    on:dragend={() => { imageDragging = false; }}
+                    on:mouseleave={() => { imageDragging = false; }}
+                    on:drop|preventDefault={(event) => {
+                      dropContent(event);
+                      imageDragging = false;
+                    }}>
+                    <Button alt on:click={() => { imageInput.click(); }}>
                       <i class="material-symbols-rounded">cloud_upload</i>
-                      {#if editingItem.image == null}
+
+                      {#if imageDragging}
+                        Drop Image Here
+                      {:else if editingItem.image == null}
                         Upload Image
                       {:else}
                         Upload New Image
