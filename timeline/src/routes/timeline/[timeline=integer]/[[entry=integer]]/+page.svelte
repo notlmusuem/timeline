@@ -34,7 +34,7 @@
   let newEntries: Writable<Entry[]> = writable(entries);
 
   newEntries.subscribe(updated => {
-    let yearEntries = Array().fill(Array().fill(null));
+    let yearEntries: Entry[][] = [];
     yearEntries = populateYearEntries(updated);
     sortingEntries(yearEntries);
     return populateNewEntries(yearEntries);
@@ -494,6 +494,7 @@
     }
 
     $newEntries[idx] = Object.assign($newEntries[idx], update_entry);
+    $newEntries = $newEntries;
     $selected_entry = $selected_entry;
   }
 
