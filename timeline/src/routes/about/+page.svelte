@@ -201,8 +201,8 @@
           artefacts from the musuem's collection.
         </p>
         <p>
-          This project was graciously funded by ... through the ... grant,
-          and was supported by Brock University in partnership with
+          This project was graciously funded by <a href="https://gattahomes.com/">Gatta Homes Inc</a>, and through the <a href="https://brocku.ca/vpmi/">VPMI</a>/<a href="https://feddev-ontario.canada.ca/en">FedDev</a> grant.
+          It was developed by Brock University students in partnership with the
           Niagara-on-the-Lake Museum.
         </p>
         <div class="row">
