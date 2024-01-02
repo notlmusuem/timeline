@@ -13,8 +13,8 @@
   {#if short}
     <span>
       &copy; 2023, by the project contributors.
-      Freely licensed under <a href="https://github.com/notlmusuem/timeline">MIT</a>.
-      <br>Funded in part by ... and Brock University through the VPMI/FedDev Grant.
+      Freely licensed under MIT.<br>
+      Funded by contributions from <a href="https://brocku.ca/vpmi/">VPMI</a>, <a href="https://feddev-ontario.canada.ca/en">FedDev</a>, and <a href="https://gattahomes.com/">Gatta Homes Inc</a>.
     </span>
   {:else}
     <span style='display: inline-block;'>&copy; 2023, by the</span>
@@ -29,8 +29,8 @@
       <a on:click|preventDefault={() => { popup = !popup; }}>project contributors</a>.
     </span>
     <span>
-      Freely licensed under <a href="https://github.com/notlmusuem/timeline">MIT</a>.
-      Funded in part by ... and Brock University through the VPMI/FedDev Grant.
+      Freely licensed under MIT.
+      Funded by contributions from <a href="https://brocku.ca/vpmi/">VPMI</a>, <a href="https://feddev-ontario.canada.ca/en">FedDev</a>, and <a href="https://gattahomes.com/">Gatta Homes Inc</a>.
     </span>
   {/if}
 </div>
