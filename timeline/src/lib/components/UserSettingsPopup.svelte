@@ -19,12 +19,12 @@
       <i class="material-symbols-rounded">key</i>
       Change Password/Email
     </Button>
-    <Button alt
+    <!-- not implemented!!! <Button alt
       on:click={() => { dispatch("close"); }}
       href="/account/manage">
       <i class="material-symbols-rounded">manage_accounts</i>
       Manage Users
-    </Button>
+    </Button> -->
     <Button alt
       title="Logout"
       on:click={() => { logout(); dispatch("close"); }}>
