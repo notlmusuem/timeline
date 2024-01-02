@@ -95,12 +95,12 @@
       playback.
     </li>
   </ul>
-  <hr />
+  <!-- <hr />
   <h3>Issues</h3>
   If you come across any issues or bugs, reach out to our team by visiting our&nbsp;<a
     href="https://github.com/SWE-2023/COSC-4P02-Project">
     GitHub repository</a
-  >.
+  >. -->
   <br />
   <br />
   <p slot="footer" style="text-align:center;">
