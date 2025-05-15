@@ -1,31 +1,19 @@
 <div align="center"><img width="96px" src="https://user-images.githubusercontent.com/18179415/222605007-66a06286-3f5a-4903-a837-d4c1e8c5147f.png"/></div>
 <br>
 
-<div align=center><img src="https://img.shields.io/github/contributors/SWE-2023/COSC-4P02-Project?style=flat-square"/><img src="https://img.shields.io/github/issues/SWE-2023/COSC-4P02-Project?style=flat-square"/></div>
-
 <div align=center><h1>Niagara-on-the-Lake Timeline</h1></div>
 
-## COSC 4P02 Team Project
+The Niagara-on-the-Lake Timeline is a project created by several teams of software developers from Brock University for the Niagara-on-the-Lake Museum. It is an interactive timeline that documents, teaches, and presents the rich history of Niagara-on-the-Lake, and other historical events & artefacts from the musuem's collection.
 
-This is a web application to present historical events on a visual timeline for the Niagara-on-the-Lake museum.
+This project was graciously funded by [Gatta Homes Inc](https://gattahomes.com/), and through the [VPMI](https://brocku.ca/vpmi/)/[FedDev](https://feddev-ontario.canada.ca/en) grant. It was developed by Brock University students in partnership with the Niagara-on-the-Lake Museum.
 
-View original project documents in the documents branch.
-
-
-## Accessing the Project
-
-- Visit the site live on the Vercel deployment at [museumtimeline.vercel.app](https://museumtimeline.vercel.app)
-- Download the application from the [Google Play](https://play.google.com/store/apps/details?id=app.notltimeline.twa) store
-
-<a href='https://play.google.com/store/apps/details?id=app.notltimeline.twa&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width=200 alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
-
-Alternatively, you can clone the repository and run it locally:
+## Setup
 
 1. Ensure [Node.js](https://nodejs.org/en) and npm are installed
 2. Clone the repository:
 ```bash
 git clone https://github.com/notlmusuem/timeline.git
-cd timeline\timeline
+cd timeline/timeline
 ```
 
 3. Install npm dependencies and development dependencies:
@@ -39,7 +27,7 @@ VITE_SUPABASE_URL=http://localhost:8000/
 VITE_SUPABASE_ANON_KEY=the_key_that_you_setup_from_the_supabase_guide
 ```
 
-5. [Setup supabase selfhosting](https://supabase.com/docs/guides/getting-started/local-development):
+5. [Setup a supabase selfhosted environment](https://supabase.com/docs/guides/getting-started/local-development):
 ```bash
 npx supabase init
 npx supabase start
@@ -73,9 +61,6 @@ npm run build
 ```
 
 
-## Project Description 📝
-The goal of this project is to create an interactive timeline web application that will allow visitors to explore the history of Niagara-on-the-Lake.
-
 ## Technology Stack
 
 <img src="https://skillicons.dev/icons?i=svelte,supabase,vite"/>
@@ -87,19 +72,8 @@ The project uses the following technologies:
 - [Supabase](https://supabase.com): Backend service with Postgres database and authentication
 - [Vite](https://vitejs.dev/): Hosting and deployment service
 
-## Team Members 👥
-
-| Name | Student Number|
-|------|---------------|
-| [Alec Ames](https://github.com/alecames) - *Team Leader* | 6843577 |
-| [Matthew Benson](https://github.com/MattMBenson)| 6729388 |
-| [Ibrahim Hashmi](https://github.com/ibhashmi)| 6352926 |
-| [Francis Monwe](https://github.com/monwe-jr)| 6724355 |
-| [Tommy Pham](https://github.com/tommyphamca)| 6733646 |
-| [Abhijeet Prajapati](https://github.com/TheDasher1)| 5987722 |
-| [Justin Stickel](https://github.com/Stickelation) - *Scrum Master*| 6718704 |
-| [Haaris Yahya](https://github.com/haarisyahya)| 7054984 |
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2023-2025 Brock University and The Project Contributors (Alec Ames, Ibrahim Hashmi, Francis Monwe, Matthew Benson, Tommy Pham, Abhijeet Prajapati, Justin Stickel, Haaris Yahya, Muhammed Bilal, and Michael Boulet).
+
+This project is licensed under the MIT License, see the [LICENSE](LICENSE) file for details.
